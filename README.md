@@ -1,7 +1,7 @@
 # Please enter your name here:
 
 
-Haomeng Wang
+Haomeng WANG
 -----------------------------------------------------------------------------
 
 # Please enter your Academic Declaration here:
