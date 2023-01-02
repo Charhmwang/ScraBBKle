@@ -1,8 +1,6 @@
 package pij.main;
-
 import java.io.*;
 import java.lang.Integer;
-import java.util.function.DoubleToIntFunction;
 
 /**
  * Validate the user uploaded board file.
@@ -14,6 +12,7 @@ import java.util.function.DoubleToIntFunction;
 public class ValidateUserBoard {
 
     private FileInputStream boardFileInpStream;
+
     public ValidateUserBoard(FileInputStream fin) {
         this.boardFileInpStream = fin;
     }
@@ -28,34 +27,40 @@ public class ValidateUserBoard {
                 // Read the first line of the board file to recognize the board scale(S x S).
                 if (rowCounter == 0) {
                     String s = "";
-                    while ( (char)i != '\n') {
+                    while ( Character.compare( (char)i, '\n') != 0 ) {
                         s += (char)i;
+                        i = boardFileInpStream.read();
                     }
                     try {
                         number = Integer.parseInt(s);
                         if (number < 12 || number > 26) return false;
                         else {
-                            i++;
+                            i = boardFileInpStream.read();
+                            // [debug] // System.out.println((char)i);
+                            rowCounter++;
                             continue;
                         }
                     } catch (NumberFormatException exc) {
                         return false;
                     }
                 }
+
+                // Read the board design.
                 if (colCounter > number) return false; // Columns exceed the expecting scale.
                 if (rowCounter > number) return false; // Rows exceed the expecting scale.
-                // Read the board design.
+
                 // When it meets Premium Word Square.
-                if ( (char)i == '{' ) {
+                if ( Character.compare((char)i, '{') == 0 ) {
                     String s = "";
                     int n;
                     int counter = 1;
-                    while ( (char)i != '}' && counter <= 3) {
+                    i = boardFileInpStream.read();
+                    while ( Character.compare( (char)i, '}') != 0 && counter < 3) {
                         s += (char)i;
                         i = boardFileInpStream.read();
                         counter++;
                     }
-                    if ( (char)i == '}' ) {
+                    if ( Character.compare( (char)i, '}') == 0 ) {
                         try {
                             n = Integer.parseInt(s);
                         } catch (NumberFormatException exc) {
@@ -67,16 +72,17 @@ public class ValidateUserBoard {
                 }
 
                 // When it meets Premium Letter Square.
-                else if ( (char)i == '(' ) {
+                else if ( Character.compare((char)i, '(') == 0 ) {
                     String s = "";
                     int n;
                     int counter = 1;
-                    while ( (char)i != ')' && counter <= 3) {
+                    i = boardFileInpStream.read();
+                    while ( Character.compare( (char)i, ')') != 0 && counter < 3) {
                         s += (char)i;
                         i = boardFileInpStream.read();
                         counter++;
                     }
-                    if ( (char)i == ')' ) {
+                    if ( Character.compare((char)i, ')') == 0 ) {
                         try {
                             n = Integer.parseInt(s);
                         } catch (NumberFormatException exc) {
@@ -88,12 +94,12 @@ public class ValidateUserBoard {
                 }
 
                 // When it meets dot and enter key.
-                else if ((char)i == '.') ;
-                else if ((char)i == '\n') {
+                else if (Character.compare((char)i, '.') == 0 ) ;
+                else if (Character.compare((char)i, '\n') == 0 ) {
                     // There are not supposed count of columns on this row.
                     if (colCounter != number) return false;
                     else {
-                        colCounter = 0;
+                        colCounter = -1;
                         rowCounter++;
                     }
                 }
@@ -106,7 +112,7 @@ public class ValidateUserBoard {
             System.out.println("An I/O Error Occurred");
         }
 
-        if (rowCounter != number) return false;
-        return true;
+        if (rowCounter != number+1) return false;
+        else return true;
     }
 }

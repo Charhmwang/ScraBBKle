@@ -1,7 +1,6 @@
 package pij.main;
-
 import java.io.*;
-import java.util.Scanner;
+import java.util.ArrayList;
 
 /**
  * Provide a board file. The first step of the ScraBBKle.
@@ -11,14 +10,14 @@ import java.util.Scanner;
  */
 
 public class GameBoard {
-    private FileInputStream fin;
+    private ArrayList<ArrayList<String>> board;
 
     public GameBoard(){
-        this.fin = this.chooseBoard();
+        this.board = chooseBoard();
     }
 
     /**
-     * Returns a txt file of board for the game,
+     * Returns a two dimensional arraylist of string to represent the board for the game,
      * user's input to make a choice using default board or uploading a board file.
      *
      * For example, if the user inputs letter d, the default board will be loaded from the file defaultBoard.txt.
@@ -26,48 +25,61 @@ public class GameBoard {
      * Then the user uploaded file will be validated whether it is syntactically correct as specified.
      * If the file is not valid, the program will ask the user to provide another file.
      *
-     * @return a valid board file chosen by the user
+     * @return a valid board from the file chosen by the user
      */
-    public FileInputStream chooseBoard() {
+    public ArrayList<ArrayList<String>> chooseBoard() {
 
         // User input to make a choice using default board or uploading a board file
         boolean correctInput = false;
-        FileInputStream fin;
+        FileInputStream finOfFile = null;
+        String userFilePath = "";
         do {
             System.out.println("Would you like to _l_oad a board or use the _d_efault board?");
             System.out.print("Please enter your choice (l/d): ");
             String choice = System.console().readLine();
 
-            if (choice == "l") {
+            // Load a file.
+            if (choice.compareTo("l") == 0) {
+                correctInput = true;
                 System.out.print("Please enter the file name of the board: ");
-                String userFilePath = System.console().readLine();
-                try {
-                    fin = new FileInputStream(userFilePath);
-                } catch (FileNotFoundException exc) {
-                    System.out.println("File Not Found");
-                    continue;
-                }
+                userFilePath = System.console().readLine();
+            }
 
-                ValidateUserBoard boardTester = new ValidateUserBoard(fin);
-                if (boardTester.test()) {
-                    return fin;
-                } else {
-                    System.out.println("Invalid board file! Provide another one.");
-                }
-            } else if (choice == "d") {
-                try {
-                    fin = new FileInputStream("../../resources/defaultBoard.txt");
-                } catch (FileNotFoundException exc) {
-                    System.out.println("File Not Found");
-                    continue;
-                }
-                return fin;
+            // Use a default file.
+            else if (choice.compareTo("d") == 0) {
+                correctInput = true;
+                userFilePath = "../defaultBoard.txt";
             } else {
                 System.out.println("Invalid choice! You must enter \"l\" or \"d\".");
             }
+
+            try {
+                finOfFile = new FileInputStream(userFilePath);
+            } catch (FileNotFoundException exc) {
+                System.out.println("File Not Found");
+                correctInput = false;
+            }
+
+            if (choice.compareTo("l") == 0) {
+                ValidateUserBoard tester = new ValidateUserBoard(finOfFile);
+                if (!tester.test()) {
+                    System.out.println("Not a Valid board");
+                    correctInput = false;
+                }
+            }
         } while (!correctInput);
 
-        return null;
+        // Save the valid game board from the file into 2-D arraylist variable board
+        // ...
+
+        return board;
+    }
+
+    /*
+     * Print the two dimensional arraylist board.
+     */
+    public void printBoard() {
+
     }
 
 }
