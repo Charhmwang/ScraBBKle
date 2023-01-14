@@ -12,6 +12,5 @@ public class GameLauncher {
 
     public GameLauncher() {
         board = new GameBoard();
-
     }
 }

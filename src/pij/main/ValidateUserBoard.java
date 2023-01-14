@@ -17,6 +17,26 @@ public class ValidateUserBoard {
         this.boardFileInpStream = fin;
     }
 
+    public int getSize() {
+        // Read the first line of the board file to recognize the board scale(S x S).
+        int size = 0;
+        int i = 0;
+        try {
+            i = boardFileInpStream.read();
+            //finOfFile = new FileInputStream(userFilePath);
+        } catch (IOException exc) {
+            System.out.println("IOException");
+        }
+
+        String s = "";
+        while ( Character.compare( (char)i, '\n') != 0 ) {
+            s += (char)i;
+            size = Integer.parseInt(s);
+        }
+
+        return size;
+    }
+
     public boolean test() {
         int colCounter = 0;
         int rowCounter = 0;
@@ -115,4 +135,5 @@ public class ValidateUserBoard {
         if (rowCounter != number+1) return false;
         else return true;
     }
+
 }
