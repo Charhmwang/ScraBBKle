@@ -10,31 +10,14 @@ import java.lang.Integer;
  */
 
 public class ValidateUserBoard {
-
     private FileInputStream boardFileInpStream;
 
-    public ValidateUserBoard(FileInputStream fin) {
-        this.boardFileInpStream = fin;
-    }
-
-    public int getSize() {
-        // Read the first line of the board file to recognize the board scale(S x S).
-        int size = 0;
-        int i = 0;
+    public ValidateUserBoard(String userFilePath) {
         try {
-            i = boardFileInpStream.read();
-            //finOfFile = new FileInputStream(userFilePath);
-        } catch (IOException exc) {
-            System.out.println("IOException");
+            this.boardFileInpStream = new FileInputStream(userFilePath);
+        } catch (FileNotFoundException exc) {
+            System.out.println("File Not Found");
         }
-
-        String s = "";
-        while ( Character.compare( (char)i, '\n') != 0 ) {
-            s += (char)i;
-            size = Integer.parseInt(s);
-        }
-
-        return size;
     }
 
     public boolean test() {

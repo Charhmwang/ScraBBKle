@@ -1,6 +1,7 @@
 package pij.main;
 import java.io.*;
-import java.util.ArrayList;
+
+import javax.swing.RowFilter;
 
 /**
  * Provide a board file. The first step of the ScraBBKle.
@@ -8,7 +9,6 @@ import java.util.ArrayList;
  * @author Haomeng Wang
  * @version 1.0
  */
-
 
 public class GameBoard {
     private String[][] board;
@@ -27,13 +27,11 @@ public class GameBoard {
      * If the file is not valid, the program will ask the user to provide another file.
      *
      * @return a valid board from the file chosen by the user
-     * @throws IOException
      */
     public String[][] chooseBoard() {
 
         // User input to make a choice using default board or uploading a board file
         boolean correctInput = false;
-        FileInputStream finOfFile = null;
         String userFilePath = "";
         do {
             System.out.println("Would you like to _l_oad a board or use the _d_efault board?");
@@ -53,16 +51,8 @@ public class GameBoard {
             } else {
                 System.out.println("Invalid choice! You must enter \"l\" or \"d\".");
             }
-
-            try {
-                finOfFile = new FileInputStream(userFilePath);
-            } catch (FileNotFoundException exc) {
-                System.out.println("File Not Found");
-                correctInput = false;
-            }
-
             //if (choice.compareTo("l") == 0) {
-            ValidateUserBoard tester = new ValidateUserBoard(finOfFile);
+            ValidateUserBoard tester = new ValidateUserBoard(userFilePath);
             if (!tester.test()) {
                 System.out.println("Not a Valid board");
                 correctInput = false;
@@ -71,35 +61,10 @@ public class GameBoard {
             //}
         } while (!correctInput);
 
-        // Save the valid gameboard from the file into 2-D arraylist variable board
-        // ...
-
         // Now the valid board for the game is confirmed.
-        // Create an arraylist copy from the txt file and return to the constructor calling function.
+        // Create an array copy from the txt file and return to the constructor calling function.
 
-
-        try {
-            finOfFile = new FileInputStream(userFilePath);
-        } catch (FileNotFoundException exc) {
-            System.out.println("File Not Found");
-            correctInput = false;
-        }
-
-        ValidateUserBoard tester = new ValidateUserBoard(finOfFile);
-        int col = tester.getSize();
-        int row = col + 1;
-        System.out.println(col + row);
-        // String[][] resArray = new String[col][row];
-        // System.out.println("col: " + col + ", row: " + row);
-        //System.out.println(userFilePath);
-        return null;
+        BoardFile validBoard = new BoardFile(userFilePath);
+        return validBoard.getArray();
     }
-
-    /*
-     * Print the two dimensional arraylist board.
-     */
-    public void printBoard() {
-
-    }
-
 }

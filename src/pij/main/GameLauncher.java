@@ -1,5 +1,7 @@
 package pij.main;
 
+import java.io.IOException;
+
 /**
  * Start the game process from here.
  *
