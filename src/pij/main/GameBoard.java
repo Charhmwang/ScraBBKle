@@ -13,8 +13,10 @@ import javax.swing.RowFilter;
 public class GameBoard {
     private String[][] board;
 
+    private int size;
+
     public GameBoard() {
-        this.board = chooseBoard();
+        this.chooseBoard();
     }
 
     /**
@@ -28,7 +30,7 @@ public class GameBoard {
      *
      * @return a valid board from the file chosen by the user
      */
-    public String[][] chooseBoard() {
+    public void chooseBoard() {
 
         // User input to make a choice using default board or uploading a board file
         boolean correctInput = false;
@@ -47,7 +49,7 @@ public class GameBoard {
             // Use a default file.
             else if (choice.compareTo("d") == 0) {
                 correctInput = true;
-                userFilePath = "../defaultBoard.txt";
+                userFilePath = "../resources/defaultBoard.txt";
             } else {
                 System.out.println("Invalid choice! You must enter \"l\" or \"d\".");
             }
@@ -65,6 +67,25 @@ public class GameBoard {
         // Create an array copy from the txt file and return to the constructor calling function.
 
         BoardFile validBoard = new BoardFile(userFilePath);
-        return validBoard.getArray();
+        this.size = validBoard.getSize();
+        this.board = new String[size+1][size];
+        String[][] cpyArr = validBoard.getArray();
+
+        board[0][0] = Integer.toString(size);
+        for (int i = 1; i <= size; i++) {
+            for (int j = 0; j < size; j++) {
+                board[i][j] = cpyArr[i][j];
+            }
+        }
+    }
+
+    public void printBoard() {
+        System.out.println(size);
+        for (int i = 1; i <= size; i++) {
+            for (int j = 0; j < size; j++) {
+                System.out.print(board[i][j]);
+            }
+            System.out.println();
+        }
     }
 }

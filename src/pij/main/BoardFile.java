@@ -40,7 +40,7 @@ public class BoardFile {
         }
 
         public void setArr() {
-            boardArr = new String[size][size + 1];
+            boardArr = new String[size+1][size];
             boardArr[0][0] = String.valueOf(size);
 
             int rowCount = 0;
@@ -97,16 +97,6 @@ public class BoardFile {
                 }
             } catch (IOException e) {
                 System.out.println("An I/O Error Occurred");
-            }
-        }
-
-        public void printBoard() {
-            System.out.println(size);
-            for (int i = 1; i < size; i++) {
-                for (int j = 0; j < size; j++) {
-                    System.out.print(boardArr[i][j]);
-                }
-                System.out.println();
             }
         }
 
