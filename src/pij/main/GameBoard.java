@@ -64,23 +64,16 @@ public class GameBoard {
         } while (!correctInput);
 
         // Now the valid board for the game is confirmed.
-        // Create an array copy from the txt file and return to the constructor calling function.
+        // Copy the board array from reading the txt file.
 
         BoardFile validBoard = new BoardFile(userFilePath);
         this.size = validBoard.getSize();
         this.board = new String[size+1][size];
-        String[][] cpyArr = validBoard.getArray();
-
-        board[0][0] = Integer.toString(size);
-        for (int i = 1; i <= size; i++) {
-            for (int j = 0; j < size; j++) {
-                board[i][j] = cpyArr[i][j];
-            }
-        }
+        validBoard.cpyArray(this.board);
     }
 
     public void printBoard() {
-        System.out.println(size);
+        System.out.println(board[0][0]);
         for (int i = 1; i <= size; i++) {
             for (int j = 0; j < size; j++) {
                 System.out.print(board[i][j]);
