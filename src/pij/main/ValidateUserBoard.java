@@ -10,113 +10,110 @@ import java.lang.Integer;
  */
 
 public class ValidateUserBoard {
-    private FileInputStream boardFileInpStream;
+    private File f;
 
     public ValidateUserBoard(String userFilePath) {
-        try {
-            this.boardFileInpStream = new FileInputStream(userFilePath);
-        } catch (FileNotFoundException exc) {
-            System.out.println("File Not Found");
-        }
+        this.f = new File(userFilePath);
     }
 
     public boolean test() {
-        int colCounter = 0;
-        int rowCounter = 0;
-        int number = 0;
-        try {
-            int i = boardFileInpStream.read();
-            while (i != -1) {
-                // Read the first line of the board file to recognize the board scale(S x S).
-                if (rowCounter == 0) {
-                    String s = "";
-                    while ( Character.compare( (char)i, '\n') != 0 ) {
-                        s += (char)i;
-                        i = boardFileInpStream.read();
-                    }
-                    try {
-                        number = Integer.parseInt(s);
-                        if (number < 12 || number > 26) return false;
-                        else {
-                            i = boardFileInpStream.read();
-                            // [debug] // System.out.println((char)i);
-                            rowCounter++;
-                            continue;
-                        }
-                    } catch (NumberFormatException exc) {
-                        return false;
-                    }
-                }
-
-                // Read the board design.
-                if (colCounter > number) return false; // Columns exceed the expecting scale.
-                if (rowCounter > number) return false; // Rows exceed the expecting scale.
-
-                // When it meets Premium Word Square.
-                if ( Character.compare((char)i, '{') == 0 ) {
-                    String s = "";
-                    int n;
-                    int counter = 1;
-                    i = boardFileInpStream.read();
-                    while ( Character.compare( (char)i, '}') != 0 && counter < 3) {
-                        s += (char)i;
-                        i = boardFileInpStream.read();
-                        counter++;
-                    }
-                    if ( Character.compare( (char)i, '}') == 0 ) {
-                        try {
-                            n = Integer.parseInt(s);
-                        } catch (NumberFormatException exc) {
-                            return false;
-                        }
-                    } else {
-                        return false;
-                    }
-                }
-
-                // When it meets Premium Letter Square.
-                else if ( Character.compare((char)i, '(') == 0 ) {
-                    String s = "";
-                    int n;
-                    int counter = 1;
-                    i = boardFileInpStream.read();
-                    while ( Character.compare( (char)i, ')') != 0 && counter < 3) {
-                        s += (char)i;
-                        i = boardFileInpStream.read();
-                        counter++;
-                    }
-                    if ( Character.compare((char)i, ')') == 0 ) {
-                        try {
-                            n = Integer.parseInt(s);
-                        } catch (NumberFormatException exc) {
-                            return false;
-                        }
-                    } else {
-                        return false;
-                    }
-                }
-
-                // When it meets dot and enter key.
-                else if (Character.compare((char)i, '.') == 0 ) ;
-                else if (Character.compare((char)i, '\n') == 0 ) {
-                    // There are not supposed count of columns on this row.
-                    if (colCounter != number) return false;
-                    else {
-                        colCounter = -1;
-                        rowCounter++;
-                    }
-                }
-                // When it meets a character should not appear on the specialized board.
-                else return false;
-                colCounter++;
-                i = boardFileInpStream.read();
-            }
-        } catch (IOException exc) {
-            System.out.println("An I/O Error Occurred");
+        // If file not found
+        if (f == null) {
+            System.out.println("E1");
+            return false;
         }
 
-        if (rowCounter != number+1) return false;
-        else return true;
-    }
+        int c = 0; int S = 0;
+        int rowCounter = 0;
+        int colCounter = 0;
+        try {
+            FileReader fr = new FileReader(f);
+            try (BufferedReader br = new BufferedReader(fr)) {
+                // Read the first line of the board file to recognize the board scale(S x S).
+                String s = "";
+                // Read char by char until the new line
+                while ((c = br.read()) != -1 && Character.compare((char)c, '\n') != 0) {
+                    s += (char)c;
+                }
+                S = Integer.parseInt(s);
+                if (!(S >= 12 && S <= 26)) {
+                    System.out.println("E2");
+                    return false;
+                }
 
+                // Comes to the main board part
+                // Read char by char until the end of file
+                while ((c = br.read()) != -1) {
+                    // Read char by char until a new line
+                    while (c != -1 && Character.compare((char)c, '\n') != 0) {
+                        // Meet a Premium Word Square
+                        if ( Character.compare((char)c, '{') == 0 ) {
+                            s = "";
+                            int n;
+                            int counter = 0;
+
+                            while ( Character.compare( (char)(c = br.read()), '}') != 0) {
+                                // If the number inside brackets is more than 2 digits
+                                if (counter > 3) {
+                                    System.out.println("E3");
+                                    return false;
+                                }
+
+                                s += (char)c;
+                                counter++;
+                            }
+                            n = Integer.parseInt(s);
+                            if (!(n >= -9 && n <= 99)) {
+                                System.out.println("E4");
+                                return false;
+                            }
+                        }
+                        // Meet a Premium Letter Square
+                        else if ( Character.compare((char)c, '(') == 0 ) {
+                            s = "";
+                            int n;
+                            int counter = 0;
+
+                            while ( Character.compare( (char)(c = br.read()), ')') != 0) {
+                                // If the number inside brackets is more than 2 digits
+                                if (counter > 3) {
+                                    System.out.println("E5");
+                                    return false;
+                                }
+
+                                s += (char)c;
+                                counter++;
+                            }
+                            n = Integer.parseInt(s);
+                            if (!(n >= -9 && n <= 99)) {
+                                System.out.println("E6");
+                                return false;
+                            }
+                        }
+                        // Meet a dot
+                        else if ( Character.compare((char)c, '.') == 0 ) ;
+                            // else is some char not expected then return false
+                        else {
+                            System.out.println("E7");
+                            return false;
+                        }
+                        colCounter++;
+                        c = br.read();
+                    }
+                    if (colCounter != S) {
+                        System.out.println("E8");
+                        return false;
+                    }
+                    colCounter = 0;
+                    rowCounter++;
+                    //System.out.println(rowCounter);
+                }
+            } catch (FileNotFoundException e) {
+                System.out.println("Error! File not found!");
+            }
+        } catch(IOException e) {
+            System.out.println("An I/O Error Occurred");
+        }
+        return (rowCounter == S);
+    }
 }

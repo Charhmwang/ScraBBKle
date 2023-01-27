@@ -40,27 +40,24 @@ public class GameBoard {
             System.out.print("Please enter your choice (l/d): ");
             String choice = System.console().readLine();
 
-            // Load a file.
-            if (choice.compareTo("l") == 0) {
-                correctInput = true;
-                System.out.print("Please enter the file name of the board: ");
-                userFilePath = System.console().readLine();
-            }
             // Use a default file.
-            else if (choice.compareTo("d") == 0) {
+            if (choice.compareTo("d") == 0) {
                 correctInput = true;
                 userFilePath = "../resources/defaultBoard.txt";
+            }
+            // Load a file.
+            else if (choice.compareTo("l") == 0) {
+                System.out.print("Please enter the file name of the board: ");
+                userFilePath = System.console().readLine();
+                ValidateUserBoard tester = new ValidateUserBoard(userFilePath);
+                if (!tester.test()) {
+                    System.out.print("This is not a valid file. ");
+                    continue;
+                }
+                correctInput = true;
             } else {
                 System.out.println("Invalid choice! You must enter \"l\" or \"d\".");
             }
-            //if (choice.compareTo("l") == 0) {
-            ValidateUserBoard tester = new ValidateUserBoard(userFilePath);
-            if (!tester.test()) {
-                System.out.println("Not a Valid board");
-                correctInput = false;
-            }
-            else System.out.println("Valid board");
-            //}
         } while (!correctInput);
 
         // Now the valid board for the game is confirmed.
