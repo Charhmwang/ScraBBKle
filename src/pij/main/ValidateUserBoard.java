@@ -90,33 +90,21 @@ public class ValidateUserBoard {
                             }
                         }
                         // Meet a dot
-                        else if ( Character.compare((char)c, ' ') == 0 ) {
-                            // Read the next char after space whether a dot
-                            if (Character.compare( (char)(c = br.read()), '.') != 0) {
-                                System.out.println("E7");
-                                return false;
-                            }
-                            // Read the next char after dot whether a space
-                            if (Character.compare( (char)(c = br.read()), ' ') != 0) {
-                                System.out.println("E8");
-                                return false;
-                            }
-                        }
-                        // else is some char not expected then return false
+                        else if (Character.compare((char)c, '.') == 0 ) ;
+                            // else is some char not expected then return false
                         else {
-                            System.out.println("E9");
+                            System.out.println("E7");
                             return false;
                         }
                         colCounter++;
                         c = br.read();
                     }
                     if (colCounter != S) {
-                        System.out.println("10");
+                        System.out.println("E8");
                         return false;
                     }
                     colCounter = 0;
                     rowCounter++;
-                    //System.out.println(rowCounter);
                 }
             } catch (FileNotFoundException e) {
                 System.out.println("Error! File not found!");

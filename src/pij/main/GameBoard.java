@@ -83,7 +83,11 @@ public class GameBoard {
             else System.out.print(i + " ");
 
             for (int j = 0; j < size; j++) {
-                System.out.print(board[i][j]);
+                // When it meets a dot
+                if (board[i][j].compareTo(".") == 0)
+                    System.out.print(" " + board[i][j] + " ");
+                if (board[i][j].startsWith("{") || board[i][j].startsWith("("))
+                    System.out.print(board[i][j]);
             }
             System.out.println();
         }

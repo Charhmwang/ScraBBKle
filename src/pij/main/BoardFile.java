@@ -56,13 +56,8 @@ public class BoardFile {
                     // If it is not the first row which shows the size number of the board
                     if (row != 0) {
                         // When it meets a dot
-                        if (Character.compare((char) c, ' ') == 0) {
-                            int counter = 1;
-                            while (counter < 3) {
-                                c = br.read();
-                                counter++;
-                            }
-                            boardArr[row][col] = " . ";
+                        if (Character.compare((char) c, '.') == 0) {
+                            boardArr[row][col] = ".";
                         }
 
                         // When it meets a Premium Word Square
@@ -109,6 +104,7 @@ public class BoardFile {
     public void cpyArray(String[][] aDestination) {
         for (int i = 0; i <= size; i++) {
             aDestination[i] = copyOf(boardArr[i], boardArr[i].length);
+            //System.out.println(aDestination[i]);
         }
     }
 }
