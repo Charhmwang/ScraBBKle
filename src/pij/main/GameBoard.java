@@ -1,7 +1,4 @@
 package pij.main;
-import java.io.*;
-
-import javax.swing.RowFilter;
 
 /**
  * Provide a board file. The first step of the ScraBBKle.

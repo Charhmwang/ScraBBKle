@@ -56,8 +56,13 @@ public class BoardFile {
                     // If it is not the first row which shows the size number of the board
                     if (row != 0) {
                         // When it meets a dot
-                        if (Character.compare((char) c, '.') == 0) {
-                            boardArr[row][col] = ".";
+                        if (Character.compare((char) c, ' ') == 0) {
+                            int counter = 1;
+                            while (counter < 3) {
+                                c = br.read();
+                                counter++;
+                            }
+                            boardArr[row][col] = " . ";
                         }
 
                         // When it meets a Premium Word Square
@@ -90,6 +95,8 @@ public class BoardFile {
                         row++;
                     }
                 }
+            } catch (FileNotFoundException e) {
+                System.out.println("Error! File not found!");
             }
         } catch (IOException e) {
             System.out.println("An I/O Error Occurred");

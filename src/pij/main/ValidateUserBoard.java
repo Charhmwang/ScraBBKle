@@ -31,7 +31,6 @@ public class ValidateUserBoard {
             try (BufferedReader br = new BufferedReader(fr)) {
                 // Read the first line of the board file to recognize the board scale(S x S).
                 String s = "";
-                // Read char by char until the new line
                 while ((c = br.read()) != -1 && Character.compare((char)c, '\n') != 0) {
                     s += (char)c;
                 }
@@ -91,17 +90,28 @@ public class ValidateUserBoard {
                             }
                         }
                         // Meet a dot
-                        else if ( Character.compare((char)c, '.') == 0 ) ;
-                            // else is some char not expected then return false
+                        else if ( Character.compare((char)c, ' ') == 0 ) {
+                            // Read the next char after space whether a dot
+                            if (Character.compare( (char)(c = br.read()), '.') != 0) {
+                                System.out.println("E7");
+                                return false;
+                            }
+                            // Read the next char after dot whether a space
+                            if (Character.compare( (char)(c = br.read()), ' ') != 0) {
+                                System.out.println("E8");
+                                return false;
+                            }
+                        }
+                        // else is some char not expected then return false
                         else {
-                            System.out.println("E7");
+                            System.out.println("E9");
                             return false;
                         }
                         colCounter++;
                         c = br.read();
                     }
                     if (colCounter != S) {
-                        System.out.println("E8");
+                        System.out.println("10");
                         return false;
                     }
                     colCounter = 0;
