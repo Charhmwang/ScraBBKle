@@ -1,4 +1,7 @@
 package pij.main;
+
+import pij.main.GameSettings.*;
+
 import java.io.IOException;
 
 public class Main {

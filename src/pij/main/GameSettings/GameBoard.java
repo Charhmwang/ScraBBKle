@@ -1,4 +1,4 @@
-package pij.main;
+package pij.main.GameSettings;
 
 /**
  * Provide a board file. The first step of the ScraBBKle.

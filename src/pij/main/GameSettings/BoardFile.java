@@ -1,12 +1,12 @@
-package pij.main;
+package pij.main.GameSettings;
 import java.io.*;
 import static java.util.Arrays.copyOf;
 
 public class BoardFile {
 
-    private int size;
+    private final int size;
     private String[][] boardArr;
-    private File f;
+    private final File f;
 
     public BoardFile(String userFilePath) {
         this.f = new File(userFilePath);
