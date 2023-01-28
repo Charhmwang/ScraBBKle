@@ -67,8 +67,21 @@ public class GameBoard {
     }
 
     public void printBoard() {
-        System.out.println(board[0][0]);
+        // Print the col numbers as the first line
+        System.out.print("   ");
+        char letter = 'a';
+        for (int i = 1; i <= size; i++, letter++) {
+            System.out.print(" ");
+            System.out.print(letter);
+            System.out.print(" ");
+        }
+        System.out.println();
+
         for (int i = 1; i <= size; i++) {
+            // Each board line starts with the row number
+            if (i < 10) System.out.print(" " + i + " ");
+            else System.out.print(i + " ");
+
             for (int j = 0; j < size; j++) {
                 System.out.print(board[i][j]);
             }
