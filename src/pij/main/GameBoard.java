@@ -1,31 +1,41 @@
-package pij.main.GameSettings;
+package pij.main;
 
 /**
- * Provide a board file. The first step of the ScraBBKle.
+ * Initialize the game board.
+ * A GameBoard has a board in form of 2D string array, and a size(S x S).
+ * Objects of this class are mutable: GameBoard has been created,
+ * during the game process, players can change the board strings content
+ * by placing the tiles they choose, size can be set by SettingBoard class.
  *
  * @author Haomeng Wang
- * @version 1.0
+ * @version 1.1
  */
-
 public class GameBoard {
-    private String[][] board;
 
-    private int size;
+    /** The name of the GameBoard. Always non-null after object creation. */
+    public String[][] board;
 
+    /** The size of a GameBoard. Must between (including) 12 and 26. */
+    public int size;
+
+    /**
+     * Constructs a new GameBoard with no parameter.
+     */
     public GameBoard() {
         this.chooseBoard();
     }
 
     /**
-     * Returns a two dimensional arraylist of string to represent the board for the game,
-     * user's input to make a choice using default board or uploading a board file.
+     * Create and initialize a two-dimensional array of string to represent the board for the game.
+     * Prompt user input to choose using default board or a local file.
      *
-     * For example, if the user inputs letter d, the default board will be loaded from the file defaultBoard.txt.
-     * If the user inputs l, the program will ask for the file name.
-     * Then the user uploaded file will be validated whether it is syntactically correct as specified.
-     * If the file is not valid, the program will ask the user to provide another file.
+     * For user input letter d, the default board will be read from the file ../resources/defaultBoard.txt.
+     * For user input letter l, the program will ask user for the file name in form of the correct filepath.
+     * If it is the user's own file, it will be validated whether it is syntactically correct as a specified form board.
      *
-     * @return a valid board from the file chosen by the user
+     * If the file is not valid, the program will ask the user to provide another file until successfully validated.
+     * If it is the default file or a validated file, 2D string array board will be created and fulfilled the content
+     * as the provided file.
      */
     public void chooseBoard() {
 
@@ -58,14 +68,14 @@ public class GameBoard {
         } while (!correctInput);
 
         // Now the valid board for the game is confirmed.
-        // Copy the board array from reading the txt file.
+        // Pass the GameBoard object into SettingBoard to do all the initialisation.
 
-        BoardFile validBoard = new BoardFile(userFilePath);
-        this.size = validBoard.getSize();
-        this.board = new String[size+1][size];
-        validBoard.cpyArray(this.board);
+        SettingBoard settings = new SettingBoard(userFilePath, this);
     }
 
+    /**
+     * Print board with line tags and spaces.
+     */
     public void printBoard() {
         // Print the col numbers as the first line
         System.out.print("   ");

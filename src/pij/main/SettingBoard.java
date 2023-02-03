@@ -1,21 +1,44 @@
-package pij.main.GameSettings;
+package pij.main;
+
 import java.io.*;
-import static java.util.Arrays.copyOf;
 
-public class BoardFile {
+/**
+ * A SettingBoard has a size(S x S),  a boardArr in form of 2D string array, and
+ * Objects of this class are immutable, created to read the designated file to set
+ * the passed in object of GameBoard.
+ *
+ * @author Haomeng Wang
+ * @version 1.1
+ */
+public class SettingBoard {
 
-    private final int size;
-    private String[][] boardArr;
+    /** The name of the File instance by converting the user given or default pathname string.
+     * Always non-null after object creation. */
     private final File f;
 
-    public BoardFile(String userFilePath) {
+    /**
+     * Constructs a new SettingBoard with pathname and GameBoard object,
+     * feed the board by contents in the userFilePath file.
+     *
+     * @param userFilePath the name of the board file; must not be null
+     * @param game_board the name of the GameBoard instance; must not be null
+     */
+    public SettingBoard(String userFilePath, GameBoard game_board) {
         this.f = new File(userFilePath);
-        this.size = setSize();
-        setArr();
-        //printBoard();
+        setSize(game_board);
+        setArr(game_board);
     }
 
-    public int setSize() {
+    /**
+     * Read the size number from the first line of the designated file,
+     * and set as the GameBoard object's size feature.
+     *
+     * @param game_board the GameBoard instance that the feature size is ready to be initialised
+     *
+     * @throws RuntimeException if accessing the file unsuccessfully
+     * @throws NumberFormatException if reading the size number in the file unsuccessfully
+     */
+    public void setSize(GameBoard game_board) {
         int size = 0;
         try {
             FileReader fr = new FileReader(f);
@@ -31,22 +54,26 @@ public class BoardFile {
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
-            return size;
+            ;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    public int getSize() {
-        return this.size;
+        game_board.size = size;
     }
 
     /**
+     * Read the board each grid content from the designated file,
+     * and set into the GameBoard object's board feature.
      *
+     * @param game_board the GameBoard instance that the feature board is ready to be initialised
+     *
+     * @catch IOException if reading the file unsuccessfully
+     * @catch FileNotFoundException if the file is not found
      */
-    public void setArr() {
-        boardArr = new String[size+1][size];
-        boardArr[0][0] = String.valueOf(size);
+    public void setArr(GameBoard game_board) {
+        int size  = game_board.size;
+        game_board.board = new String[size+1][size];
+        game_board.board[0][0] = String.valueOf(size);
 
         int c = 0; int row = 0; int col = 0;
         try {
@@ -57,25 +84,25 @@ public class BoardFile {
                     if (row != 0) {
                         // When it meets a dot
                         if (Character.compare((char) c, '.') == 0) {
-                            boardArr[row][col] = ".";
+                            game_board.board[row][col] = ".";
                         }
 
                         // When it meets a Premium Word Square
                         if (Character.compare((char) c, '{') == 0) {
-                            boardArr[row][col] = "{";
+                            game_board.board[row][col] = "{";
                             while (Character.compare((char)(c = br.read()), '}') != 0) {
-                                boardArr[row][col] += (char) c;
+                                game_board.board[row][col] += (char) c;
                             }
-                            boardArr[row][col] += "}";
+                            game_board.board[row][col] += "}";
                         }
 
                         // When it meets a Premium Letter Square
                         if (Character.compare((char) c, '(') == 0) {
-                            boardArr[row][col] = "(";
+                            game_board.board[row][col] = "(";
                             while (Character.compare((char)(c = br.read()), ')') != 0) {
-                                boardArr[row][col] += (char) c;
+                                game_board.board[row][col] += (char) c;
                             }
-                            boardArr[row][col] += ")";
+                            game_board.board[row][col] += ")";
                         }
                         col++;
                         // When it meets a \n
@@ -95,16 +122,6 @@ public class BoardFile {
             }
         } catch (IOException e) {
             System.out.println("An I/O Error Occurred");
-        }
-    }
-
-    /**
-     * Copy boardArr
-     */
-    public void cpyArray(String[][] aDestination) {
-        for (int i = 0; i <= size; i++) {
-            aDestination[i] = copyOf(boardArr[i], boardArr[i].length);
-            //System.out.println(aDestination[i]);
         }
     }
 }

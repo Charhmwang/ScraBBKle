@@ -1,4 +1,6 @@
-package pij.main.GameSettings;
+package pij.main;
+
+
 import java.io.*;
 import java.lang.Integer;
 
@@ -31,9 +33,12 @@ public class ValidateUserBoard {
             try (BufferedReader br = new BufferedReader(fr)) {
                 // Read the first line of the board file to recognize the board scale(S x S).
                 String s = "";
-                while ((c = br.read()) != -1 && Character.compare((char)c, '\n') != 0) {
+                int bitCounter = 0;
+                while ((c = br.read()) != -1 && Character.compare((char)c, '\n') != 0 && bitCounter < 3) {
                     s += (char)c;
+                    bitCounter++;
                 }
+                if (bitCounter == 3) return false;
                 S = Integer.parseInt(s);
                 if (!(S >= 12 && S <= 26)) {
                     System.out.println("E2");
