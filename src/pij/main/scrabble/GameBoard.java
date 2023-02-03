@@ -1,14 +1,14 @@
 package pij.main.scrabble;
 
 /**
+ * Initialize the game board.
  * A GameBoard has a board in form of 2D string array, and a size(S x S).
  * Objects of this class are mutable: GameBoard has been created,
  * during the game process, players can change the board strings content
- * by placing the tiles they choose.
- * Initialize the game board.
+ * by placing the tiles they choose, size can be set by SettingBoard class.
  *
  * @author Haomeng Wang
- * @version 1.0
+ * @version 1.1
  */
 public class GameBoard {
 
@@ -16,7 +16,7 @@ public class GameBoard {
     public String[][] board;
 
     /** The size of a GameBoard. Must between (including) 12 and 26. */
-    private int size;
+    public int size;
 
     /**
      * Constructs a new GameBoard with no parameter.
@@ -68,12 +68,9 @@ public class GameBoard {
         } while (!correctInput);
 
         // Now the valid board for the game is confirmed.
-        // Copy the board array from reading the txt file.
+        // Pass the GameBoard object into SettingBoard to do all the initialisation.
 
-        SettingBoard validBoard = new SettingBoard(userFilePath);
-        this.size = validBoard.getSize();
-        this.board = new String[size+1][size];
-        validBoard.cpyArray(this.board);
+        SettingBoard settings = new SettingBoard(userFilePath, this);
     }
 
     /**
