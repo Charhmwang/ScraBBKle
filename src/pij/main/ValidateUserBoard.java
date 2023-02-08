@@ -29,7 +29,7 @@ public class ValidateUserBoard {
         int rowCounter = 0;
         int colCounter = 0;
         try {
-            FileReader fr = new FileReader(f);
+            FileReader fr = new FileReader(this.f);
             try (BufferedReader br = new BufferedReader(fr)) {
                 // Read the first line of the board file to recognize the board scale(S x S).
                 String s = "";
@@ -113,9 +113,11 @@ public class ValidateUserBoard {
                 }
             } catch (FileNotFoundException e) {
                 System.out.println("Error! File not found!");
+                return false;
             }
         } catch(IOException e) {
             System.out.println("An I/O Error Occurred");
+            return false;
         }
         return (rowCounter == S);
     }

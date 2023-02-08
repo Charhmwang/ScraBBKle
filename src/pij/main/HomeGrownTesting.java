@@ -53,9 +53,10 @@ public class HomeGrownTesting {
     }
 
     public void runTests() {
-        ValidateUserBoard testValidation = new ValidateUserBoard("../test_resources/invalidBoard.txt");
-        this.testBooleanEqual("ValidateUserBoard", false, testValidation.test()); // 1
+        ValidateUserBoard testValidation1 = new ValidateUserBoard("../test_res/invalidBoard.txt");
+        this.testBooleanEqual("ValidateUserBoard", false, testValidation1.test()); // 1
 
-
+        ValidateUserBoard testValidation2 = new ValidateUserBoard("../resources/defaultBoard.txt");
+        this.testBooleanEqual("ValidateUserBoard", true, testValidation2.test()); // 2
     }
 }
