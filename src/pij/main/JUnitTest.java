@@ -29,21 +29,19 @@ public class JUnitTest {
     }
 
     @Test
-    void testWord_in_Dictionary1() throws IOException {
+    void testWord_in_WordList1() throws IOException {
         System.out.println("Test 3: find words in Dictionary - class Dictionary, WordList");
         WordList wl = new WordList();
-        Dictionary dictionary = new Dictionary(wl);
         boolean expected = true; // existing
-        Assertions.assertEquals(expected, dictionary.validateWord("academic"));
+        Assertions.assertEquals(expected, wl.validateWord("academic"));
     }
 
     @Test
     void testWord_in_Dictionary2() throws IOException {
         System.out.println("Test 4: find words in Dictionary - class Dictionary, WordList");
         WordList wl = new WordList();
-        Dictionary dictionary = new Dictionary(wl);
         boolean expected = false; // not existing
-        Assertions.assertEquals(expected, dictionary.validateWord("zza"));
+        Assertions.assertEquals(expected, wl.validateWord("zza"));
     }
 
 

@@ -18,4 +18,6 @@ public class WordList {
             map.put(word, true);
         }
     }
+
+    public boolean validateWord(String word) { return map.containsKey(word); }
 }
