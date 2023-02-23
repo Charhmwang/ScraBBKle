@@ -1,15 +1,13 @@
 package pij.main;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 
 public class Dictionary {
     private HashMap<Character, Integer> letterPoints;
-    private WordTrie wordTrie;
-
-    public Dictionary(WordTrie wordTrie) { this.wordTrie = wordTrie; }
+    private final WordList wordList;
+    public Dictionary(WordList wordList) {
+        this.wordList = wordList;
+    }
 
     public int getWordScore(String word){
         int score = 0;
@@ -20,16 +18,8 @@ public class Dictionary {
         return score;
     }
 
-    public void readWordlist(String filename) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(filename));
-        String word = br.readLine();
-        while ( word != null ){
-            wordTrie.insertWord(word.toUpperCase());
-            wordTrie.num_words++;
-            word = br.readLine();
-        }
-        br.close();
-    }
+    public boolean validateWord(String word) { return wordList.map.containsKey(word); }
+
     public void setupLetterScores() {
         /*
         (1 point)-A, E, I, O, U, L, N, S, T, R.
