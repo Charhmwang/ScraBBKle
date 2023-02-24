@@ -1,23 +1,28 @@
 package pij.main;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class TileRack {
-    private final ArrayList<Tile> tiles;
+    public static final int RACK_SIZE = 7;
+    private final List<Tile> tiles = new ArrayList<Tile>();
     private final Player player;
 
     public TileRack(Player player) {
         this.player = player;
-        this.tiles = new ArrayList<Tile>();
+        player.setTileRack(this);
         fillUp();
     }
 
+    public TileRack getTileRack(Player player) { return this; }
+
+    public List<Tile> getTiles() { return tiles; }
+
     public boolean fillUp() {
-        int RACK_SIZE = 7;
         while (tiles.size() < RACK_SIZE) {
             // If tile bag is empty , return false
-            if (TileBag.tilesInBag.isEmpty()) return false;
+            if (TileBag.isEmpty()) return false;
 
             // Take tile out of tile bag randomly and add to rack
             tiles.add(TileBag.takeOutTile());
@@ -31,7 +36,7 @@ public class TileRack {
         System.out.println("It's your turn! Your tiles:");
         System.out.println(
                 tiles.stream().map(Tile::toString)
-                .collect(Collectors.joining(", ", "[", "]" )));
+                .collect(Collectors.joining(", ")));
     }
 
     public Tile takeOutTileFromRack(char letter) {
@@ -44,9 +49,21 @@ public class TileRack {
     }
 
     public Tile isTileExisting(char letter) {
-        for (Tile t : tiles) {
-            if (t.letter == letter) return t;
+
+        if (Character.isAlphabetic(letter)) {
+            if (Character.isUpperCase(letter)) {
+                for (Tile t : tiles)
+                    if (t.letter == letter)
+                        return t;
+            } else {
+                for (Tile t : tiles)
+                    if (t.letter == '?') {
+                        t.letter = letter;
+                        return t;
+                    }
+            }
         }
         return null;
     }
+
 }
