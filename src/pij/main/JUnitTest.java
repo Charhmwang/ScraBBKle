@@ -56,16 +56,16 @@ public class JUnitTest {
     @Test
     void test_TileBag() {
         System.out.println("Test 6: test TileBag class and method isEmpty");
-        TileBag tb = new TileBag();
+        TileBag tb = TileBag.getInstance();
         boolean expected = false;
-        boolean actual = tb.tilesInBag.isEmpty();
+        boolean actual = tb.isEmpty();
         Assertions.assertEquals(expected, actual);
     }
 
     @Test
     void test_TileBag_takeOutTile() {
         System.out.println("Test 7: test TileBag class and method takeOutTile");
-        TileBag tb = new TileBag();
+        TileBag tb = TileBag.getInstance();
         Tile tile = new Tile('Q', 10);
         Tile getTile = tb.takeOutTile();
         Class<? extends Tile> actual = getTile.getClass();
@@ -100,4 +100,11 @@ public class JUnitTest {
             Assertions.assertEquals(expected, actual);
         }
     }
+
+//    @Test
+//    void test_Player_with_Move() {
+//        System.out.println("Test 10: test Move class");
+//        Player player = new Player(true);
+//        Tile
+//    }
 }

@@ -3,10 +3,12 @@ package pij.main;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class TileBag {
-    public ArrayList<Tile> tilesInBag;
+public class TileBag { //Needs to be singleton
+    private static ArrayList<Tile> tilesInBag;
+    private final static TileBag instance  = new TileBag();
+    public static TileBag getInstance() { return instance; }
 
-    public TileBag() {
+    private TileBag() {
         tilesInBag = new ArrayList<>();
         addTiles('A',1,9);
         addTiles('B',3,2);
@@ -44,7 +46,7 @@ public class TileBag {
     }
 
 
-    public Tile takeOutTile(){
+    public static Tile takeOutTile(){
         if (isEmpty()) return null;
         Random random = new Random();
         int idx = random.nextInt(tilesInBag.size());
@@ -54,5 +56,5 @@ public class TileBag {
     }
 
 
-    public boolean isEmpty() { return tilesInBag.size() == 0; }
+    public static boolean isEmpty() { return tilesInBag.size() == 0; }
 }
