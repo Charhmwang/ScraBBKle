@@ -3,11 +3,17 @@ package pij.main;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JUnitTest {
+    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     @Test
     void testValidateUserBoard1() {
         System.out.println("Test 1: test an invalid board - class ValidateUserBoard");
@@ -101,10 +107,48 @@ public class JUnitTest {
         }
     }
 
-//    @Test
-//    void test_Player_with_Move() {
-//        System.out.println("Test 10: test Move class");
-//        Player player = new Player(true);
-//        Tile
-//    }
+    @Test
+    void test_Move_HumanAction() {
+        System.out.println("Test 10: test Move class");
+        GameBoard.size = 15;
+        Player human = new Player(true);
+        TileRack myRack = new TileRack(human);
+        myRack.displayTiles();
+        List<Tile> tiles = myRack.getTiles();
+        Random rand = new Random();
+
+        // Take 3 random tiles away from rack but not wildcard
+       Tile t1, t2, t3;
+       boolean isWildCard = true;
+        do {
+            t1 = tiles.get(rand.nextInt(tiles.size()));
+            if (t1.letter != '?') isWildCard = false;
+        } while (isWildCard);
+
+        isWildCard = true;
+        boolean sameTile = true;
+        do {
+            t2 = tiles.get(rand.nextInt(tiles.size()));
+            if (t2.letter != '?') isWildCard = false;
+            if (t2 != t1) sameTile = false;
+        } while (isWildCard || sameTile);
+
+        isWildCard = true;
+        sameTile = true;
+        do {
+            t3 = tiles.get(rand.nextInt(tiles.size()));
+            if (t3.letter != '?') isWildCard = false;
+            if (t3 != t1 && t3 != t2) sameTile = false;
+        } while (isWildCard || sameTile);
+
+        String word = String.valueOf(t1.letter) + String.valueOf(t2.letter) + String.valueOf(t3.letter);
+        String position = "d5";
+        String direction = "r";
+        Move move = new Move(human, word, position, direction);
+        System.out.println(move.toString());
+
+        boolean expected = true;
+        boolean actual = move.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
 }
