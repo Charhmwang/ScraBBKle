@@ -62,16 +62,16 @@ public class JUnitTest {
         Assertions.assertEquals(expected, actual);
     }
 
-//    @Test
-//    void test_TileBag_takeOutTile() {
-//        System.out.println("Test 7: test TileBag class and method takeOutTile");
-//        TileBag tb = new TileBag();
-//        Tile tile = new Tile('Q', 10);
-//        Tile getTile = tb.takeOutTile();
-//        Class<? extends Tile> actual = getTile.getClass();
-//        Class<? extends Tile> expected = tile.getClass();
-//        Assertions.assertEquals(expected, actual);
-//    }
+    @Test
+    void test_TileBag_takeOutTile() {
+        System.out.println("Test 7: test TileBag class and method takeOutTile");
+        TileBag tb = new TileBag();
+        Tile tile = new Tile('Q', 10);
+        Tile getTile = tb.takeOutTile();
+        Class<? extends Tile> actual = getTile.getClass();
+        Class<? extends Tile> expected = tile.getClass();
+        Assertions.assertEquals(expected, actual);
+    }
 
 
 }
