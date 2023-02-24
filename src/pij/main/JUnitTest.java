@@ -73,5 +73,31 @@ public class JUnitTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    void test_Player_with_TileRack() {
+        System.out.println("Test 8: test Player class and TileRack class");
+        Player human = new Player(true);
+        TileRack myRack = new TileRack(human);
+        myRack.displayTiles();
+        int expected = 7;
+        int actual = myRack.getTilesAmount();
+        Assertions.assertEquals(expected, actual);
+    }
 
+    @Test
+    void test_Player_with_TileRack_takeOutTile() {
+        System.out.println("Test 9: test method takeOutTileFromRack in TileRack class");
+        Player human = new Player(true);
+        TileRack myRack = new TileRack(human);
+        myRack.takeOutTileFromRack('G');
+        if (myRack.isTileExisting('G') != null) {
+            char expected = 'G';
+            char actual = myRack.takeOutTileFromRack('G').letter;
+            Assertions.assertEquals(expected, actual);
+        } else {
+            Tile expected = null;
+            Tile actual = myRack.takeOutTileFromRack('G');
+            Assertions.assertEquals(expected, actual);
+        }
+    }
 }
