@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class TileBag {
     public ArrayList<Tile> tilesInBag;
-    private TileBag tileBag = new TileBag();
+
     public TileBag() {
         tilesInBag = new ArrayList<>();
         addTiles('A',1,9);
