@@ -7,10 +7,11 @@ public class Main {
 
         GameBoard board = new GameBoard();
         Game play = new Game(board);
-        TileRack tileRack1 = new TileRack();
-        TileRack tileRack2 = new TileRack();
-        Player human = new Player(true, tileRack1);
-        Player computer = new Player(false, tileRack2);
+        Player human = new Player(true);
+        Player computer = new Player(false);
+        TileRack tileRack1 = new TileRack(human);
+        TileRack tileRack2 = new TileRack(computer);
+
         play.startGame(human, computer);
 
     }
