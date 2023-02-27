@@ -1,6 +1,7 @@
 package pij.main;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class JUnitTest {
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     @Test
+    @Order(1)
     void testValidateUserBoard1() {
         System.out.println("Test 1: test an invalid board - class ValidateUserBoard");
         String userFilePath = "./test_res/invalidBoard.txt";
@@ -25,6 +27,7 @@ public class JUnitTest {
     }
 
     @Test
+    @Order(2)
     void testValidateUserBoard2() {
         System.out.println("Test 2: test a valid board - class ValidateUserBoard");
         String userFilePath = "./resources/defaultBoard.txt";
@@ -35,6 +38,7 @@ public class JUnitTest {
     }
 
     @Test
+    @Order(3)
     void testWord_in_WordList1() throws IOException {
         System.out.println("Test 3: find words in class WordList");
         WordList wl = new WordList();
@@ -43,6 +47,7 @@ public class JUnitTest {
     }
 
     @Test
+    @Order(4)
     void testWord_in_WordList2() throws IOException {
         System.out.println("Test 4: find words in class WordList");
         WordList wl = new WordList();
@@ -51,6 +56,7 @@ public class JUnitTest {
     }
 
     @Test
+    @Order(5)
     void test_Tile_toString() {
         System.out.println("Test 5: test Tile class and method toString");
         Tile tile = new Tile('Q', 10);
@@ -60,6 +66,7 @@ public class JUnitTest {
     }
 
     @Test
+    @Order(6)
     void test_TileBag() {
         System.out.println("Test 6: test TileBag class and method isEmpty");
         TileBag tb = TileBag.getInstance();
@@ -69,6 +76,7 @@ public class JUnitTest {
     }
 
     @Test
+    @Order(7)
     void test_TileBag_takeOutTile() {
         System.out.println("Test 7: test TileBag class and method takeOutTile");
         TileBag tb = TileBag.getInstance();
@@ -80,6 +88,7 @@ public class JUnitTest {
     }
 
     @Test
+    @Order(8)
     void test_Player_with_TileRack() {
         System.out.println("Test 8: test Player class and TileRack class");
         Player human = new Player(true);
@@ -91,6 +100,7 @@ public class JUnitTest {
     }
 
     @Test
+    @Order(9)
     void test_Player_with_TileRack_takeOutTile() {
         System.out.println("Test 9: test method takeOutTileFromRack in TileRack class");
         Player human = new Player(true);
@@ -108,6 +118,7 @@ public class JUnitTest {
     }
 
     @Test
+    @Order(10)
     void test_Move_HumanAction() {
         System.out.println("Test 10: test Move class");
         GameBoard.size = 15;
@@ -119,23 +130,25 @@ public class JUnitTest {
 
         // Take 3 random tiles away from rack but not wildcard
        Tile t1, t2, t3;
-       boolean isWildCard = true;
+       boolean isWildCard;
         do {
+            isWildCard = true;
             t1 = tiles.get(rand.nextInt(tiles.size()));
             if (t1.letter != '?') isWildCard = false;
         } while (isWildCard);
 
-        isWildCard = true;
-        boolean sameTile = true;
+        boolean sameTile;
         do {
+            isWildCard = true;
+            sameTile = true;
             t2 = tiles.get(rand.nextInt(tiles.size()));
             if (t2.letter != '?') isWildCard = false;
             if (t2 != t1) sameTile = false;
         } while (isWildCard || sameTile);
 
-        isWildCard = true;
-        sameTile = true;
         do {
+            isWildCard = true;
+            sameTile = true;
             t3 = tiles.get(rand.nextInt(tiles.size()));
             if (t3.letter != '?') isWildCard = false;
             if (t3 != t1 && t3 != t2) sameTile = false;
@@ -151,4 +164,27 @@ public class JUnitTest {
         boolean actual = move.isValid;
         Assertions.assertEquals(expected, actual);
     }
+
+    @Test
+    @Order(11)
+    void test_Score_addScore() {
+        Player human = new Player(true);
+        Scores humanScore = new Scores(human);
+        int expected = 10;
+        humanScore.addScore(10);
+        int actual = humanScore.getScore();
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    @Order(12)
+    void test_Score_toString() {
+        Player human = new Player(true);
+        Scores humanScore = new Scores(human);
+        String expected = "Human player score:\t" + 10;
+        humanScore.addScore(10);
+        String actual = humanScore.toString();
+        Assertions.assertEquals(expected, actual);
+    }
+
 }
