@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -99,63 +98,77 @@ public class JUnitTest {
 
     @Test
     @Order(9)
-    void test_Player_with_TileRack_takeOutTile() {
+    void test_Player_with_TileRack_isTileExisting() {
         System.out.println("Test 9: test method takeOutTileFromRack in TileRack class");
         Player human = new Player(true);
         TileRack myRack = new TileRack(human);
-        myRack.takeOutTileFromRack('G');
-        if (myRack.isTileExisting('G') != null) {
+        Tile tileG = myRack.isTileExisting('G');
+        if (tileG != null) {
             char expected = 'G';
-            char actual = myRack.takeOutTileFromRack('G').letter;
-            Assertions.assertEquals(expected, actual);
-        } else {
-            Tile expected = null;
-            Tile actual = myRack.takeOutTileFromRack('G');
+            char actual = tileG.letter;
             Assertions.assertEquals(expected, actual);
         }
     }
 
     @Test
     @Order(10)
-    void test_Move_HumanAction() {
+    void test_Move_HumanAction() throws IOException {
         System.out.println("Test 10: test Move class");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.printBoard();
         GameBoard.size = 15;
+        WordList wordList = new WordList();
         Player human = new Player(true);
         TileRack myRack = new TileRack(human);
         myRack.displayTiles();
         List<Tile> tiles = myRack.getTiles();
         Random rand = new Random();
 
-        // Take 3 random tiles away from rack but not wildcard
-       Tile t1, t2, t3;
-       boolean isWildCard;
-        do {
-            isWildCard = true;
-            t1 = tiles.get(rand.nextInt(tiles.size()));
-            if (t1.letter != '?') isWildCard = false;
-        } while (isWildCard);
+        // Take 3 random tiles away from rack but not wildcard until it can compose a legal word
+        boolean found = false;
+        String legalWord = "";
+        while (!found) {
+            Tile t1, t2, t3;
+            boolean isWildCard;
+            do {
+                isWildCard = true;
+                t1 = tiles.get(rand.nextInt(tiles.size()));
+                if (t1.letter != '?') isWildCard = false;
+            } while (isWildCard);
 
-        boolean sameTile;
-        do {
-            isWildCard = true;
-            sameTile = true;
-            t2 = tiles.get(rand.nextInt(tiles.size()));
-            if (t2.letter != '?') isWildCard = false;
-            if (t2 != t1) sameTile = false;
-        } while (isWildCard || sameTile);
+            boolean sameTile;
+            do {
+                isWildCard = true;
+                sameTile = true;
+                t2 = tiles.get(rand.nextInt(tiles.size()));
+                if (t2.letter != '?') isWildCard = false;
+                if (t2 != t1) sameTile = false;
+            } while (isWildCard || sameTile);
 
-        do {
-            isWildCard = true;
-            sameTile = true;
-            t3 = tiles.get(rand.nextInt(tiles.size()));
-            if (t3.letter != '?') isWildCard = false;
-            if (t3 != t1 && t3 != t2) sameTile = false;
-        } while (isWildCard || sameTile);
+            do {
+                isWildCard = true;
+                sameTile = true;
+                t3 = tiles.get(rand.nextInt(tiles.size()));
+                if (t3.letter != '?') isWildCard = false;
+                if (t3 != t1 && t3 != t2) sameTile = false;
+            } while (isWildCard || sameTile);
 
-        String word = String.valueOf(t1.letter) + String.valueOf(t2.letter) + String.valueOf(t3.letter);
+            String beforeShuffle = String.valueOf(t1.letter) + String.valueOf(t2.letter) + String.valueOf(t3.letter);
+            List<String> characters = Arrays.asList(beforeShuffle.split(""));
+            Collections.shuffle(characters);
+            String afterShuffle = "";
+            for (String character : characters)
+                afterShuffle += character;
+
+            if (WordList.validateWord(afterShuffle.toLowerCase())) {
+                found = true;
+                legalWord = afterShuffle;
+            }
+        }
         String position = "d5";
         String direction = "r";
-        Move move = new Move(human, word, position, direction);
+        System.out.println(legalWord);
+        Move move = new Move(human, legalWord, position, direction);
         System.out.println(move.toString());
 
         boolean expected = true;

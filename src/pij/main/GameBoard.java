@@ -111,8 +111,9 @@ public class GameBoard {
      * @param col the targeting column
      * @param letter the new content
      */
-    public void reviseBoard(int row, int col, String letter) {
-        board[row-1][col-1] = letter;
+    public static void reviseBoard(int row, int col, String letter) {
+
+        board[row][col] = letter;
     }
 
     public static String getBoardGridContent(int row, int col) { return board[row][col]; }

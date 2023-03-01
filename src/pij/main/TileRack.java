@@ -15,8 +15,6 @@ public class TileRack {
         fillUp();
     }
 
-    public TileRack getTileRack(Player player) { return this; }
-
     public List<Tile> getTiles() { return tiles; }
 
     public boolean fillUp() {
@@ -39,13 +37,11 @@ public class TileRack {
                 .collect(Collectors.joining(", ")));
     }
 
-    public Tile takeOutTileFromRack(char letter) {
+    public void takeOutTileFromRack(char letter) {
         Tile t = isTileExisting(letter);
         if (t != null) {
                 tiles.remove(t);
-                return t;
             }
-        return null;
     }
 
     public Tile isTileExisting(char letter) {

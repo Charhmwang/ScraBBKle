@@ -34,16 +34,11 @@ public class ScraBBKle {
         GameBoard.printBoard();
         humanRack.displayTiles();
 
-        String[] hmInput= hmAction.promptMove();
-        Move hmMove = new Move(human, hmInput[0], hmInput[1], hmInput[2]);
-        boolean validMove = hmMove.validateMove();
-        if (validMove) {
-            // 1. take tiles out of human rack and refill
-            // 2. revise board content
-            // 3. give human score
-        } else {
-            // give a reminder, re-enter
-        }
+        //The game ends when the tile bag is empty and one of the player has an empty tile rack.
+        // The game also ends if both players pass twice in a row.
+        Move hmMove= hmAction.promptMove(); //the move will must get a valid one, unless the human admit to finish game.
+        boolean isGameOver = hmMove.execute();
+        // if game over, calculate scores
 
 
     }
