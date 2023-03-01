@@ -1,7 +1,9 @@
 package pij.main;
 
+import java.util.Objects;
+
 public class Tile {
-    private char letter;
+    public char letter;
     int points;
     boolean isWildCard;
 
@@ -15,6 +17,9 @@ public class Tile {
     public String toString() {
         return "[" + letter + points + "]";
     }
+
+    @Override
+    public int hashCode() { return Objects.hash(letter, points, isWildCard); }
 
     public void wildCardChar() {
         boolean correctInput = false;

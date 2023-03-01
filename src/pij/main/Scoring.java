@@ -1,11 +1,11 @@
 package pij.main;
 
-public class Scores {
+public class Scoring {
 
     private int score;
     private final Player owner;
 
-    public Scores(Player owner) {
+    public Scoring(Player owner) {
         this.owner = owner;
         this.score = 0;
     }

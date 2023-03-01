@@ -13,10 +13,10 @@ package pij.main;
 public class GameBoard {
 
     /** The name of the GameBoard. Always non-null after object creation. */
-    public String[][] board;
+    public static String[][] board;
 
     /** The size of a GameBoard. Must between (including) 12 and 26. */
-    public int size;
+    public static int size;
 
     /**
      * Constructs a new GameBoard with no parameter.
@@ -70,13 +70,13 @@ public class GameBoard {
         // Now the valid board for the game is confirmed.
         // Pass the GameBoard object into SettingBoard to do all the initialisation.
 
-        SettingBoard settings = new SettingBoard(userFilePath, this);
+        SettingBoard settings = new SettingBoard(userFilePath);
     }
 
     /**
      * Print board with line tags and spaces.
      */
-    public void printBoard() {
+    public static void printBoard() {
         // Print the col numbers as the first line
         System.out.print("   ");
         char letter = 'a';
@@ -102,4 +102,21 @@ public class GameBoard {
             System.out.println();
         }
     }
+
+
+    /**
+     * Edit board square contents.
+     *
+     * @param row the targeting row
+     * @param col the targeting column
+     * @param letter the new content
+     */
+    public void reviseBoard(int row, int col, String letter) {
+        board[row-1][col-1] = letter;
+    }
+
+    public static String getBoardGridContent(int row, int col) { return board[row][col]; }
+
+    public String[][] getBoard() { return board; }
+
 }

@@ -21,24 +21,21 @@ public class SettingBoard {
      * feed the board by contents in the userFilePath file.
      *
      * @param userFilePath the name of the board file; must not be null
-     * @param game_board the name of the GameBoard instance; must not be null
      */
-    public SettingBoard(String userFilePath, GameBoard game_board) {
+    public SettingBoard(String userFilePath) {
         this.f = new File(userFilePath);
-        setSize(game_board);
-        setArr(game_board);
+        setSize();
+        setArr();
     }
 
     /**
      * Read the size number from the first line of the designated file,
      * and set as the GameBoard object's size feature.
      *
-     * @param game_board the GameBoard instance that the feature size is ready to be initialised
-     *
      * @throws RuntimeException if accessing the file unsuccessfully
      * @throws NumberFormatException if reading the size number in the file unsuccessfully
      */
-    public void setSize(GameBoard game_board) {
+    public void setSize() {
         int size = 0;
         try {
             FileReader fr = new FileReader(f);
@@ -58,22 +55,20 @@ public class SettingBoard {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        game_board.size = size;
+        GameBoard.size = size;
     }
 
     /**
      * Read the board each grid content from the designated file,
      * and set into the GameBoard object's board feature.
      *
-     * @param game_board the GameBoard instance that the feature board is ready to be initialised
-     *
      * @catch IOException if reading the file unsuccessfully
      * @catch FileNotFoundException if the file is not found
      */
-    public void setArr(GameBoard game_board) {
-        int size  = game_board.size;
-        game_board.board = new String[size+1][size];
-        game_board.board[0][0] = String.valueOf(size);
+    public void setArr() {
+        int size  = GameBoard.size;
+        GameBoard.board = new String[size+1][size];
+        GameBoard.board[0][0] = String.valueOf(size);
 
         int c = 0; int row = 0; int col = 0;
         try {
@@ -84,25 +79,25 @@ public class SettingBoard {
                     if (row != 0) {
                         // When it meets a dot
                         if (Character.compare((char) c, '.') == 0) {
-                            game_board.board[row][col] = ".";
+                            GameBoard.board[row][col] = ".";
                         }
 
                         // When it meets a Premium Word Square
                         if (Character.compare((char) c, '{') == 0) {
-                            game_board.board[row][col] = "{";
+                            GameBoard.board[row][col] = "{";
                             while (Character.compare((char)(c = br.read()), '}') != 0) {
-                                game_board.board[row][col] += (char) c;
+                                GameBoard.board[row][col] += (char) c;
                             }
-                            game_board.board[row][col] += "}";
+                            GameBoard.board[row][col] += "}";
                         }
 
                         // When it meets a Premium Letter Square
                         if (Character.compare((char) c, '(') == 0) {
-                            game_board.board[row][col] = "(";
+                            GameBoard.board[row][col] = "(";
                             while (Character.compare((char)(c = br.read()), ')') != 0) {
-                                game_board.board[row][col] += (char) c;
+                                GameBoard.board[row][col] += (char) c;
                             }
-                            game_board.board[row][col] += ")";
+                            GameBoard.board[row][col] += ")";
                         }
                         col++;
                         // When it meets a \n

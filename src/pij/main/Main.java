@@ -6,13 +6,19 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         GameBoard board = new GameBoard();
-        Game play = new Game(board);
+        ScraBBKle play = new ScraBBKle(board);
+
         Player human = new Player(true);
         Player computer = new Player(false);
-        TileRack tileRack1 = new TileRack(human);
-        TileRack tileRack2 = new TileRack(computer);
 
-        play.startGame(human, computer);
+        TileRack humanRack = new TileRack(human);
+        human.setTileRack(humanRack);
+        TileRack pcRack = new TileRack(computer);
+        computer.setTileRack(pcRack);
+
+        HumanAction hmAction = new HumanAction(human);
+
+        play.startGame(human, computer, humanRack, pcRack, hmAction);
 
     }
 }

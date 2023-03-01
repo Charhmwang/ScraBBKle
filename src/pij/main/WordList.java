@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class WordList {
-    public HashMap<String, Boolean> map;
+    private static HashMap<String, Boolean> map;
 
     private Scanner sc = new Scanner(new File("./resources/wordlist.txt"), StandardCharsets.UTF_8);
 
@@ -19,5 +19,5 @@ public class WordList {
         }
     }
 
-    public boolean validateWord(String word) { return map.containsKey(word); }
+    public static boolean validateWord(String word) { return map.containsKey(word); }
 }

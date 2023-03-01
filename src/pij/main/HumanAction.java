@@ -4,10 +4,10 @@ public class HumanAction {
 
     private final Player human;
     private Move move;
-    private final String[] inputNoComma;
+    private String[] input;
     public HumanAction(Player human) {
         this.human = human;
-        inputNoComma = promptMove();
+        input = promptMove();
     }
     public String[] promptMove() {
         String[] strArr = new String[3];
@@ -26,10 +26,8 @@ public class HumanAction {
                 System.out.println("Invalid move! Re-enter your move decision in the next line.");
             }
         }
-        return strArr;
+        return strArr;  // GIT,f8,r
     }
 
-    String[] getInputNoComma() { return inputNoComma; }
 
-    Move getMove()  { return move; }
 }

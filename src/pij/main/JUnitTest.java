@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -168,8 +166,9 @@ public class JUnitTest {
     @Test
     @Order(11)
     void test_Score_addScore() {
+        System.out.println("Test 11: test Scores class addScore method");
         Player human = new Player(true);
-        Scores humanScore = new Scores(human);
+        Scoring humanScore = new Scoring(human);
         int expected = 10;
         humanScore.addScore(10);
         int actual = humanScore.getScore();
@@ -179,8 +178,9 @@ public class JUnitTest {
     @Test
     @Order(12)
     void test_Score_toString() {
+        System.out.println("Test 12: test Scores class toString method");
         Player human = new Player(true);
-        Scores humanScore = new Scores(human);
+        Scoring humanScore = new Scoring(human);
         String expected = "Human player score:\t" + 10;
         humanScore.addScore(10);
         String actual = humanScore.toString();
