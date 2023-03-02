@@ -44,23 +44,27 @@ public class Move {
                 this.row = row;
             }
         } else return null;
-        System.out.println("Move check 1 done");
 
         // 2. Validate whether the player is using tiles from its own tiles rack
         TileRack tileRack = player.getTileRack();
         if (inputLetters.length() <= tileRack.getTilesAmount()) {
             for (int i = 0; i < inputLetters.length(); i++) {
                 Tile t = tileRack.isTileExisting(inputLetters.charAt(i));
-                if (t != null && !useTiles.contains(t)) {
+                if (t != null) {
+                    if (useTiles.contains(t)) {
+                        for (Tile tile : useTiles) {
+                            if (tile.letter == t.letter) {
+                                if (tile.hashCode() == t.hashCode()) return null;
+                            }
+                        }
+                    }
                     useTiles.add(t);
                 } else return null;
             }
             if (useTiles.size() != inputLetters.length()) return null;
         } else return null;
-        System.out.println("Move check 2 done");
 
         // 3. Check whether anywhere violates the game word rule after these tiles adding
-        System.out.println(inputLetters + " " + String.valueOf(row) + " " + String.valueOf(column) + " " + direction);
         return WordsOnBoard.validateWord(inputLetters, row, column, direction);
     }
 

@@ -96,8 +96,9 @@ public class GameBoard {
                 // When it meets a dot
                 if (board[i][j].compareTo(".") == 0)
                     System.out.print(" " + board[i][j] + " ");
-                if (board[i][j].startsWith("{") || board[i][j].startsWith("("))
+                else if (board[i][j].startsWith("{") || board[i][j].startsWith("("))
                     System.out.print(board[i][j]);
+                else System.out.print(board[i][j]);
             }
             System.out.println();
         }

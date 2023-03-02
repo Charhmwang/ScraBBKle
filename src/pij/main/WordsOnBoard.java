@@ -34,13 +34,10 @@ public class WordsOnBoard {
 
         int rowIdx = row - 1;
         int colIdx = col - 97;
-        System.out.println(String.valueOf(rowIdx) + " " + String.valueOf(colIdx));
 
         // CHECK 1. is the starting position already having a letter
         boolean occupied = Character.isAlphabetic(GameBoard.getBoardGridContent(rowIdx, colIdx).charAt(0));
         if (occupied) return null;
-
-        System.out.println("check 0 done");
 
         // First fill up the row/column (depends on the direction) skipping the grid already had a letter
         // var newCreatedWordUndone - The word composed of letters from the first tile to the end, maybe it is the new
@@ -48,15 +45,14 @@ public class WordsOnBoard {
         Pair<String, int[]> word_and_idx = buildWordUsingTileLetters(inputLetters, rowIdx, colIdx, direction);
         if (word_and_idx == null) return null;
 
-        System.out.println("check 1 done");
-
-        String preWord = word_and_idx.getKey();
-        int[] tilesSetInto = word_and_idx.getValue();
 
         // CHECK 2. is there one and only one legal word constructed on the current row (if right)/ col (if down)?
         // if there are more than one or zero, return false;
-        int endIdxRow = rowIdx + preWord.length();
-        int endIdxCol = colIdx + preWord.length();
+        String preWord = word_and_idx.getKey();
+        int[] tilesSetInto = word_and_idx.getValue();
+
+        int endIdxRow = rowIdx + preWord.length() - 1;
+        int endIdxCol = colIdx + preWord.length() - 1;
 
         ArrayList<Object> res = new ArrayList<>();
         if (direction.equals("right")) {
@@ -67,33 +63,32 @@ public class WordsOnBoard {
         }
         if (res == null) return null;
 
-        System.out.println("check 2 done");
+
+        // Check 3. is there any new legal word constructed on each tile's right angle direction because of this tile?
+        // if yes, return null;
 
         String newWord = (String)res.get(0);
         int startFrom = (int)res.get(1);
         int endAT = (int)res.get(2);
 
-        // Check 3. is there any new legal word constructed on each tile's right angle direction because of this tile?
-        // if yes, return false;
-
         boolean rightAngleCheck = isAnyRightAngleNewWord(direction, tilesSetInto, rowIdx, colIdx);
         if (rightAngleCheck) return null;
         // Till here, can ensure that there is not more than one word constructed
-            // due to the new adding tiles both horizontally and vertically.
+        // due to the new adding tiles both horizontally and vertically.
 
+
+        // CHECK 4. not allowed to place a word at right angles to a word already on the board without an overlap
+        // If the existing word is at the right angle to the new created word
 
         ArrayList<Object> list = words_on_board.get(newWord);  // if not null, will be used in the following if condition
-        if (list == null) return null; //???
-
-        System.out.println("check 3 done");
+        // if null, means the board now is empty, then no need to check the following steps
+        if (list == null) return new Pair<Boolean, int[]>(true, tilesSetInto);
 
         int exWord_rowStart = (char) list.get(1);
         int exWord_colStart = (char) list.get(2);
         int exWord_rowEnd = exWord_rowStart + newWord.length();
         int exWord_colEnd = exWord_colStart + newWord.length();
 
-        // CHECK 4. not allowed to place a word at right angles to a word already on the board without an overlap
-        // If the existing word is at the right angle to the new created word
         boolean rightAngleExistWordNoOverlap = isRightAngleExistWordNoOverlap(direction, list, startFrom, endAT,
                 rowIdx, colIdx, exWord_rowStart, exWord_colStart, exWord_colEnd, exWord_rowEnd);
         if (rightAngleExistWordNoOverlap) return null;
@@ -119,48 +114,88 @@ public class WordsOnBoard {
 
         while (bitCounter < inputLetters.length() && bound1 < GameBoard.size && bound2 < GameBoard.size) {
 
-            if ( !Character.isAlphabetic(GameBoard.getBoardGridContent(rowIdx, colIdx).charAt(0)) ) {
-                newCreatedWordUndone += inputLetters.charAt(bitCounter);
-                tilesSetInto[bitCounter] = rowIdx + gridCounter;
-                bitCounter++;
-            } else {
-                if (direction.equals("down")) {
-                    newCreatedWordUndone += GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx).charAt(0);
+            if (direction.equals("down")) {
+                char ch = GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx).charAt(0);
+                if (!Character.isAlphabetic(ch)) {
+                    char curLetter = inputLetters.charAt(bitCounter);
+                    String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx);
+                    newCreatedWordUndone += curLetter;
+                    GameBoard.reviseBoard(rowIdx + gridCounter, colIdx, testContent);
+                    //not score, only letter for testing
+                    //if move is valid, board content needs to add the corresponding scores
+                    //e.g. (3) is changed into G(3) at this stage, will be change into G2 if it's valid move when it's executed
+                    //if move is invalid, board grid contents need to recover (cut the letter of the head)
+                    //e.g. (3) is changed into G(3) at this stage, will be reset into (3)
+                    bitCounter++;
+                } else {
+                    newCreatedWordUndone += ch;
                 }
-                if (direction.equals("right")) {
-                    newCreatedWordUndone += GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter).charAt(0);
+            }
+
+            if (direction.equals("right")) {
+                char ch = GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter).charAt(0);
+                if (!Character.isAlphabetic(ch)) {
+                    char curLetter = inputLetters.charAt(bitCounter);
+                    String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter);
+                    newCreatedWordUndone += curLetter;
+                    //same as above in "down" case
+                    GameBoard.reviseBoard(rowIdx, colIdx + gridCounter, testContent);  //not score, only letter for testing
+                    bitCounter++;
+                } else {
+                    newCreatedWordUndone += ch;
                 }
             }
             gridCounter++;
             if (direction.equals("down")) bound1 = rowIdx + gridCounter;
             if (direction.equals("right")) bound2 = colIdx + gridCounter;
         }
+
         if (bitCounter < inputLetters.length()) {
-            System.out.println(bitCounter);
             return null;  // out of legal bounds before using all the tiles
         }
+
         return new Pair<String, int[]>(newCreatedWordUndone, tilesSetInto);
     }
 
 
     public static ArrayList<Object> multiWordsOrNoneRow(String preWord, int rowIdx, int colIdx, int endIdxCol) {
-        int legalWordsCounter = 0;
-        int startFrom = 0, endAT = 0;
-        String newWord = "";
 
-        for (int i = 0; i <= colIdx; i++) {
-            String curTry = "";
-            for (int j = endIdxCol; j < GameBoard.size; j++) {
-                for (int k = i; k < colIdx; k++) {
+        // 1. find out this row from where to where (index) having consistent letters connected with the current word
+        // 2. then use this below way to check how many legal word it can construct including the tiles word as a part
+
+        //check each col the tile is set in
+        //first find out the consist word with the tile
+        int allFilledFrom = 0;
+        int allFilledTo = 0;
+        for (int left = colIdx - 1; left >= 0; left--) {
+            char letter = GameBoard.getBoardGridContent(rowIdx, left).charAt(0);
+            if (!Character.isAlphabetic(letter)) {
+                allFilledFrom = left + 1;
+                break;
+            }
+        }
+
+        for (int right = colIdx + preWord.length(); right < GameBoard.size; right++) {
+            char letter = GameBoard.getBoardGridContent(rowIdx, right).charAt(0);
+            if (!Character.isAlphabetic(letter)) {
+                allFilledTo = right - 1;
+                break;
+            }
+        }
+
+        int legalWordsCounter = 0;
+        String newWord = "";
+        int startFrom = 0, endAT = 0;
+
+        for (int i = allFilledFrom; i <= colIdx; i++ ){ //try each word with longer head letters including tiles
+
+            for (int j = endIdxCol; j <= allFilledTo; j++) { //try each word with longer tail letters including tiles
+                String curTry = "";
+                for (int k = i; k <= j; k++) {  //make word composed of each bit letter
                     char letter = GameBoard.getBoardGridContent(rowIdx, k).charAt(0);
-                    if (!Character.isAlphabetic(letter)) curTry = "";
-                    else curTry = curTry.concat(String.valueOf(letter));
-                }
-                curTry = curTry.concat(preWord);
-                if (j != endIdxCol) {
-                    char letter = GameBoard.getBoardGridContent(rowIdx, j).charAt(0);
-                    if (!Character.isAlphabetic(letter)) break;
-                    else curTry = curTry.concat(String.valueOf(letter));
+                    //need to set first for validate
+                    //if not valid, reset, backtrace
+                    curTry += letter;
                 }
                 if (WordList.validateWord(curTry.toLowerCase())) {
                     legalWordsCounter++;
@@ -179,23 +214,37 @@ public class WordsOnBoard {
 
     public static ArrayList<Object> multiWordsOrNoneCol(String preWord, int rowIdx, int colIdx, int endIdxRow) {
 
-        int legalWordsCounter = 0;
-        int startFrom = 0, endAT = 0;
-        String newWord = "";
+        int allFilledFrom = 0;
+        int allFilledTo = 0;
+        for (int up = rowIdx - 1; up >= 0; up--) {
+            char letter = GameBoard.getBoardGridContent(up, colIdx).charAt(0);
+            if (!Character.isAlphabetic(letter)) {
+                allFilledFrom = up + 1;
+                break;
+            }
+        }
 
-        for (int i = 0; i <= rowIdx; i++) {
-            String curTry = "";
-            for (int j = endIdxRow; j < GameBoard.size; j++) {
-                for (int k = i; k < rowIdx; k++) {
+        for (int down = rowIdx + preWord.length(); down < GameBoard.size; down++) {
+            char letter = GameBoard.getBoardGridContent(down, colIdx).charAt(0);
+            if (!Character.isAlphabetic(letter)) {
+                allFilledTo = down - 1;
+                break;
+            }
+        }
+
+        int legalWordsCounter = 0;
+        String newWord = "";
+        int startFrom = 0, endAT = 0;
+
+        for (int i = allFilledFrom; i <= rowIdx; i++ ){ //try each word with longer head letters including tiles
+
+            for (int j = endIdxRow; j <= allFilledTo; j++) { //try each word with longer tail letters including tiles
+                String curTry = "";
+                for (int k = i; k <= j; k++) {  //make word composed of each bit letter
                     char letter = GameBoard.getBoardGridContent(k, colIdx).charAt(0);
-                    if (!Character.isAlphabetic(letter)) curTry = "";
-                    else curTry = curTry.concat(String.valueOf(letter));
-                }
-                curTry = curTry.concat(preWord);
-                if (j != endIdxRow) {
-                    char letter = GameBoard.getBoardGridContent(j, colIdx).charAt(0);
-                    if (!Character.isAlphabetic(letter)) break;
-                    else curTry = curTry.concat(String.valueOf(letter));
+                    //need to set first for validate
+                    //if not valid, reset, backtrace
+                    curTry += letter;
                 }
                 if (WordList.validateWord(curTry.toLowerCase())) {
                     legalWordsCounter++;
@@ -235,11 +284,9 @@ public class WordsOnBoard {
                 }
                 for (int a = allFilledFrom; a <= rowIdx; a++) {
                     for (int b = rowIdx; b <= allFilledTo; b++) {
-                        for (int c = a; c < b; c++) {
-                            curTry = curTry.concat(String.valueOf(GameBoard.getBoardGridContent(c, i).charAt(0)));
+                        for (int c = a; c <= b; c++) {
+                            curTry += (GameBoard.getBoardGridContent(c, i).charAt(0));
                         }
-                        if(b != rowIdx)
-                            curTry = curTry.concat(String.valueOf(GameBoard.getBoardGridContent(b, i).charAt(0)));
                         if (WordList.validateWord(curTry.toLowerCase())) return true;
                     }
                 }
@@ -253,20 +300,18 @@ public class WordsOnBoard {
                         break;
                     }
                 }
-                for (int right = rowIdx + 1; right < GameBoard.size; right++) {
+                for (int right = colIdx + 1; right < GameBoard.size; right++) {
                     char letter = GameBoard.getBoardGridContent(i, right).charAt(0);
                     if (!Character.isAlphabetic(letter)) {
                         allFilledTo = right - 1;
                         break;
                     }
                 }
-                for (int a = allFilledFrom; a <= colIdx; a++) {
-                    for (int b = colIdx; b <= allFilledTo; b++) {
-                        for (int c = a; c < b; c++) {
-                            curTry = curTry.concat(String.valueOf(GameBoard.getBoardGridContent(i, c).charAt(0)));
+                for (int a = allFilledFrom; a <= rowIdx; a++) {
+                    for (int b = rowIdx; b <= allFilledTo; b++) {
+                        for (int c = a; c <= b; c++) {
+                            curTry += (GameBoard.getBoardGridContent(i, c).charAt(0));
                         }
-                        if(b != colIdx)
-                            curTry = curTry.concat(String.valueOf(GameBoard.getBoardGridContent(i, b).charAt(0)));
                         if (WordList.validateWord(curTry.toLowerCase())) return true;
                     }
                 }

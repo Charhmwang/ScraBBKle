@@ -142,7 +142,7 @@ public class JUnitTest {
                 sameTile = true;
                 t2 = tiles.get(rand.nextInt(tiles.size()));
                 if (t2.letter != '?') isWildCard = false;
-                if (t2 != t1) sameTile = false;
+                if (t2.hashCode() != t1.hashCode()) sameTile = false;
             } while (isWildCard || sameTile);
 
             do {
@@ -150,7 +150,7 @@ public class JUnitTest {
                 sameTile = true;
                 t3 = tiles.get(rand.nextInt(tiles.size()));
                 if (t3.letter != '?') isWildCard = false;
-                if (t3 != t1 && t3 != t2) sameTile = false;
+                if (t3.hashCode() != t1.hashCode() && t3.hashCode() != t2.hashCode()) sameTile = false;
             } while (isWildCard || sameTile);
 
             String beforeShuffle = String.valueOf(t1.letter) + String.valueOf(t2.letter) + String.valueOf(t3.letter);
