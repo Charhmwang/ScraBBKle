@@ -31,8 +31,21 @@ public class HumanAction {
                     rightForm = true;
                     System.out.println(move);
                 } else {
-                    // Reject invalid move
+                    // Reject invalid move and recover the board content IF the board has been revised while validating,
+                    // see explanation in method buildWordUsingTileLetters in WordsOnBoard class
+                    // need to update the grid content from such as "G{3}" into "{3}" or "T." into "."
                     System.out.println("Invalid move! Re-enter your move decision in the next line.");
+
+                    int row = strArr[1].charAt(1) - '1';
+                    int col = strArr[1].charAt(0) - 'a';
+                    // Check if the grid content was revised
+                    String gridContent = GameBoard.getBoardGridContent(row, col);
+                    if ((gridContent.charAt(0) != '.' && gridContent.charAt(0) != '{' && gridContent.charAt(0) != '(')
+                            && (gridContent.charAt(1) == '.' || gridContent.charAt(1) == '{' || gridContent.charAt(1) == '(')) {
+
+                        gridContent = gridContent.substring(1);
+                        GameBoard.reviseBoard(row, col, gridContent);
+                    }
                 }
             } else {
                 System.out.println("Invalid input form! Re-enter your move decision in the next line.");

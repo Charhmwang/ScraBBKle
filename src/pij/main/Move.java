@@ -73,8 +73,6 @@ public class Move {
 
     // If the move is valid,
     // need to update the grid content from the form such as "G{3}" to "G2" or "T." to "T1", or "t{3}" to "t3"(wildcard)
-    // If the move is invalid,
-    // need to update the grid content from the form such as "G{3}" into "{3}" or "T." into "."
     // See method buildWordUsingTileLetters in WordsOnBoard class
     public boolean execute() {
         for (int i = 0; i < tilesSetInto.length; i++) {
@@ -83,6 +81,9 @@ public class Move {
             if (t.isWildCard) letterPoints = 3;
             else letterPoints = LetterPoints.letterMap.get(t.letter);
             String letter_points = String.valueOf(t.letter) + letterPoints;
+
+            // TODO: Before revise the board content, calculate scores add to player
+
             if (direction.equals("right"))
                 GameBoard.reviseBoard(row - 1, tilesSetInto[i], letter_points);
             if (direction.equals("down"))
@@ -90,12 +91,15 @@ public class Move {
             // Take each tile out of rack
             player.getTileRack().takeOutTileFromRack(t.letter);
         }
+
+        // TODO: Display each side score
+
         // refill the rack
         int counter = useTiles.size();
         while (counter-- > 0) {
             if (!player.getTileRack().fillUp()) {
                 if (player.getTileRack().getTilesAmount() == 0)
-                    return false; // cannot refill because tiles bag empty, and also the player rack empty, game over
+                    return false; // cannot refill because tiles bag empty, and also the player rack empty, so game over
             }
         }
         return true;
