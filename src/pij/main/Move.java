@@ -70,6 +70,11 @@ public class Move {
 
 
     // Change the grids on board contents as the user input tiles letters
+
+    // If the move is valid,
+    // need to update the grid content from the form such as "G{3}" to "G2" or "T." to "T1", or "t{3}" to "t3"(wildcard)
+    // If the move is invalid,
+    // need to update the grid content from the form such as "G{3}" into "{3}" or "T." into "."
     public boolean execute() {
         for (int i = 0; i < tilesSetInto.length; i++) {
             Tile t = useTiles.get(i);
