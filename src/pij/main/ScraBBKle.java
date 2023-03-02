@@ -15,6 +15,7 @@ public class ScraBBKle {
     private TileRack humanRack;
     private TileRack pcRack;
     private HumanAction hmAction;
+    public static boolean gameOver = false;
 
 
     public ScraBBKle(GameBoard board) {

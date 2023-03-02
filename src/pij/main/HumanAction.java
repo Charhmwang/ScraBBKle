@@ -4,12 +4,14 @@ public class HumanAction {
 
     private final Player human;
     private Move move;
+    public Boolean skipped;
 
 
     public HumanAction(Player human) {
         this.human = human;
         move = promptMove();
-        //move.execute();
+        if (move == null) skipped = true;
+        else move.execute();
     }
 
 
@@ -18,8 +20,10 @@ public class HumanAction {
         boolean rightForm = false;
         Move move = null;
         while (!rightForm) {
-            System.out.println("Your move: ");
+            System.out.println("Your move: (Type \'S\' to skip)");
             String input = System.console().readLine();
+            if (input.equals("S")) return null;
+
             if (input.chars().filter(ch -> ch == ',').count() == 2) {
                 strArr = input.split(",");
                 move = new Move(human, strArr[0], strArr[1], strArr[2]);
@@ -36,8 +40,5 @@ public class HumanAction {
         }
         return move;
     }
-
-
-
 
 }
