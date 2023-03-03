@@ -12,6 +12,9 @@ public class Player {
 
     public void setTileRack(TileRack tileRack) { this.tileRack = tileRack; }
 
+    public int getScore() { return score; }
+
+
     public TileRack getTileRack() { return tileRack; }
 
     void addScore(int score) {

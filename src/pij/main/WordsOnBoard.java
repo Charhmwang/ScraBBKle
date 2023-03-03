@@ -3,6 +3,7 @@ package pij.main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javafx.util.Pair;
 
@@ -29,20 +30,21 @@ public class WordsOnBoard {
         words_on_board.put(word, list);
     }
 
-    public static Pair<Boolean, int[]> validateWord(String inputLetters, int row, char col, String direction) {
+    public static Pair<Pair<String, List<Integer>>, int[]> validateWord(String inputLetters, int row, char col, String direction) {
         //change return from boolean to pair <boolean, int[]>
 
-        int rowIdx = row - 1;
+        // rowIdx stays the same as arg row because the game board content at [0][0] is the size number,
+        // not the first line of the board
         int colIdx = col - 97;
 
         // CHECK 1. is the starting position already having a letter
-        boolean occupied = Character.isAlphabetic(GameBoard.getBoardGridContent(rowIdx, colIdx).charAt(0));
+        boolean occupied = Character.isAlphabetic(GameBoard.getBoardGridContent(row, colIdx).charAt(0));
         if (occupied) return null;
 
         // First fill up the row/column (depends on the direction) skipping the grid already had a letter
         // var newCreatedWordUndone - The word composed of letters from the first tile to the end, maybe it is the new
         // word on its own, maybe it is the substring of the new word constructed with other next letters in the same row/col
-        Pair<String, int[]> word_and_idx = buildWordUsingTileLetters(inputLetters, rowIdx, colIdx, direction);
+        Pair<String, int[]> word_and_idx = buildWordUsingTileLetters(inputLetters, row, colIdx, direction);
         if (word_and_idx == null) return null;
 
 
@@ -51,15 +53,15 @@ public class WordsOnBoard {
         String preWord = word_and_idx.getKey();
         int[] tilesSetInto = word_and_idx.getValue();
 
-        int endIdxRow = rowIdx + preWord.length() - 1;
+        int endIdxRow = row + preWord.length() - 1;
         int endIdxCol = colIdx + preWord.length() - 1;
 
         ArrayList<Object> res = new ArrayList<>();
         if (direction.equals("right")) {
-            res = multiWordsOrNoneRow(preWord, rowIdx, colIdx, endIdxCol);
+            res = multiWordsOrNoneRow(preWord, row, colIdx, endIdxCol);
         }
         if (direction.equals("down")) {
-            res = multiWordsOrNoneCol(preWord, rowIdx, colIdx, endIdxRow);
+            res = multiWordsOrNoneCol(preWord, row, colIdx, endIdxRow);
         }
         if (res == null) return null;
 
@@ -71,7 +73,7 @@ public class WordsOnBoard {
         int startFrom = (int)res.get(1);
         int endAT = (int)res.get(2);
 
-        boolean rightAngleCheck = isAnyRightAngleNewWord(direction, tilesSetInto, rowIdx, colIdx);
+        boolean rightAngleCheck = isAnyRightAngleNewWord(direction, tilesSetInto, row, colIdx);
         if (rightAngleCheck) return null;
         // Till here, can ensure that there is not more than one word constructed
         // due to the new adding tiles both horizontally and vertically.
@@ -82,7 +84,10 @@ public class WordsOnBoard {
 
         ArrayList<Object> list = words_on_board.get(newWord);  // if not null, will be used in the following if condition
         // if null, means the board now is empty, then no need to check the following steps
-        if (list == null) return new Pair<Boolean, int[]>(true, tilesSetInto);
+        if (list == null) {
+            List<Integer> idxOfNewWord = calNewWordIdx(row, colIdx, startFrom, direction);
+            return new Pair<Pair<String, List<Integer>>, int[]>(new Pair<>(newWord, idxOfNewWord), tilesSetInto);
+        }
 
         int exWord_rowStart = (char) list.get(1);
         int exWord_colStart = (char) list.get(2);
@@ -90,7 +95,7 @@ public class WordsOnBoard {
         int exWord_colEnd = exWord_colStart + newWord.length();
 
         boolean rightAngleExistWordNoOverlap = isRightAngleExistWordNoOverlap(direction, list, startFrom, endAT,
-                rowIdx, colIdx, exWord_rowStart, exWord_colStart, exWord_colEnd, exWord_rowEnd);
+                row, colIdx, exWord_rowStart, exWord_colStart, exWord_colEnd, exWord_rowEnd);
         if (rightAngleExistWordNoOverlap) return null;
 
         System.out.println("check 4 done");
@@ -98,12 +103,26 @@ public class WordsOnBoard {
 
         // CHECK 5. not allowed to place a complete word parallel immediately next to a word already played
         boolean nextToParallelExistWord = isNextToParallelExistWord(direction, list, startFrom, endAT,
-                rowIdx, colIdx, exWord_rowStart, exWord_colStart, exWord_colEnd, exWord_rowEnd);
+                row, colIdx, exWord_rowStart, exWord_colStart, exWord_colEnd, exWord_rowEnd);
         if (nextToParallelExistWord) return null;
 
-        return new Pair<Boolean, int[]>(true, tilesSetInto);
+        List<Integer> idxOfNewWord = calNewWordIdx(row, colIdx, startFrom, direction);
+        return new Pair<Pair<String, List<Integer>>, int[]>(new Pair<>(newWord, idxOfNewWord), tilesSetInto);
     }
 
+
+    public static List<Integer> calNewWordIdx(int rowIdx, int colIdx, int startFrom,
+                                                                  String direction) {
+        List<Integer> idxOfNewWord = new ArrayList<>();
+        if (direction.equals("right")) {
+            idxOfNewWord.add(rowIdx);
+            idxOfNewWord.add(startFrom);
+        } else {
+            idxOfNewWord.add(startFrom);
+            idxOfNewWord.add(colIdx);
+        }
+        return idxOfNewWord;
+    }
 
     public static Pair<String, int[]> buildWordUsingTileLetters(String inputLetters, int rowIdx, int colIdx, String direction) {
         String newCreatedWordUndone = "";
@@ -137,6 +156,7 @@ public class WordsOnBoard {
                 if (!Character.isAlphabetic(ch)) {
                     char curLetter = inputLetters.charAt(bitCounter);
                     String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter);
+                    int temp = colIdx + gridCounter;
                     newCreatedWordUndone += curLetter;
                     //same as above in "down" case
                     GameBoard.reviseBoard(rowIdx, colIdx + gridCounter, testContent);  //not score, only letter for testing

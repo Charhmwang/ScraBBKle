@@ -9,9 +9,58 @@ public class Scoring {
 
     public Scoring(Move move, Player owner) {
         this.owner = owner;
-        this.score = 0;
+        this.move = move;
+        this.score = calculateMoveScore();
     }
 
     public int getScore() { return score; }
+
+    public int calculateMoveScore() {
+        int totalScoreOfThisMove = 0;
+        int scoreWithoutPremiumWord = 0;
+
+        int wordSize = move.madeNewWord.length();
+        int startRow = move.startPosOfNewWord.get(0), startCol = move.startPosOfNewWord.get(1);
+        boolean hasPremiumWordSqr  = false;
+        int factorInPremiumWordSqr = 0;
+        for (int i = 0; i < wordSize; i++) {
+            String grid = "";
+            if (move.direction.equals("right"))
+                grid = GameBoard.getBoardGridContent(startRow, startCol + i);
+            else grid = GameBoard.getBoardGridContent(startRow + i, startCol);
+
+            // check grid content, if it's new added letter, content is in form of "G{3}", "G(2)", "T." or "t." or "t{3}"(if used wildcard)
+            // if it's existed letter, content is in form of "G2" "I1" "g3"(if used wildcard)
+            char letter = grid.charAt(0);
+            if (grid.charAt(1) == '{' || grid.charAt(1) == '(' || grid.charAt(1) == '.') {
+                if (grid.charAt(1) == '.') {
+                    scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
+                }
+                if (grid.charAt(1) == '(') {  // premium letter, multiply factor of the current letter
+                    int factor = getFactor(grid);
+                    scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter) * factor;
+                }
+                if (grid.charAt(1) == '{') {  // !premium word, multiply the whole word value with factor
+                    hasPremiumWordSqr = true;
+                    scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
+                    factorInPremiumWordSqr = getFactor(grid);
+                }
+            } else {
+                scoreWithoutPremiumWord += Integer.parseInt(grid.substring(1));
+            }
+        }
+
+        if (hasPremiumWordSqr) totalScoreOfThisMove = scoreWithoutPremiumWord * factorInPremiumWordSqr;
+        else totalScoreOfThisMove = scoreWithoutPremiumWord;
+
+        // Check whether player used all 7 tiles in this move to get awarded 70 extra points
+        if (move.tilesSetInto.length == 7) totalScoreOfThisMove += 70;
+
+        return totalScoreOfThisMove;
+    }
+
+    public int getFactor(String grid) {
+        return Integer.parseInt(grid.substring(2, grid.length() - 1));
+    }
 
 }

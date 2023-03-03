@@ -46,8 +46,10 @@ public class ScraBBKle {
             boolean hmSkip = false, pcSkip = false;
             // The move will must get a valid one, unless the human admit to skip.
             if (hmMove.isValid) {
+                // TODO: add scores to human, print out the move
+                Scoring scoring = new Scoring(hmMove, human);
+                human.addScore(scoring.calculateMoveScore());
                 // change the board content and remove tiles also refill the rack,
-                // add scores to human, print out the move
                 boolean isGameOver = hmMove.execute();
                 if (isGameOver) break;
                 System.out.println(hmMove);

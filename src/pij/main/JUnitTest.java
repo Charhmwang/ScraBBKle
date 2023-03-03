@@ -178,13 +178,16 @@ public class JUnitTest {
 
     @Test
     @Order(11)
-    void test_Score_addScore() {
+    void test_Score_addScore() throws IOException {
         System.out.println("Test 11: test Scores class addScore method");
+
+        GameBoard.size = 15;
+        WordList wordList = new WordList();
         Player human = new Player(true);
-        Scoring humanScore = new Scoring(human);
+
         int expected = 10;
-        humanScore.addScore(10);
-        int actual = humanScore.getScore();
+        human.addScore(10);
+        int actual = human.getScore();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -193,13 +196,29 @@ public class JUnitTest {
     void test_Score_toString() {
         System.out.println("Test 12: test Scores class toString method");
         Player human = new Player(true);
-        Scoring humanScore = new Scoring(human);
         String expected = "Human player score:\t" + 10;
-        humanScore.addScore(10);
-        String actual = humanScore.toString();
+        human.addScore(10);
+        String actual = human.toString();
         Assertions.assertEquals(expected, actual);
     }
 
-    
+    @Test
+    @Order(13)
+    void test_Scoring_calculateMoveScore() throws IOException {
+        System.out.println("Test 13: test Scoring class calculateMoveScore method");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        LetterPoints letterPoints= new LetterPoints();
+        GameBoard.size = 15;
+        WordList wordList = new WordList();
+        Player human = new Player(true);
+        Move move = new Move(human, "GIT", "f8", "r");
+        Scoring scoring = new Scoring(move, human);
+        int expected = 8;
+        int actual = scoring.getScore();
+        Assertions.assertEquals(expected, actual);
+    }
+
+
+
 
 }

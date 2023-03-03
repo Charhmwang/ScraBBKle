@@ -14,8 +14,10 @@ public class Move {
     public Player player;
     public boolean isValid;
     public int[] tilesSetInto;
-    Pair<Boolean, int[]> valid_setIntoPosition;
     public List<Tile> useTiles = new ArrayList<>();
+    public String madeNewWord = "";
+    // if going right: startfrom: (3,2) endat:(3,8) / if down: (5,8) (10, 8)
+    public List<Integer> startPosOfNewWord = new ArrayList<>();
 
 
     public Move(Player player, String inputLetters, String position, String direction) {
@@ -23,15 +25,23 @@ public class Move {
         this.player = player;
         this.position = position;
         this.direction = direction;
-        valid_setIntoPosition = validateMove();
+        Pair<Pair<String, List<Integer>>, int[]> valid_setIntoPosition = validateMove();
         if (valid_setIntoPosition != null) {
             isValid = true;
+            madeNewWord = valid_setIntoPosition.getKey().getKey();
             tilesSetInto = valid_setIntoPosition.getValue();
+            startPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(0));
+            startPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(1));
         } // else isValid=false, tilesSetInto=null as default initialization
     }
 
-    public Pair<Boolean, int[]> validateMove() {
+    public Pair<Pair<String,List<Integer>>, int[]> validateMove() {
 
+        this.column = position.charAt(0);
+        this.row = Integer.parseInt(position.substring(1));
+        this.direction = direction.charAt(0) == 'r' ? "right" : "down";
+
+        /*
         // 1. Validate player's input position and move direction
         int size = GameBoard.size;
         if (position.length() >= 2 && position.length() <= 3 &&
@@ -63,6 +73,10 @@ public class Move {
             }
             if (useTiles.size() != inputLetters.length()) return null;
         } else return null;
+
+
+         */
+
 
         // 3. Check whether anywhere violates the game word rule after these tiles adding
         return WordsOnBoard.validateWord(inputLetters, row, column, direction);
