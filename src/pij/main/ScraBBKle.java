@@ -32,18 +32,38 @@ public class ScraBBKle {
     }
 
     public void gameOperations() {
-        GameBoard.printBoard();
-        humanRack.displayTiles();
 
-        //The game ends when the tile bag is empty and one of the player has an empty tile rack.
+
+        // The game ends when the tile bag is empty and one of the player has an empty tile rack.
         // The game also ends if both players pass twice in a row.
-        Move hmMove= hmAction.promptMove(); //the move will must get a valid one, unless the human admit to finish game.
-        boolean isGameOver = hmMove.execute();
-        // if game over, calculate scores
+        boolean gameOver = false;
+        while (!gameOver) {
 
+            // If it is human's turn, print board and current tiles from the rack, and prompt user to enter the move
+            GameBoard.printBoard();
+            humanRack.displayTiles();
+            Move hmMove = hmAction.promptMove();
+            boolean hmSkip = false, pcSkip = false;
+            // The move will must get a valid one, unless the human admit to skip.
+            if (hmMove.isValid) {
+                // change the board content and remove tiles also refill the rack,
+                // add scores to human, print out the move
+                boolean isGameOver = hmMove.execute();
+                if (isGameOver) break;
+                System.out.println(hmMove);
+            } else { //human skip
+                // Computer's turn
+                hmSkip = true;
+            }
+            //Move pcMove =
+            // The move will must get a valid one, unless the pc choose to skip.
+            // if pc skipped, set the boolean pcSkip to true, and check if both pc and human skipped, set boolean game over as true
+            // else, execute pc's move and if pc's execute is not valid means game over due to tiles bag empty, so break
+
+
+        }
+        // if game over, check bonus and calculate scores and display the winner
 
     }
-
-
 
 }

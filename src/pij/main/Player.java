@@ -14,7 +14,15 @@ public class Player {
 
     public TileRack getTileRack() { return tileRack; }
 
-    void getPoints(int points) {
-        score += points;
+    void addScore(int score) {
+        this.score += score;
+    }
+
+    public void reduceScore(int reducing) { score -= reducing; }
+
+    @Override
+    public String toString() {
+        String playerName = isHuman ? "Human" : "Computer";
+        return playerName + " player score:\t" + score;
     }
 }
