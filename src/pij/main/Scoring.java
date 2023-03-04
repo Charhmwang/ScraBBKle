@@ -63,4 +63,20 @@ public class Scoring {
         return Integer.parseInt(grid.substring(2, grid.length() - 1));
     }
 
+
+    // At the end of the game, each player’s score is reduced by the sum of the values of their own un-played tiles.
+    public static void removeScoresFromRemainedTiles(Player player) {
+        int remove = getSumValuesOfTiles(player.getTileRack());
+        player.reduceScore(remove);
+    }
+
+
+    public static int getSumValuesOfTiles(TileRack tileRack) {
+        int sum = 0;
+        for (Tile t : tileRack.getTiles()) {
+            sum += LetterPoints.letterMap.get(t.letter);
+        }
+        return sum;
+    }
+
 }

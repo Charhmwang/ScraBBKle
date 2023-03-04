@@ -98,7 +98,6 @@ public class Move {
             player.getTileRack().takeOutTileFromRack(letter);
         }
 
-        // TODO: Display each side score
         // refill the rack
         int counter = useTiles.size();
         while (counter-- > 0) {

@@ -43,28 +43,54 @@ public class ScraBBKle {
             GameBoard.printBoard();
             humanRack.displayTiles();
             Move hmMove = hmAction.promptMove();
-            boolean hmSkip = false, pcSkip = false;
+            boolean hmSkip = false;
+            boolean pcSkip = false;
+
             // The move will must get a valid one, unless the human admit to skip.
             if (hmMove.isValid) {
-                // TODO: add scores to human, print out the move
+                // Add scores to human, print out the move
                 Scoring scoring = new Scoring(hmMove, human);
                 human.addScore(scoring.calculateMoveScore());
-                // change the board content and remove tiles also refill the rack,
-                boolean isGameOver = hmMove.execute();
-                if (isGameOver) break;
                 System.out.println(hmMove);
+                boolean bothBagRackEmpty = hmMove.execute();
+                hmMove.recoverBoardGridContent();
+                System.out.println(human);
+                System.out.println(computer);
+
+                if (bothBagRackEmpty) break;
             } else { //human skip
                 // Computer's turn
                 hmSkip = true;
+
+                //Move pcMove =
+                // The move will must get a valid one, unless the pc choose to skip.
+                //if pc also skips here, means game over, break
+                //otherwise, execute pc's move and add the score for pc,
+                // and print out the move to show human also both sides scores
+
+                //Scoring scoring = new Scoring(pcMove, computer);
+                //...
+
             }
+
+            // if human skip boolean is true, means the else on top was executed,
+            // so, if both skip values are true means game over -> break;
+            // otherwise continue to the next for loop turn to ask human's move.
+
+            // if human skip boolean is false, means this round pc not moved yet, so execute the following steps
             //Move pcMove =
             // The move will must get a valid one, unless the pc choose to skip.
-            // if pc skipped, set the boolean pcSkip to true, and check if both pc and human skipped, set boolean game over as true
-            // else, execute pc's move and if pc's execute is not valid means game over due to tiles bag empty, so break
+            //if pc skip, continue to the next for loop turn prompt human's move action
+            //otherwise, execute pc's move and add the score for pc, and print out the move to show human
+            // and print out the move to show human also both sides scores
 
+            //Scoring scoring = new Scoring(pcMove, computer);
+            //...
 
         }
-        // if game over, check bonus and calculate scores and display the winner
+
+        // Now game over, calculate scores and display the winner
+        // use static removeScoresFromRemainedTiles(player) method in Scoring class
 
     }
 
