@@ -1,16 +1,21 @@
 package pij.main;
 
 
+import java.lang.reflect.Array;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import javafx.util.Pair;
 
 public class WordsOnBoard {
 
-    // String is word, ArrayList [0] is "right" or "down", [1] is row, [2] is col of the starting grid
-    private static Map<String, ArrayList<Object>> words_on_board = new HashMap<>();
+    // String is word, ArrayList [0]start row idx [1]start col idx, [2]end row idx, [3]end col idx
+    private static Map<ArrayList<Integer>, String> words_on_board = new HashMap<>();
+    // [8, 5, 8, 7] : "GIT" represents the word starts from index[8][5] ends at[8][7] on the board is GIT
 
     private WordsOnBoard() {}
     private static WordsOnBoard instance;
@@ -22,12 +27,13 @@ public class WordsOnBoard {
         return instance;
     }
 
-    public void addWord(String word, int row, char col, String direction) {  // !!row and col is the index
-        ArrayList<Object> list = new ArrayList<>();
-        list.add(0, direction);
-        list.add(1, row - 1);
-        list.add(2, col - 1);
-        words_on_board.put(word, list);
+    public static void addWord(int startRow, int startCol, int endRow, int endCol, String word) {
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(0, startRow);
+        list.add(1, startCol);
+        list.add(2, endRow);
+        list.add(3, endCol);
+        words_on_board.put(list, word);
     }
 
     public static Pair<Pair<String, List<Integer>>, int[]> validateWord(String inputLetters, int row, char col, String direction) {
@@ -46,6 +52,7 @@ public class WordsOnBoard {
         // word on its own, maybe it is the substring of the new word constructed with other next letters in the same row/col
         Pair<String, int[]> word_and_idx = buildWordUsingTileLetters(inputLetters, row, colIdx, direction);
         if (word_and_idx == null) return null;
+        //System.out.println("CHECK 1 done"); //debug
 
 
         // CHECK 2. is there one and only one legal word constructed on the current row (if right)/ col (if down)?
@@ -58,13 +65,14 @@ public class WordsOnBoard {
 
         ArrayList<Object> res = new ArrayList<>();
         if (direction.equals("right")) {
+            //System.out.println(preWord + " " + row + " " + colIdx + " " + endIdxCol);//debug
             res = multiWordsOrNoneRow(preWord, row, colIdx, endIdxCol);
         }
         if (direction.equals("down")) {
             res = multiWordsOrNoneCol(preWord, row, colIdx, endIdxRow);
         }
         if (res == null) return null;
-
+        //System.out.println("CHECK 2 done"); //debug
 
         // Check 3. is there any new legal word constructed on each tile's right angle direction because of this tile?
         // if yes, return null;
@@ -72,55 +80,73 @@ public class WordsOnBoard {
         String newWord = (String)res.get(0);
         int startFrom = (int)res.get(1);
         int endAT = (int)res.get(2);
+        List<Integer> idxOfNewWord = calNewWordIdx(row, colIdx, startFrom, endAT, direction);
 
         boolean rightAngleCheck = isAnyRightAngleNewWord(direction, tilesSetInto, row, colIdx);
         if (rightAngleCheck) {
             return null;
         }
+        //System.out.println("CHECK 3 done"); //debug
         // Till here, can ensure that there is not more than one word constructed
         // due to the new adding tiles both horizontally and vertically.
 
 
         // CHECK 4. not allowed to place a word at right angles to a word already on the board without an overlap
-        // If the existing word is at the right angle to the new created word
 
-        ArrayList<Object> list = words_on_board.get(newWord);  // if not null, will be used in the following if condition
-        // if null, means the board now is empty, then no need to check the following steps
-        if (list == null) {
-            List<Integer> idxOfNewWord = calNewWordIdx(row, colIdx, startFrom, direction);
-            return new Pair<Pair<String, List<Integer>>, int[]>(new Pair<>(newWord, idxOfNewWord), tilesSetInto);
-        }
-
-        int exWord_rowStart = (char) list.get(1);
-        int exWord_colStart = (char) list.get(2);
-        int exWord_rowEnd = exWord_rowStart + newWord.length();
-        int exWord_colEnd = exWord_colStart + newWord.length();
-
-        boolean rightAngleExistWordNoOverlap = isRightAngleExistWordNoOverlap(direction, list, startFrom, endAT,
-                row, colIdx, exWord_rowStart, exWord_colStart, exWord_colEnd, exWord_rowEnd);
+        boolean rightAngleExistWordNoOverlap = isRightAngleExistWordNoOverlap(direction, idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3));
         if (rightAngleExistWordNoOverlap) return null;
 
-        System.out.println("check 4 done");
-
+        //System.out.println("CHECK 4 done"); //debug
 
         // CHECK 5. not allowed to place a complete word parallel immediately next to a word already played
-        boolean nextToParallelExistWord = isNextToParallelExistWord(direction, list, startFrom, endAT,
-                row, colIdx, exWord_rowStart, exWord_colStart, exWord_colEnd, exWord_rowEnd);
-        if (nextToParallelExistWord) return null;
 
-        List<Integer> idxOfNewWord = calNewWordIdx(row, colIdx, startFrom, direction);
-        return new Pair<Pair<String, List<Integer>>, int[]>(new Pair<>(newWord, idxOfNewWord), tilesSetInto);
+       // If the board does not have the new created word played, then no need to check the following steps for parallel.
+        Pair<Pair<String, List<Integer>>, int[]> forReturn = new Pair<Pair<String, List<Integer>>, int[]>(new Pair<>(newWord, idxOfNewWord), tilesSetInto);
+        if (!words_on_board.containsValue(newWord)) {
+            return forReturn;
+        }
+
+            Map<String, ArrayList<ArrayList<Integer>>> reverseMap = new HashMap<>(
+                    words_on_board.entrySet().stream()
+                            .collect(Collectors.groupingBy(Map.Entry::getValue)).values().stream()
+                            .collect(Collectors.toMap(
+                                    item -> item.get(0).getValue(),
+                                    item -> new ArrayList<>(
+                                            item.stream()
+                                                    .map(Map.Entry::getKey)
+                                                    .collect(Collectors.toList())
+                                    ))
+                            ));
+            ArrayList<ArrayList<Integer>> idxes = reverseMap.get(newWord);
+            for (ArrayList<Integer> list : idxes) {
+
+                int exWord_rowStart = list.get(0);
+                int exWord_colStart = list.get(1);
+                int exWord_rowEnd = list.get(2);
+                int exWord_colEnd = list.get(3);
+
+                boolean nextToParallelExistWord = isNextToParallelExistWord(direction,
+                        idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3),
+                        exWord_rowStart, exWord_colStart, exWord_rowEnd, exWord_colEnd);
+                if (nextToParallelExistWord) return null;
+            }
+
+        return forReturn;
     }
 
 
-    public static List<Integer> calNewWordIdx(int rowIdx, int colIdx, int startFrom,
+    public static List<Integer> calNewWordIdx(int rowIdx, int colIdx, int startFrom, int endAT,
                                                                   String direction) {
         List<Integer> idxOfNewWord = new ArrayList<>();
         if (direction.equals("right")) {
             idxOfNewWord.add(rowIdx);
             idxOfNewWord.add(startFrom);
+            idxOfNewWord.add(rowIdx);
+            idxOfNewWord.add(endAT);
         } else {
             idxOfNewWord.add(startFrom);
+            idxOfNewWord.add(colIdx);
+            idxOfNewWord.add(endAT);
             idxOfNewWord.add(colIdx);
         }
         return idxOfNewWord;
@@ -212,7 +238,6 @@ public class WordsOnBoard {
         int startFrom = 0, endAT = 0;
 
         for (int i = allFilledFrom; i <= colIdx; i++ ){ //try each word with longer head letters including tiles
-
             for (int j = endIdxCol; j <= allFilledTo; j++) { //try each word with longer tail letters including tiles
                 String curTry = "";
                 for (int k = i; k <= j; k++) {  //make word composed of each bit letter
@@ -221,12 +246,14 @@ public class WordsOnBoard {
                     //if not valid, reset, backtrace
                     curTry += letter;
                 }
+                //System.out.println(curTry); //debug
                 if (WordList.validateWord(curTry.toLowerCase())) {
                     legalWordsCounter++;
                     newWord = curTry;
                     startFrom = i;
                     endAT = j;
                 }
+                //System.out.println(legalWordsCounter); //debug
                 if (legalWordsCounter > 1) return null;
             }
         }
@@ -347,85 +374,74 @@ public class WordsOnBoard {
     }
 
 
-    public static boolean isRightAngleExistWordNoOverlap(String direction, ArrayList<Object> list,
-                                                         int startFrom, int endAT, int rowIdx, int colIdx,
-                                                         int exWord_rowStart, int exWord_colStart,
-                                                         int exWord_colEnd, int exWord_rowEnd) {
+    // if next to with no overlap, is like:
+    //      if the new word going right: other words are :
+    //1. on left or right vertical: (start col == nw start col-1 || start col == nw start col+1)
+    //                       && (nw start row >= start row && nw start row <= end row)
+    //2. on top or down vertical: (start row == nw start row+1 || end row == nw start row-1)
+    //                       && (start col >= nw start col && start col <= nw end col)
 
-        if ( ((String)list.get(0)).equals("right") && direction.equals("down") ||
-                (((String)list.get(0)).equals("down") && direction.equals("right")) )  {
-            boolean overlap = false;
+    //      if the new word going down: other words are :
+    //1. on left or right vertical: (end col == nw start col-1 || start col == nw start col+1)
+    //                        && (nw start row <= start row && nw end row >= start row)
+    //2. on top or down vertical: (start row == nw start row-1 || start row == nw end row+1)
+    //                        && (start col >= nw start col && end col <= nw start col)
+    public static boolean isRightAngleExistWordNoOverlap(String direction, int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol) {
 
-            // If the new word vertical and has cross with the existing word which direction is right, it needs to
-            // have col number in between the existing word's col limit,
-            // and the existing word row number in between the new word's row limit.
-            if (((String)list.get(0)).equals("right")) {
-                if ((colIdx >= exWord_colStart && colIdx <= exWord_colEnd)
-                        && (exWord_rowStart >= startFrom && exWord_rowStart <= endAT))
-                    overlap = true;
+        boolean rightAngleNoOverlap = false;
+        int startRow = 0, startCol = 0, endRow = 0, endCol = 0;
+        for (ArrayList<Integer> idxes : words_on_board.keySet()) {
+            startRow = idxes.get(0);
+            startCol = idxes.get(1);
+            endRow = idxes.get(2);
+            endCol = idxes.get(3);
+
+            if (direction.equals("right")) {
+                if ( ((startCol == nwStartCol - 1 || startCol == nwStartCol + 1) && (nwStartRow >= startRow && nwStartRow <= endRow))
+                        || ((startRow == nwStartRow + 1 || endRow == nwStartRow - 1) && (startCol >= nwStartCol && startCol <= nwEndCol)) )
+                    rightAngleNoOverlap = true;
             }
-            // If the new word vertical and has cross with the existing word which direction is down, it needs to
-            // have row number in between the existing word's row limit,
-            // and the existing word col number in between the new word's col limit.
-            else {
-                if ((rowIdx >= exWord_rowStart && rowIdx <= exWord_rowEnd)
-                        && (exWord_colStart >= startFrom && exWord_colStart <= endAT))
-                    overlap = true;
+            if (direction.equals("down")) {
+                if ( ((endCol == nwStartCol - 1 || startCol == nwStartCol + 1) && (nwStartRow <= startRow && nwEndRow >= startRow))
+                        || ((startRow == nwStartRow - 1 || startRow == nwEndRow + 1) && (startCol >= nwStartCol && endCol <= nwStartCol)) )
+                    rightAngleNoOverlap = true;
             }
-
-            if (!overlap) return true;
         }
-        return false;
+        return rightAngleNoOverlap;
     }
 
-    public static boolean isNextToParallelExistWord(String direction, ArrayList<Object> list,
-                                                    int startFrom, int endAT, int rowIdx, int colIdx,
-                                                    int exWord_rowStart, int exWord_colStart,
-                                                    int exWord_colEnd, int exWord_rowEnd) {
-        // to have a new word next to an existing word(same content word)
-        // case: right
-        // a) if the new word row is in the same row with the existing word: col start is one after the old word collimit
-        // or the old word col start is one after the new word col limit
-        // b) if the new word row is one above or below the existing word:
-        // the new word starting col is between the old word col limit or the new word ending col is between that
 
-        if ( ((String)list.get(0)).equals("right") && direction.equals("right") ||
-                (((String)list.get(0)).equals("down") && direction.equals("down")) ) {
-            boolean nextTo = false;
+    // to have a new word parallel next to an existing word(same content word)
+    //      if the new word going right: old words are :
+    //1. on left or right parallel: (end col == nw start col-1 || start col == nw end col+1)
+    //                       && (start row == nw start row && start row == end row)
+    //2. on top or down parallel: (start row == nw start row+1 || start row == nw start row-1 && start row == end row)
+    //                       && ((start col >= nw start col && start col <= nw end col) || (end col >= nw start col && end col <= nw end col))
 
-            // case: right
-            if (((String)list.get(0)).equals("right")) {
-                // same row
-                if (rowIdx == (int)list.get(1)) {
-                    if (startFrom == exWord_colEnd + 1 || endAT == exWord_colStart - 1)
-                        nextTo = true;
-                } else if ( rowIdx == (int)list.get(1) + 1 ||  rowIdx == (int)list.get(1) - 1) { // diff row that one row above or bellow
-                    if ( (startFrom >= exWord_colStart && startFrom <= exWord_colEnd)
-                            || (endAT >= exWord_colStart && endAT <= exWord_colEnd) )
-                        nextTo = true;
-                }
-            }
+    //      if the new word going down: old words are :
+    //1. on top or down parallel: (end row == nw start row-1 || start row == nw end row+1)
+    //                       && (start col == nw start col && start col == end col)
+    //2. on left or right parallel: (start col == nw start col+1 || start col == nw start col-1 && start col == end col)
+    //                       && ((start row >= nw start row && start row <= nw end row) || (end row >= nw start row && end row <= nw end row))
 
-            // case: down
-            // 1. if the new word col is in the same col with the existing word: row start is one after the old word row limit
-            // or the old word row start is one after the new word row limit
-            // 2. if the new word col is one left or right beside the existing word:
-            // the new word starting row is between the old word row limits or the new word ending row is between that
-
-            else {
-                // same column
-                if (colIdx == (int)list.get(2)) {
-                    if (startFrom == exWord_rowEnd + 1 || endAT == exWord_rowStart - 1)
-                        nextTo = true;
-                } else if (colIdx == (int)list.get(2) + 1 || colIdx == (int)list.get(2) - 1) { // diff column next to the existing word's collumn
-                    if ( (startFrom >= exWord_rowStart && startFrom <= exWord_rowEnd)
-                            || (endAT >= exWord_rowStart && endAT <= exWord_rowEnd) )
-                        nextTo = true;
-                }
-            }
-            if (nextTo) return true;
+    public static boolean isNextToParallelExistWord (String direction,
+    int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol,
+    int startRow, int startCol,
+    int endRow, int endCol){
+        boolean nextTo = false;
+        if (direction.equals("right")) {
+            if ( ((endCol == nwStartCol - 1 || startCol == nwEndCol + 1) && (startRow == nwStartRow && startRow == endRow))
+                    || ((startRow == nwStartRow + 1 || startRow == nwStartRow - 1 && startRow == endRow) &&
+                    ((startCol >= nwStartCol && startCol <= nwEndCol) || (endCol >= nwStartCol && endCol <= nwEndCol))) )
+                nextTo = true;
         }
-        return false;
+        if (direction.equals("down")) {
+            if ( ((endRow == nwStartRow - 1 || startRow == nwEndRow + 1) && (startCol == nwStartCol && startCol == endCol))
+                    || ((startCol == nwStartCol + 1 || startCol == nwStartCol - 1 && startCol == endCol) &&
+                    ((startRow >= nwStartRow && startRow <= nwEndRow) || (endRow >= nwStartRow && endRow <= nwEndRow))) )
+                nextTo = true;
+        }
+        return nextTo;
     }
 
 }

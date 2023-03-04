@@ -20,7 +20,7 @@ public class Scoring {
         int scoreWithoutPremiumWord = 0;
 
         int wordSize = move.madeNewWord.length();
-        int startRow = move.startPosOfNewWord.get(0), startCol = move.startPosOfNewWord.get(1);
+        int startRow = move.start_and_endPosOfNewWord.get(0), startCol = move.start_and_endPosOfNewWord.get(1);
         boolean hasPremiumWordSqr  = false;
         int factorInPremiumWordSqr = 0;
         for (int i = 0; i < wordSize; i++) {

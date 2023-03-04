@@ -2,7 +2,6 @@ package pij.main;
 
 import javafx.util.Pair;
 
-import java.sql.Array;
 import java.util.*;
 
 public class Move {
@@ -17,7 +16,7 @@ public class Move {
     public List<Tile> useTiles = new ArrayList<>();
     public String madeNewWord = "";
     // if going right: startfrom: (3,2) endat:(3,8) / if down: (5,8) (10, 8)
-    public List<Integer> startPosOfNewWord = new ArrayList<>();
+    public List<Integer> start_and_endPosOfNewWord = new ArrayList<>();
 
 
     public Move(Player player, String inputLetters, String position, String direction) {
@@ -30,8 +29,10 @@ public class Move {
             isValid = true;
             madeNewWord = valid_setIntoPosition.getKey().getKey();
             tilesSetInto = valid_setIntoPosition.getValue();
-            startPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(0));
-            startPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(1));
+            start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(0));
+            start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(1));
+            start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(2));
+            start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(3));
         } // else isValid=false, tilesSetInto=null as default initialization
     }
 
@@ -126,6 +127,7 @@ public class Move {
             }
         }
     }
+
 
 
     @Override

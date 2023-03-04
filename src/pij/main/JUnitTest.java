@@ -225,7 +225,6 @@ public class JUnitTest {
         System.out.println("Test 14: test Scoring WordsOnBoard class multiWordsOrNoneRow method");
 
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
-        LetterPoints letterPoints= new LetterPoints();
         GameBoard.size = 15;
         WordList wordList = new WordList();
 
@@ -243,11 +242,10 @@ public class JUnitTest {
 
     @Test
     @Order(15)
-    void test_WordsOnBoard_multiWordsOrNoneRow() throws IOException {
-        System.out.println("Test 15: test Scoring WordsOnBoard class multiWordsOrNoneRow method");
+    void test_WordsOnBoard_multiWordsOrNoneRow_isAnyRightAngleNewWord() throws IOException {
+        System.out.println("Test 15: test Scoring WordsOnBoard class multiWordsOrNoneRow method and isAnyRightAngleNewWord method");
 
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
-        LetterPoints letterPoints= new LetterPoints();
         GameBoard.size = 15;
         GameBoard.printBoard();
         WordList wordList = new WordList();
@@ -266,4 +264,64 @@ public class JUnitTest {
         boolean actual = move3.isValid;
         Assertions.assertEquals(expected, actual);
     }
+
+    @Test
+    @Order(16)
+    void test_WordsOnBoard_isRightAngleExistWordNoOverlap1() throws IOException {
+        System.out.println("Test 16: test Scoring WordsOnBoard class isRightAngleExistWordNoOverlap method 1");
+
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+        GameBoard.printBoard();
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+        Player human = new Player(true);
+        Move move1 = new Move(human, "GIT", "f8", "r");
+        move1.recoverBoardGridContent();
+        WordsOnBoard.addWord(8, 5, 8, 7,"GIT");
+        System.out.println("\n=== After move1 and recovered ===");
+        GameBoard.printBoard();
+        Move move2 = new Move(human, "SAR", "h7", "d");
+        move2.recoverBoardGridContent();
+        WordsOnBoard.addWord(7, 5, 10, 5,"STAR");
+        System.out.println("\n=== After move2 and recovered ===");
+        GameBoard.printBoard();
+        Move move3 = new Move(human, "IS", "i9", "r");
+
+        boolean expected = false;
+        boolean actual = move3.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    @Order(17)
+    void test_WordsOnBoard_isRightAngleExistWordNoOverlap2() throws IOException {
+        System.out.println("Test 17: test Scoring WordsOnBoard class isRightAngleExistWordNoOverlap method 2");
+
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+        GameBoard.printBoard();
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+        Player human = new Player(true);
+        Move move1 = new Move(human, "GIT", "f8", "r");
+        move1.recoverBoardGridContent();
+        WordsOnBoard.addWord(8, 5, 8, 7,"GIT");
+        System.out.println("\n=== After move1 and recovered ===");
+        GameBoard.printBoard();
+        Move move2 = new Move(human, "SAR", "h7", "d");
+        move2.recoverBoardGridContent();
+        WordsOnBoard.addWord(7, 5, 10, 5,"STAR");
+        System.out.println("\n=== After move2 and recovered ===");
+        GameBoard.printBoard();
+        Move move3 = new Move(human, "R", "i9", "r");
+        System.out.println("\n=== After move3 and recovered ===");
+        move3.recoverBoardGridContent();
+        GameBoard.printBoard();
+
+        boolean expected = true;
+        boolean actual = move3.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
+
 }
