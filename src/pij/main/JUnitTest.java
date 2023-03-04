@@ -241,4 +241,29 @@ public class JUnitTest {
 
     }
 
+    @Test
+    @Order(15)
+    void test_WordsOnBoard_multiWordsOrNoneRow() throws IOException {
+        System.out.println("Test 15: test Scoring WordsOnBoard class multiWordsOrNoneRow method");
+
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        LetterPoints letterPoints= new LetterPoints();
+        GameBoard.size = 15;
+        GameBoard.printBoard();
+        WordList wordList = new WordList();
+        Player human = new Player(true);
+        Move move1 = new Move(human, "GIT", "f8", "r");
+        move1.recoverBoardGridContent();
+        System.out.println("\n=== After move1 and recovered ===");
+        GameBoard.printBoard();
+        Move move2 = new Move(human, "SAR", "h7", "d");
+        move2.recoverBoardGridContent();
+        System.out.println("\n=== After move2 and recovered ===");
+        GameBoard.printBoard();
+        Move move3 = new Move(human, "TG", "g9", "r");
+
+        boolean expected = false;
+        boolean actual = move3.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
 }

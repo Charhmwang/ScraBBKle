@@ -122,7 +122,7 @@ public class Move {
                 GameBoard.reviseBoard(row, tilesSetInto[i], letter_with_points);
             }
             if (direction.equals("down")) {
-                GameBoard.reviseBoard(tilesSetInto[i], column - 1, letter_with_points);
+                GameBoard.reviseBoard(tilesSetInto[i], column - 97, letter_with_points);
             }
         }
     }
