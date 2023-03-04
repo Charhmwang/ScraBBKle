@@ -74,7 +74,9 @@ public class WordsOnBoard {
         int endAT = (int)res.get(2);
 
         boolean rightAngleCheck = isAnyRightAngleNewWord(direction, tilesSetInto, row, colIdx);
-        if (rightAngleCheck) return null;
+        if (rightAngleCheck) {
+            return null;
+        }
         // Till here, can ensure that there is not more than one word constructed
         // due to the new adding tiles both horizontally and vertically.
 
@@ -140,6 +142,7 @@ public class WordsOnBoard {
                     String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx);
                     newCreatedWordUndone += curLetter;
                     GameBoard.reviseBoard(rowIdx + gridCounter, colIdx, testContent);
+                    tilesSetInto[bitCounter] = rowIdx + gridCounter;
                     //not score, only letter for testing
                     //if move is valid, board content needs to add the corresponding scores
                     //e.g. (3) is changed into G(3) at this stage, will be change into G2 if it's valid move when it's executed
@@ -160,6 +163,7 @@ public class WordsOnBoard {
                     newCreatedWordUndone += curLetter;
                     //same as above in "down" case
                     GameBoard.reviseBoard(rowIdx, colIdx + gridCounter, testContent);  //not score, only letter for testing
+                    tilesSetInto[bitCounter] = colIdx + gridCounter;
                     bitCounter++;
                 } else {
                     newCreatedWordUndone += ch;
@@ -282,26 +286,28 @@ public class WordsOnBoard {
 
 
     public static boolean isAnyRightAngleNewWord(String direction, int[] tilesSetInto, int rowIdx, int colIdx) {
-        String curTry = "";
+
         for (int i : tilesSetInto) {
+            String curTry = "";
             int allFilledFrom = 0, allFilledTo = GameBoard.size - 1;
             if (direction.equals("right")) {
                 //check each col the tile is set in
                 //first find out the consist word with the tile
-                for (int up = rowIdx - 1; up >= 0; up--) {
+                for (int up = rowIdx - 1; up >= 1; up--) {
                     char letter = GameBoard.getBoardGridContent(up, i).charAt(0);
                     if (!Character.isAlphabetic(letter)) {
                         allFilledFrom = up + 1;
                         break;
                     }
                 }
-                for (int down = rowIdx + 1; down < GameBoard.size; down++) {
+                for (int down = rowIdx + 1; down <= GameBoard.size; down++) {
                     char letter = GameBoard.getBoardGridContent(down, i).charAt(0);
                     if (!Character.isAlphabetic(letter)) {
                         allFilledTo = down - 1;
                         break;
                     }
                 }
+
                 for (int a = allFilledFrom; a <= rowIdx; a++) {
                     for (int b = rowIdx; b <= allFilledTo; b++) {
                         for (int c = a; c <= b; c++) {
@@ -320,15 +326,15 @@ public class WordsOnBoard {
                         break;
                     }
                 }
-                for (int right = colIdx + 1; right < GameBoard.size; right++) {
+                for (int right = colIdx + 1; right <= GameBoard.size; right++) {
                     char letter = GameBoard.getBoardGridContent(i, right).charAt(0);
                     if (!Character.isAlphabetic(letter)) {
                         allFilledTo = right - 1;
                         break;
                     }
                 }
-                for (int a = allFilledFrom; a <= rowIdx; a++) {
-                    for (int b = rowIdx; b <= allFilledTo; b++) {
+                for (int a = allFilledFrom; a <= colIdx; a++) {
+                    for (int b = colIdx; b <= allFilledTo; b++) {
                         for (int c = a; c <= b; c++) {
                             curTry += (GameBoard.getBoardGridContent(i, c).charAt(0));
                         }

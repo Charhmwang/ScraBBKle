@@ -89,25 +89,15 @@ public class Move {
     // need to update the grid content from the form such as "G{3}" to "G2" or "T." to "T1", or "t{3}" to "t3"(wildcard)
     // See method buildWordUsingTileLetters in WordsOnBoard class
     public boolean execute() {
+
+        recoverBoardGridContent();
+        // Take each tile out of rack
         for (int i = 0; i < tilesSetInto.length; i++) {
-            Tile t = useTiles.get(i);
-            int letterPoints = 0;
-            if (t.isWildCard) letterPoints = 3;
-            else letterPoints = LetterPoints.letterMap.get(t.letter);
-            String letter_points = String.valueOf(t.letter) + letterPoints;
-
-            // TODO: Before revise the board content, calculate scores add to player
-
-            if (direction.equals("right"))
-                GameBoard.reviseBoard(row - 1, tilesSetInto[i], letter_points);
-            if (direction.equals("down"))
-                GameBoard.reviseBoard(tilesSetInto[i], column - 1, letter_points);
-            // Take each tile out of rack
-            player.getTileRack().takeOutTileFromRack(t.letter);
+            char letter = inputLetters.charAt(i);
+            player.getTileRack().takeOutTileFromRack(letter);
         }
 
         // TODO: Display each side score
-
         // refill the rack
         int counter = useTiles.size();
         while (counter-- > 0) {
@@ -117,6 +107,24 @@ public class Move {
             }
         }
         return true;
+    }
+
+    void recoverBoardGridContent() {
+
+        for (int i = 0; i < tilesSetInto.length; i++) {
+            char letter = inputLetters.charAt(i);
+            int letterPoints = 0;
+            if (Character.isLowerCase(letter)) letterPoints = 3;
+            else letterPoints = LetterPoints.letterMap.get(letter);
+            String letter_with_points = String.valueOf(letter) + letterPoints + " ";
+
+            if (direction.equals("right")) {
+                GameBoard.reviseBoard(row, tilesSetInto[i], letter_with_points);
+            }
+            if (direction.equals("down")) {
+                GameBoard.reviseBoard(tilesSetInto[i], column - 1, letter_with_points);
+            }
+        }
     }
 
 
