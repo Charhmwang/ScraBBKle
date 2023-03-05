@@ -10,6 +10,7 @@ public class Move {
     public int row;  //not idx
     public String position;
     public String direction;
+
     public Player player;
     public boolean isValid;
     public int[] tilesSetInto;

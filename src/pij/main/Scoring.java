@@ -1,5 +1,7 @@
 package pij.main;
 
+import java.util.List;
+
 // Present the scores getting from each move
 public class Scoring {
 
@@ -66,15 +68,27 @@ public class Scoring {
 
     // At the end of the game, each player’s score is reduced by the sum of the values of their own un-played tiles.
     public static void removeScoresFromRemainedTiles(Player player) {
-        int remove = getSumValuesOfTiles(player.getTileRack());
+        int remove = getSumValuesOfRack(player.getTileRack());
         player.reduceScore(remove);
     }
 
 
-    public static int getSumValuesOfTiles(TileRack tileRack) {
+    public static int getSumValuesOfRack(TileRack tileRack) {
         int sum = 0;
         for (Tile t : tileRack.getTiles()) {
             sum += LetterPoints.letterMap.get(t.letter);
+        }
+        return sum;
+    }
+
+    public static int getSumValueOfTiles(List<Tile> tiles) {
+        int sum = 0;
+        for (Tile t : tiles) {
+            if (Character.isLowerCase(t.letter)) {
+                sum += 3;
+            } else {
+                sum += LetterPoints.letterMap.get(t.letter);
+            }
         }
         return sum;
     }
