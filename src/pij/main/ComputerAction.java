@@ -14,6 +14,8 @@ public class ComputerAction {
         else move.execute();
     }
 
+    public Move getMove() { return move; }
+
     public Move autoMove() {
 
         // Create a list to store the possible moves, choose one of them randomly as the return:
@@ -77,8 +79,8 @@ public class ComputerAction {
     public void ifValidMove(Move tryMove, List<Move> validMoves) {
         if (tryMove.isValid) {
             validMoves.add(tryMove);
-            move.recoverBoardGridContent();
         }
+        move.recoverBoardGridContent();
     }
 
     public char randomChar() {

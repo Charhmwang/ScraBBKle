@@ -7,7 +7,7 @@ import java.util.*;
 public class Move {
     public String inputLetters;
     public char column; //not idx
-    public int row;  //not idx
+    public int row;  //idx
     public String position;
     public String direction;
 
@@ -26,15 +26,20 @@ public class Move {
         this.position = position;
         this.direction = direction;
         Pair<Pair<String, List<Integer>>, int[]> valid_setIntoPosition = validateMove();
-        if (valid_setIntoPosition != null) {
+        String newWord = valid_setIntoPosition.getKey().getKey();
+        if (newWord != null) {
             isValid = true;
-            madeNewWord = valid_setIntoPosition.getKey().getKey();
+            madeNewWord = newWord;
             tilesSetInto = valid_setIntoPosition.getValue();
             start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(0));
             start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(1));
             start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(2));
             start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(3));
-        } // else isValid=false, tilesSetInto=null as default initialization
+        } else {
+            // Still need to store the setIntoPosition for recovering the board grid contents which been changed during
+            // the move validation in class WordsOnBoard
+            tilesSetInto = valid_setIntoPosition.getValue();
+        }
     }
 
     public Pair<Pair<String,List<Integer>>, int[]> validateMove() {
@@ -126,6 +131,26 @@ public class Move {
                 GameBoard.reviseBoard(tilesSetInto[i], column - 97, letter_with_points);
             }
         }
+    }
+
+    void recoverBoardGridContentForInvalidMove() {
+
+        // Check if the grid content was revised
+        int col = column - 'a';
+
+        for (int i = 0; i < tilesSetInto.length; i++) {
+                String gridContent = "";
+                if (direction.equals("right")) {
+                    gridContent = GameBoard.getBoardGridContent(row, tilesSetInto[i]);
+                    gridContent = gridContent.substring(1);
+                    GameBoard.reviseBoard(row, tilesSetInto[i], gridContent);
+                }
+                else {
+                    gridContent = GameBoard.getBoardGridContent(tilesSetInto[i], col);
+                    gridContent = gridContent.substring(1);
+                    GameBoard.reviseBoard(tilesSetInto[i], col, gridContent);
+                }
+            }
     }
 
 

@@ -301,8 +301,8 @@ public class JUnitTest {
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         GameBoard.printBoard();
-        WordList wordList = new WordList();
         LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = new WordList();
         Player human = new Player(true);
         Move move1 = new Move(human, "GIT", "f8", "r");
         move1.recoverBoardGridContent();
@@ -324,7 +324,36 @@ public class JUnitTest {
         Assertions.assertEquals(expected, actual);
     }
 
+
     @Test
     @Order(18)
+    void test_Move_recoverBoardGridContentForInvalidMove() throws IOException {
+        System.out.println("Test 18: test Move class recoverBoardGridContentForInvalidMove method");
+
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+        GameBoard.printBoard();
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+        Player human = new Player(true);
+        Move move1 = new Move(human, "GIT", "f8", "r");
+        move1.recoverBoardGridContent();
+        WordsOnBoard.addWord(8, 5, 8, 7,"GIT");
+        System.out.println("\n=== After move1 and recovered ===");
+        GameBoard.printBoard();
+        Move move2 = new Move(human, "SAR", "h7", "d");
+        move2.recoverBoardGridContent();
+        WordsOnBoard.addWord(7, 5, 10, 5,"STAR");
+        System.out.println("\n=== After move2 and recovered ===");
+        GameBoard.printBoard();
+        Move move3 = new Move(human, "TG", "g9", "r");
+        System.out.println("\n=== After move3 and recovered ===");
+        move3.recoverBoardGridContentForInvalidMove();
+        GameBoard.printBoard();
+
+        boolean expected = false;
+        boolean actual = move3.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
 
 }

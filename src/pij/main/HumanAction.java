@@ -35,17 +35,11 @@ public class HumanAction {
                     // see explanation in method buildWordUsingTileLetters in WordsOnBoard class
                     // need to update the grid content from such as "G{3}" into "{3}" or "T." into "."
                     System.out.println("Invalid move! Re-enter your move decision in the next line.");
-
-                    int row = strArr[1].charAt(1) - '1';
-                    int col = strArr[1].charAt(0) - 'a';
                     // Check if the grid content was revised
-                    String gridContent = GameBoard.getBoardGridContent(row, col);
+                    String gridContent = GameBoard.getBoardGridContent(move.row, move.column - 'a');
                     if ((gridContent.charAt(0) != '.' && gridContent.charAt(0) != '{' && gridContent.charAt(0) != '(')
-                            && (gridContent.charAt(1) == '.' || gridContent.charAt(1) == '{' || gridContent.charAt(1) == '(')) {
-
-                        gridContent = gridContent.substring(1);
-                        GameBoard.reviseBoard(row, col, gridContent);
-                    }
+                            && (gridContent.charAt(1) == '.' || gridContent.charAt(1) == '{' || gridContent.charAt(1) == '('))
+                     move.recoverBoardGridContentForInvalidMove();
                 }
             } else {
                 System.out.println("Invalid input form! Re-enter your move decision in the next line.");

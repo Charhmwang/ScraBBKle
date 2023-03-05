@@ -1,8 +1,7 @@
 package pij.main;
 
 
-import java.lang.reflect.Array;
-import java.sql.SQLOutput;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,19 +46,22 @@ public class WordsOnBoard {
         boolean occupied = Character.isAlphabetic(GameBoard.getBoardGridContent(row, colIdx).charAt(0));
         if (occupied) return null;
 
+
+
         // First fill up the row/column (depends on the direction) skipping the grid already had a letter
         // var newCreatedWordUndone - The word composed of letters from the first tile to the end, maybe it is the new
         // word on its own, maybe it is the substring of the new word constructed with other next letters in the same row/col
         Pair<String, int[]> word_and_idx = buildWordUsingTileLetters(inputLetters, row, colIdx, direction);
-        if (word_and_idx == null) return null;
+        String preWord = word_and_idx.getKey();
+        int[] tilesSetInto = word_and_idx.getValue();
+        if (preWord == null) { // means user's input out of the board bound
+            return new Pair<Pair<String, List<Integer>>, int[]>(new Pair<>(null, null), tilesSetInto);
+        }
         //System.out.println("CHECK 1 done"); //debug
 
 
         // CHECK 2. is there one and only one legal word constructed on the current row (if right)/ col (if down)?
         // if there are more than one or zero, return false;
-        String preWord = word_and_idx.getKey();
-        int[] tilesSetInto = word_and_idx.getValue();
-
         int endIdxRow = row + preWord.length() - 1;
         int endIdxCol = colIdx + preWord.length() - 1;
 
@@ -71,7 +73,9 @@ public class WordsOnBoard {
         if (direction.equals("down")) {
             res = multiWordsOrNoneCol(preWord, row, colIdx, endIdxRow);
         }
-        if (res == null) return null;
+        if (res == null) {
+            return new Pair<Pair<String, List<Integer>>, int[]>(new Pair<>(null, null), tilesSetInto);
+        };
         //System.out.println("CHECK 2 done"); //debug
 
         // Check 3. is there any new legal word constructed on each tile's right angle direction because of this tile?
@@ -84,7 +88,7 @@ public class WordsOnBoard {
 
         boolean rightAngleCheck = isAnyRightAngleNewWord(direction, tilesSetInto, row, colIdx);
         if (rightAngleCheck) {
-            return null;
+            return new Pair<Pair<String, List<Integer>>, int[]>(new Pair<>(null, null), tilesSetInto);
         }
         //System.out.println("CHECK 3 done"); //debug
         // Till here, can ensure that there is not more than one word constructed
@@ -94,7 +98,9 @@ public class WordsOnBoard {
         // CHECK 4. not allowed to place a word at right angles to a word already on the board without an overlap
 
         boolean rightAngleExistWordNoOverlap = isRightAngleExistWordNoOverlap(direction, idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3));
-        if (rightAngleExistWordNoOverlap) return null;
+        if (rightAngleExistWordNoOverlap) {
+            return new Pair<Pair<String, List<Integer>>, int[]>(new Pair<>(null, null), tilesSetInto);
+        }
 
         //System.out.println("CHECK 4 done"); //debug
 
@@ -201,9 +207,8 @@ public class WordsOnBoard {
         }
 
         if (bitCounter < inputLetters.length()) {
-            return null;  // out of legal bounds before using all the tiles
+            return new Pair<String, int[]>(null, tilesSetInto); // out of legal bounds before using all the tiles
         }
-
         return new Pair<String, int[]>(newCreatedWordUndone, tilesSetInto);
     }
 
