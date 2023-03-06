@@ -1,11 +1,12 @@
 package pij.main;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 public class ComputerAction {
     private final Player computer;
     private Move move;
-    public Boolean skipped;
+    public Boolean skipped = false;
 
     public ComputerAction(Player computer) {
         this.computer = computer;
@@ -32,45 +33,75 @@ public class ComputerAction {
         // Recover the content of the grid and execute to take tiles out and refill
 
         List<Move> validMoves = new ArrayList<>();
+        // randomly choose how many tiles computer will use for this move
+        int rackTilesNum = computer.getTileRack().getTiles().size();
 
         for (int i = 1; i <= GameBoard.size; i++) { //row
-
             for (int j = 0; j < GameBoard.size; j++) { //col
                 if (Character.isAlphabetic(GameBoard.getBoardGridContent(i,j).charAt(0))) {
-                    continue;
+                    continue;  //already covered a tile
                 }
 
-                int rackTilesNum = computer.getTileRack().getTiles().size();
-                for (int k = 1; k <= rackTilesNum; k++) {  // try using only one tile to the full size tiles to build input letters
+                //========================================================================
+                Random rd = new Random();
+                // change 0->4 for debugging
+                int useTilesAmount = rd.nextInt(0, rackTilesNum + 1); //if 0, pc skip for this move
+                //int useTilesAmount = 7; //debug
+                System.out.println("PC choosing " + useTilesAmount + " tiles for this move.");// debug
 
-                    List<Tile> tiles = computer.getTileRack().getTiles();
-                    List<String> allTheLetterSequences = new ArrayList<>();
-                    switch (k) {
-                            case 1: allTheLetterSequences = getSeqFor1Bit(tiles);
-                            case 2: allTheLetterSequences = getSeqFor2Bits(tiles);
-                            case 3: allTheLetterSequences = getSeqFor3Bits(tiles);
-                            case 4: allTheLetterSequences = getSeqFor4Bits(tiles);
-                            case 5: allTheLetterSequences = getSeqFor5Bits(tiles);
-                            case 6: allTheLetterSequences = getSeqFor6Bits(tiles);
-                            case 7: allTheLetterSequences = getSeqFor7Bits(tiles);
-                            default: break;
+                System.out.println(computer.getTileRack());
+                List<Tile> tiles = computer.getTileRack().getTiles();
+                List<String> allTheLetterSequences = new ArrayList<>();
+
+                switch (useTilesAmount) {
+                    case 1 -> {
+                        allTheLetterSequences = getSeqFor1Bit(tiles); break;
                     }
-
-                    for (String s : allTheLetterSequences) {
-                        String pos = "" + (char)('a' + j) + i;
-                        Move tryMoveR = new Move(computer, s, pos, "r");
-                        ifValidMove(tryMoveR, validMoves);
-                        Move tryMoveD = new Move(computer, s, pos, "d");
-                        ifValidMove(tryMoveD, validMoves);
+                    case 2 -> {
+                        allTheLetterSequences = getSeqFor2Bits(tiles); break;
+                    }
+                    case 3 -> {
+                        allTheLetterSequences = getSeqFor3Bits(tiles); break;
+                    }
+                    case 4 -> {
+                        allTheLetterSequences = getSeqFor4Bits(tiles); break;
+                    }
+                    case 5 -> {
+                        allTheLetterSequences = getSeqFor5Bits(tiles); break;
+                    }
+                    case 6 -> {
+                        allTheLetterSequences = getSeqFor6Bits(tiles); break;
+                    }
+                    case 7 -> {
+                        allTheLetterSequences = getSeqFor7Bits(tiles); break;
+                    }
+                    default -> {
                     }
                 }
+
+                // TODO: Don't give chance to computer to use 7 tiles for now - Brute force out of memory - fix later
+               for (String s : allTheLetterSequences) {
+                   String pos = "" + (char)('a' + j) + i;  // try each grid on the board to be the starting point
+//                   System.out.println(s + " " + pos);  //debug
+                   Move tryMoveRight = new Move(computer, s, pos, "r");
+                   ifValidMove(tryMoveRight, validMoves);
+                   Move tryMoveDown = new Move(computer, s, pos, "d");
+                   ifValidMove(tryMoveDown, validMoves);
+               }
             }
         }
 
         int validMovesAmount = validMoves.size();
+        System.out.println("There are " + validMovesAmount + " valid moves");  //debug
+        System.out.println("They are: "); //debug
+        for(Move m : validMoves) {
+            System.out.println(m); //debug
+        }
+        // if there was no valid move found, return null meaning skip
         if (validMovesAmount > 0) {
-            Random rd = new Random();
-            int choose = rd.nextInt(0, validMovesAmount);
+            Random rdm = new Random();
+            int choose = rdm.nextInt(0, validMovesAmount);
+            System.out.println(validMoves.get(choose)); //debug
             return validMoves.get(choose);
         } else
             return null;
@@ -78,9 +109,12 @@ public class ComputerAction {
 
     public void ifValidMove(Move tryMove, List<Move> validMoves) {
         if (tryMove.isValid) {
+            tryMove.recoverBoardGridContentForInvalidMove();
+            //because it's need to be recovered as original for other potential possible moves validation
             validMoves.add(tryMove);
+        } else {
+            tryMove.recoverBoardGridContentForInvalidMove();
         }
-        move.recoverBoardGridContent();
     }
 
     public char randomChar() {
@@ -104,8 +138,11 @@ public class ComputerAction {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
             for (int b = 0; b < 7; b++) {
-                if (b != a) each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
-                res.add(each);
+                if (b != a) {
+                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    res.add(each);
+                    break;
+                }
             }
         }
         return res;
@@ -117,10 +154,16 @@ public class ComputerAction {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
             for (int b = 0; b < 7; b++) {
-                if (b != a) each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
-                for (int c = 0; c < 7; c++) {
-                    if (c != a && c != b) each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
-                    res.add(each);
+                if (b != a) {
+                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    for (int c = 0; c < 7; c++) {
+                        if (c != a && c != b) {
+                            each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
+                            res.add(each);
+                            break;
+                        }
+                    }
+                    break;
                 }
             }
         }
@@ -133,18 +176,27 @@ public class ComputerAction {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
             for (int b = 0; b < 7; b++) {
-                if (b != a) each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
-                for (int c = 0; c < 7; c++) {
-                    if (c != a && c != b) each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
-                    for (int d = 0; d < 7; d++) {
-                        if (d != a && d != b && d != c) each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
-                        res.add(each);
+                if (b != a) {
+                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    for (int c = 0; c < 7; c++) {
+                        if (c != a && c != b) {
+                            each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
+                            for (int d = 0; d < 7; d++) {
+                                if (d != a && d != b && d != c) {
+                                    each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
+                                    res.add(each);
+                                    break;
+                                }
+                            }
+                            break;
+                        }
                     }
+                    break;
                 }
             }
         }
         return res;
-    };
+    }
 
     public List<String> getSeqFor5Bits(List<Tile> tiles) {
         List<String> res = new ArrayList<>();
@@ -152,21 +204,33 @@ public class ComputerAction {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
             for (int b = 0; b < 7; b++) {
-                if (b != a) each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
-                for (int c = 0; c < 7; c++) {
-                    if (c != a && c != b) each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
-                    for (int d = 0; d < 7; d++) {
-                        if (d != a && d != b && d != c) each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
-                        for (int e = 0; e < 7; e++) {
-                            if (e != a && e != b && e != c && e != d) each += tiles.get(e).isWildCard ? "" + randomChar() : "" + tiles.get(e).letter;
-                            res.add(each);
+                if (b != a) {
+                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    for (int c = 0; c < 7; c++) {
+                        if (c != a && c != b) {
+                            each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
+                            for (int d = 0; d < 7; d++) {
+                                if (d != a && d != b && d != c) {
+                                    each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
+                                    for (int e = 0; e < 7; e++) {
+                                        if (e != a && e != b && e != c && e != d) {
+                                            each += tiles.get(e).isWildCard ? "" + randomChar() : "" + tiles.get(e).letter;
+                                            res.add(each);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
                         }
                     }
+                    break;
                 }
             }
         }
         return res;
-    };
+    }
 
     public List<String> getSeqFor6Bits(List<Tile> tiles) {
         List<String> res = new ArrayList<>();
@@ -174,24 +238,39 @@ public class ComputerAction {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
             for (int b = 0; b < 7; b++) {
-                if (b != a) each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
-                for (int c = 0; c < 7; c++) {
-                    if (c != a && c != b) each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
-                    for (int d = 0; d < 7; d++) {
-                        if (d != a && d != b && d != c) each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
-                        for (int e = 0; e < 7; e++) {
-                            if (e != a && e != b && e != c && e != d) each += tiles.get(e).isWildCard ? "" + randomChar() : "" + tiles.get(e).letter;
-                            for (int f = 0; f < 7; f++) {
-                                if (f != a && f != b && f != c && f != d && f != e) each += tiles.get(f).isWildCard ? "" + randomChar() : "" + tiles.get(f).letter;
-                                res.add(each);
+                if (b != a) {
+                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    for (int c = 0; c < 7; c++) {
+                        if (c != a && c != b) {
+                            each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
+                            for (int d = 0; d < 7; d++) {
+                                if (d != a && d != b && d != c) {
+                                    each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
+                                    for (int e = 0; e < 7; e++) {
+                                        if (e != a && e != b && e != c && e != d) {
+                                            each += tiles.get(e).isWildCard ? "" + randomChar() : "" + tiles.get(e).letter;
+                                            for (int f = 0; f < 7; f++) {
+                                                if (f != a && f != b && f != c && f != d && f != e) {
+                                                    each += tiles.get(f).isWildCard ? "" + randomChar() : "" + tiles.get(f).letter;
+                                                    res.add(each);
+                                                    break;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
                             }
+                            break;
                         }
                     }
+                    break;
                 }
             }
         }
         return res;
-    };
+    }
 
     public List<String> getSeqFor7Bits(List<Tile> tiles) {
         List<String> res = new ArrayList<>();
@@ -199,27 +278,44 @@ public class ComputerAction {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
             for (int b = 0; b < 7; b++) {
-                if (b != a) each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
-                for (int c = 0; c < 7; c++) {
-                    if (c != a && c != b) each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
-                    for (int d = 0; d < 7; d++) {
-                        if (d != a && d != b && d != c) each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
-                        for (int e = 0; e < 7; e++) {
-                            if (e != a && e != b && e != c && e != d) each += tiles.get(e).isWildCard ? "" + randomChar() : "" + tiles.get(e).letter;
-                            for (int f = 0; f < 7; f++) {
-                                if (f != a && f != b && f != c && f != d && f != e) each += tiles.get(f).isWildCard ? "" + randomChar() : "" + tiles.get(f).letter;
-                                for (int g = 0; g < 7; g++) {
-                                    if (g != a && g != b && g != c && g != d && g != e && g != f)
-                                        each += tiles.get(g).isWildCard ? "" + randomChar() : "" + tiles.get(g).letter;
-                                    res.add(each);
+                if (b != a) {
+                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    for (int c = 0; c < 7; c++) {
+                        if (c != a && c != b) {
+                            each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
+                            for (int d = 0; d < 7; d++) {
+                                if (d != a && d != b && d != c) {
+                                    each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
+                                    for (int e = 0; e < 7; e++) {
+                                        if (e != a && e != b && e != c && e != d) {
+                                            each += tiles.get(e).isWildCard ? "" + randomChar() : "" + tiles.get(e).letter;
+                                            for (int f = 0; f < 7; f++) {
+                                                if (f != a && f != b && f != c && f != d && f != e) {
+                                                    each += tiles.get(f).isWildCard ? "" + randomChar() : "" + tiles.get(f).letter;
+                                                    for (int g = 0; g < 7; g++) {
+                                                        if (g != a && g != b && g != c && g != d && g != e && g != f) {
+                                                            each += tiles.get(g).isWildCard ? "" + randomChar() : "" + tiles.get(g).letter;
+                                                            res.add(each);
+                                                            break;
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    break;
                                 }
                             }
+                            break;
                         }
                     }
+                    break;
                 }
             }
         }
         return res;
-    };
+    }
 
 }

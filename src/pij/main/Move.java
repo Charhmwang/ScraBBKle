@@ -13,7 +13,7 @@ public class Move {
 
     public Player player;
     public boolean isValid;
-    public int[] tilesSetInto;
+    public List<Integer> tilesSetInto;
     public List<Tile> useTiles = new ArrayList<>();
     public String madeNewWord = "";
     // if going right: startfrom: (3,2) endat:(3,8) / if down: (5,8) (10, 8)
@@ -25,30 +25,28 @@ public class Move {
         this.player = player;
         this.position = position;
         this.direction = direction;
-        Pair<Pair<String, List<Integer>>, int[]> valid_setIntoPosition = validateMove();
-        String newWord = valid_setIntoPosition.getKey().getKey();
-        if (newWord != null) {
-            isValid = true;
-            madeNewWord = newWord;
-            tilesSetInto = valid_setIntoPosition.getValue();
-            start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(0));
-            start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(1));
-            start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(2));
-            start_and_endPosOfNewWord.add(valid_setIntoPosition.getKey().getValue().get(3));
-        } else {
-            // Still need to store the setIntoPosition for recovering the board grid contents which been changed during
-            // the move validation in class WordsOnBoard
-            tilesSetInto = valid_setIntoPosition.getValue();
+        //( (newWord, idxOfNewWord), tilesSetInto )
+        Pair<Pair<String, List<Integer>>, List<Integer>> setIntoPosition = validateMove();
+        // valid_setIntoPosition will be null
+        // 1. if the player's move input form is wrong,
+        // 2. if the player try to use the word not coming from its own rack,
+        // 3. if the player try to set tile into a grid already been covered by tile
+        if (setIntoPosition != null) {
+            tilesSetInto = setIntoPosition.getValue();
+            Pair<String, List<Integer>> newWord_and_idxes = setIntoPosition.getKey();
+            if (newWord_and_idxes.getKey() != null) { //there is valid string returned
+                isValid = true;
+                madeNewWord = newWord_and_idxes.getKey();
+                start_and_endPosOfNewWord.add(newWord_and_idxes.getValue().get(0));
+                start_and_endPosOfNewWord.add(newWord_and_idxes.getValue().get(1));
+                start_and_endPosOfNewWord.add(newWord_and_idxes.getValue().get(2));
+                start_and_endPosOfNewWord.add(newWord_and_idxes.getValue().get(3));
+            }
         }
     }
 
-    public Pair<Pair<String,List<Integer>>, int[]> validateMove() {
+    public Pair<Pair<String,List<Integer>>, List<Integer>> validateMove() {
 
-        this.column = position.charAt(0);
-        this.row = Integer.parseInt(position.substring(1));
-        this.direction = direction.charAt(0) == 'r' ? "right" : "down";
-
-        /*
         // 1. Validate player's input position and move direction
         int size = GameBoard.size;
         if (position.length() >= 2 && position.length() <= 3 &&
@@ -62,27 +60,18 @@ public class Move {
             }
         } else return null;
 
-        // 2. Validate whether the player is using tiles from its own tiles rack
-        TileRack tileRack = player.getTileRack();
-        if (inputLetters.length() <= tileRack.getTilesAmount()) {
-            for (int i = 0; i < inputLetters.length(); i++) {
-                Tile t = tileRack.isTileExisting(inputLetters.charAt(i));
-                if (t != null) {
-                    if (useTiles.contains(t)) {
-                        for (Tile tile : useTiles) {
-                            if (tile.letter == t.letter) {
-                                if (tile.hashCode() == t.hashCode()) return null;
-                            }
-                        }
-                    }
-                    useTiles.add(t);
-                } else return null;
-            }
-            if (useTiles.size() != inputLetters.length()) return null;
-        } else return null;
+//        // 2. Validate whether the player is using tiles from its own tiles rack
+//        TileRack tileRack = player.getTileRack();
+//        if (inputLetters.length() <= tileRack.getTilesAmount()) {
+//            for (int i = 0; i < inputLetters.length(); i++) {
+//                Tile t = tileRack.isTileExisting(inputLetters.charAt(i));
+//                if (t != null) {
+//                    useTiles.add(t);
+//                } else return null;
+//            }
+//            if (useTiles.size() != inputLetters.length()) return null;
+//        } else return null;
 
-
-         */
 
 
         // 3. Check whether anywhere violates the game word rule after these tiles adding
@@ -99,15 +88,15 @@ public class Move {
 
         recoverBoardGridContent();
         // Take each tile out of rack
-        for (int i = 0; i < tilesSetInto.length; i++) {
-            char letter = inputLetters.charAt(i);
-            player.getTileRack().takeOutTileFromRack(letter);
+        for (Tile useTile : useTiles) {
+            player.getTileRack().takeOutTileFromRack(useTile);
         }
 
         // refill the rack
         int counter = useTiles.size();
         while (counter-- > 0) {
-            if (!player.getTileRack().fillUp()) {
+            boolean filled = player.getTileRack().fillUp();
+            if (!filled) {
                 if (player.getTileRack().getTilesAmount() == 0)
                     return false; // cannot refill because tiles bag empty, and also the player rack empty, so game over
             }
@@ -117,7 +106,7 @@ public class Move {
 
     void recoverBoardGridContent() {
 
-        for (int i = 0; i < tilesSetInto.length; i++) {
+        for (int i = 0; i < tilesSetInto.size(); i++) {
             char letter = inputLetters.charAt(i);
             int letterPoints = 0;
             if (Character.isLowerCase(letter)) letterPoints = 3;
@@ -125,10 +114,10 @@ public class Move {
             String letter_with_points = String.valueOf(letter) + letterPoints + " ";
 
             if (direction.equals("right")) {
-                GameBoard.reviseBoard(row, tilesSetInto[i], letter_with_points);
+                GameBoard.reviseBoard(row, tilesSetInto.get(i), letter_with_points);
             }
             if (direction.equals("down")) {
-                GameBoard.reviseBoard(tilesSetInto[i], column - 97, letter_with_points);
+                GameBoard.reviseBoard(tilesSetInto.get(i), column - 'a', letter_with_points);
             }
         }
     }
@@ -138,17 +127,25 @@ public class Move {
         // Check if the grid content was revised
         int col = column - 'a';
 
-        for (int i = 0; i < tilesSetInto.length; i++) {
+        for (int i = 0; i < tilesSetInto.size(); i++) {
                 String gridContent = "";
                 if (direction.equals("right")) {
-                    gridContent = GameBoard.getBoardGridContent(row, tilesSetInto[i]);
-                    gridContent = gridContent.substring(1);
-                    GameBoard.reviseBoard(row, tilesSetInto[i], gridContent);
+                    gridContent = GameBoard.getBoardGridContent(row, tilesSetInto.get(i));
+                    if ((gridContent.charAt(0) != '.' && gridContent.charAt(0) != '{' && gridContent.charAt(0) != '(')
+                            && (gridContent.charAt(1) == '.' || gridContent.charAt(1) == '{' || gridContent.charAt(1) == '('))
+                    {
+                        gridContent = gridContent.substring(1);
+                        GameBoard.reviseBoard(row, tilesSetInto.get(i), gridContent);
+                    }
                 }
                 else {
-                    gridContent = GameBoard.getBoardGridContent(tilesSetInto[i], col);
-                    gridContent = gridContent.substring(1);
-                    GameBoard.reviseBoard(tilesSetInto[i], col, gridContent);
+                    gridContent = GameBoard.getBoardGridContent(tilesSetInto.get(i), col);
+                    if ((gridContent.charAt(0) != '.' && gridContent.charAt(0) != '{' && gridContent.charAt(0) != '(')
+                            && (gridContent.charAt(1) == '.' || gridContent.charAt(1) == '{' || gridContent.charAt(1) == '('))
+                    {
+                        gridContent = gridContent.substring(1);
+                        GameBoard.reviseBoard(tilesSetInto.get(i), col, gridContent);
+                    }
                 }
             }
     }

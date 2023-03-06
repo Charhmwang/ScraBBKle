@@ -37,13 +37,10 @@ public class TileRack {
                 .collect(Collectors.joining(", ")));
     }
 
-    public void takeOutTileFromRack(char letter) {
-        Tile t = isTileExisting(letter);
-        if (t != null) {
-                tiles.remove(t);
-            }
-    }
+    public void takeOutTileFromRack(Tile tile) { tiles.remove(tile); }
 
+
+    // TODO: ! if user only have 1 wildcard but input having more than 1 lowercase letter
     public Tile isTileExisting(char letter) {
 
         if (Character.isAlphabetic(letter)) {
@@ -54,12 +51,16 @@ public class TileRack {
             } else {
                 for (Tile t : tiles)
                     if (t.letter == '?') {
-                        t.letter = letter;
                         return t;
                     }
             }
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return tiles.stream().map(Tile::toString).collect(Collectors.joining(", "));
     }
 
 }

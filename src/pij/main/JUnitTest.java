@@ -171,7 +171,7 @@ public class JUnitTest {
         Move move = new Move(human, legalWord, position, direction);
         System.out.println(move.toString());
 
-        boolean expected = true;
+        boolean expected = false;
         boolean actual = move.isValid;
         Assertions.assertEquals(expected, actual);
     }
@@ -212,6 +212,8 @@ public class JUnitTest {
         WordList wordList = new WordList();
         Player human = new Player(true);
         Move move = new Move(human, "GIT", "f8", "r");
+        System.out.println(move.isValid);
+
         Scoring scoring = new Scoring(move, human);
         int expected = 8;
         int actual = scoring.getScore();
@@ -249,6 +251,7 @@ public class JUnitTest {
         GameBoard.size = 15;
         GameBoard.printBoard();
         WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
         Player human = new Player(true);
         Move move1 = new Move(human, "GIT", "f8", "r");
         move1.recoverBoardGridContent();
@@ -353,6 +356,66 @@ public class JUnitTest {
 
         boolean expected = false;
         boolean actual = move3.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
+
+
+    @Test
+    @Order(19)
+    void test_ComputerAction_autoMove() throws IOException {
+        System.out.println("Test 19: test ComputerAction class autoMove method");
+
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+        GameBoard.printBoard();
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+        Player computer = new Player(false);
+        TileRack pcRack = new TileRack(computer);
+        computer.setTileRack(pcRack);
+
+        ComputerAction pcAction = new ComputerAction(computer);
+        if (!pcAction.skipped) {
+            Move pcMove = pcAction.getMove();
+            pcMove.recoverBoardGridContent();
+            int startRow = pcMove.start_and_endPosOfNewWord.get(0);
+            int startCol = pcMove.start_and_endPosOfNewWord.get(1);
+            int endRow = pcMove.start_and_endPosOfNewWord.get(2);
+            int endCol = pcMove.start_and_endPosOfNewWord.get(3);
+            //WordsOnBoard.addWord(startRow, startCol, endRow, endCol, pcMove.madeNewWord);
+            System.out.println("\n=== After PC move and recovered ===");
+            GameBoard.printBoard();
+            System.out.println(pcMove.inputLetters);
+            boolean expected = true;
+            boolean actual = pcMove.isValid;
+            Assertions.assertEquals(expected, actual);
+        } else {
+            System.out.println("Computer skipped");
+            System.out.println("\n=== After PC move and recovered ===");
+            GameBoard.printBoard();
+            boolean expected = true;
+            boolean actual = pcAction.skipped;
+            Assertions.assertEquals(expected, actual);
+        }
+    }
+
+
+    @Test
+    @Order(20)
+    void test_WordsOnBoard() throws IOException {
+        System.out.println("Test 20: test WordsOnBoard class");
+
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+        Player human = new Player(true);
+        Move move = new Move(human, "UIN", "a1", "r");
+        move.recoverBoardGridContentForInvalidMove();
+        GameBoard.printBoard();
+
+        boolean expected = false;
+        boolean actual = move.isValid;
         Assertions.assertEquals(expected, actual);
     }
 

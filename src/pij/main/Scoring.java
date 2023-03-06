@@ -56,7 +56,7 @@ public class Scoring {
         else totalScoreOfThisMove = scoreWithoutPremiumWord;
 
         // Check whether player used all 7 tiles in this move to get awarded 70 extra points
-        if (move.tilesSetInto.length == 7) totalScoreOfThisMove += 70;
+        if (move.tilesSetInto.size() == 7) totalScoreOfThisMove += 70;
 
         return totalScoreOfThisMove;
     }
