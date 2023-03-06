@@ -45,11 +45,11 @@ public class ComputerAction {
                 //========================================================================
                 Random rd = new Random();
                 // change 0->4 for debugging
-                int useTilesAmount = rd.nextInt(0, rackTilesNum + 1); //if 0, pc skip for this move
+                int useTilesAmount = rd.nextInt(3, rackTilesNum + 1); //if 0, pc skip for this move
                 //int useTilesAmount = 7; //debug
-                System.out.println("PC choosing " + useTilesAmount + " tiles for this move.");// debug
-
-                System.out.println(computer.getTileRack());
+//                System.out.println("PC choosing " + useTilesAmount + " tiles for this move.");// debug
+//
+//                System.out.println(computer.getTileRack());  //debug
                 List<Tile> tiles = computer.getTileRack().getTiles();
                 List<String> allTheLetterSequences = new ArrayList<>();
 
@@ -93,10 +93,10 @@ public class ComputerAction {
 
         int validMovesAmount = validMoves.size();
         System.out.println("There are " + validMovesAmount + " valid moves");  //debug
-        System.out.println("They are: "); //debug
-        for(Move m : validMoves) {
-            System.out.println(m); //debug
-        }
+//        System.out.println("They are: "); //debug
+//        for(Move m : validMoves) {
+//            System.out.println(m); //debug
+//        }
         // if there was no valid move found, return null meaning skip
         if (validMovesAmount > 0) {
             Random rdm = new Random();

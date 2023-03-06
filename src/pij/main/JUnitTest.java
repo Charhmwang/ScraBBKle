@@ -171,7 +171,7 @@ public class JUnitTest {
         Move move = new Move(human, legalWord, position, direction);
         System.out.println(move.toString());
 
-        boolean expected = false;
+        boolean expected = true;
         boolean actual = move.isValid;
         Assertions.assertEquals(expected, actual);
     }
@@ -212,7 +212,10 @@ public class JUnitTest {
         WordList wordList = new WordList();
         Player human = new Player(true);
         Move move = new Move(human, "GIT", "f8", "r");
-        System.out.println(move.isValid);
+        GameBoard.printBoard();
+//        System.out.println("After recover:");
+//        move.recoverBoardGridContent();
+//        GameBoard.printBoard();
 
         Scoring scoring = new Scoring(move, human);
         int expected = 8;
@@ -391,8 +394,6 @@ public class JUnitTest {
             Assertions.assertEquals(expected, actual);
         } else {
             System.out.println("Computer skipped");
-            System.out.println("\n=== After PC move and recovered ===");
-            GameBoard.printBoard();
             boolean expected = true;
             boolean actual = pcAction.skipped;
             Assertions.assertEquals(expected, actual);

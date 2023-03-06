@@ -22,7 +22,9 @@ public class Scoring {
         int scoreWithoutPremiumWord = 0;
 
         int wordSize = move.madeNewWord.length();
+        //( (newWord, idxOfNewWord), tilesSetInto )
         int startRow = move.start_and_endPosOfNewWord.get(0), startCol = move.start_and_endPosOfNewWord.get(1);
+        //System.out.println("startRow: " + startRow + "; startCol: " + startCol);  //debug
         boolean hasPremiumWordSqr  = false;
         int factorInPremiumWordSqr = 0;
         for (int i = 0; i < wordSize; i++) {
@@ -34,6 +36,7 @@ public class Scoring {
             // check grid content, if it's new added letter, content is in form of "G{3}", "G(2)", "T." or "t." or "t{3}"(if used wildcard)
             // if it's existed letter, content is in form of "G2" "I1" "g3"(if used wildcard)
             char letter = grid.charAt(0);
+            //System.out.println(letter);  //debug
             if (grid.charAt(1) == '{' || grid.charAt(1) == '(' || grid.charAt(1) == '.') {
                 if (grid.charAt(1) == '.') {
                     scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
