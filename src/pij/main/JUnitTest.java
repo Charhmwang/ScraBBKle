@@ -420,4 +420,52 @@ public class JUnitTest {
         Assertions.assertEquals(expected, actual);
     }
 
+
+    @Test
+    @Order(21)
+    void test_WordsOnBoard_isNextToParallelExistWord1() throws IOException {
+        System.out.println("Test 21: test WordsOnBoard class isNextToParallelExistWord method 1");
+
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+        GameBoard.printBoard();
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+        Player human = new Player(true);
+        Move move1 = new Move(human, "GIT", "f8", "r");
+        move1.recoverBoardGridContent();
+        WordsOnBoard.addWord(8, 5, 8, 7,"GIT");
+        System.out.println("\n=== After move1 and recovered ===");
+        GameBoard.printBoard();
+        Move move2 = new Move(human, "GIT", "g9", "r");
+
+        boolean expected = false;
+        boolean actual = move2.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
+
+
+    @Test
+    @Order(22)
+    void test_WordsOnBoard_isNextToParallelExistWord2() throws IOException {
+        System.out.println("Test 22: test WordsOnBoard class isNextToParallelExistWord method 2");
+
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+        GameBoard.printBoard();
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+        Player human = new Player(true);
+        Move move1 = new Move(human, "GIT", "f8", "d");
+        move1.recoverBoardGridContent();
+        WordsOnBoard.addWord(8, 5, 8, 7,"GIT");
+        System.out.println("\n=== After move1 and recovered ===");
+        GameBoard.printBoard();
+        Move move2 = new Move(human, "GIT", "g7", "d");
+
+        boolean expected = false;
+        boolean actual = move2.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
+
 }
