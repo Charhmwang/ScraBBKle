@@ -11,7 +11,6 @@ public class HumanAction {
         this.human = human;
         move = promptMove();
         if (move == null) skipped = true;
-        else move.execute();
     }
 
     public Move getMove() { return move; }

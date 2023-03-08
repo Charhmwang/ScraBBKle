@@ -24,6 +24,8 @@ public class SettingBoard {
      */
     public SettingBoard(String userFilePath) {
         this.f = new File(userFilePath);
+        setSize();
+        setArr();
     }
 
     /**

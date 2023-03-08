@@ -1,16 +1,12 @@
 package pij.main;
 
-import java.util.List;
-
 // Present the scores getting from each move
 public class Scoring {
 
     private int score;
-    private Move move;
-    private final Player owner;
+    private final Move move;
 
-    public Scoring(Move move, Player owner) {
-        this.owner = owner;
+    public Scoring(Move move) {
         this.move = move;
         this.score = calculateMoveScore();
     }
@@ -79,19 +75,8 @@ public class Scoring {
     public static int getSumValuesOfRack(TileRack tileRack) {
         int sum = 0;
         for (Tile t : tileRack.getTiles()) {
-            sum += LetterPoints.letterMap.get(t.letter);
-        }
-        return sum;
-    }
-
-    public static int getSumValueOfTiles(List<Tile> tiles) {
-        int sum = 0;
-        for (Tile t : tiles) {
-            if (Character.isLowerCase(t.letter)) {
-                sum += 3;
-            } else {
-                sum += LetterPoints.letterMap.get(t.letter);
-            }
+            if (Character.isLowerCase(t.letter)) sum += 3;
+            else sum += LetterPoints.letterMap.get(t.letter);
         }
         return sum;
     }

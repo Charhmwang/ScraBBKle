@@ -1,14 +1,9 @@
 package pij.main;
 
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import javafx.util.Pair;
 
 public class WordsOnBoard {
 
@@ -35,8 +30,7 @@ public class WordsOnBoard {
         words_on_board.put(list, word);
     }
 
-    public static Pair<Pair<String, List<Integer>>, List<Integer>> validateWord(String inputLetters, int row, char col, String direction) {
-        //change return from boolean to pair <boolean, int[]>
+    public static AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>> validateWord(String inputLetters, int row, char col, String direction) {
 
         // rowIdx stays the same as arg row because the game board content at [0][0] is the size number,
         // not the first line of the board
@@ -47,18 +41,26 @@ public class WordsOnBoard {
         if (occupied) return null;
 
 
-
         // First fill up the row/column (depends on the direction) skipping the grid already had a letter
         // var newCreatedWordUndone - The word composed of letters from the first tile to the end, maybe it is the new
         // word on its own, maybe it is the substring of the new word constructed with other next letters in the same row/col
-        Pair<String, List<Integer>> word_and_idx = buildWordUsingTileLetters(inputLetters, row, colIdx, direction);
-        String preWord = word_and_idx.getKey();
-        List<Integer> tilesSetInto = word_and_idx.getValue();
+        //Pair<String, List<Integer>> word_and_idx = buildWordUsingTileLetters(inputLetters, row, colIdx, direction);
+        AbstractMap.SimpleEntry<String, List<Integer>> preword_and_idx = buildWordUsingTileLetters(inputLetters, row, colIdx, direction);
+
+
+        String preWord = preword_and_idx.getKey();
+        List<Integer> tilesSetInto = preword_and_idx.getValue();
+        AbstractMap.SimpleEntry<String, List<Integer>> word_and_idx =
+                new AbstractMap.SimpleEntry<String, List<Integer>>(null, null);
+        AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>>
+                forReturn = new AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>>
+                (tilesSetInto, word_and_idx);
+
         //System.out.println(preWord);  //debug
         if (preWord == null) { // means user's input out of the board bound
-            return new Pair<Pair<String, List<Integer>>, List<Integer>>(new Pair<>(null, null), tilesSetInto);
+            return forReturn;
         }
-        //System.out.println("CHECK 1 done"); //debug
+        System.out.println("CHECK 1 done"); //debug
 
 
         // CHECK 2. is there one and only one legal word constructed on the current row (if right)/ col (if down)?
@@ -76,9 +78,9 @@ public class WordsOnBoard {
         }
         if (res == null) {
             //System.out.println("res == null"); //debug
-            return new Pair<Pair<String, List<Integer>>, List<Integer>>(new Pair<>(null, null), tilesSetInto);
+            return forReturn;
         };
-        //System.out.println("CHECK 2 done"); //debug
+        System.out.println("CHECK 2 done"); //debug
 
         // Check 3. is there any new legal word constructed on each tile's right angle direction because of this tile?
         // if yes, return null;
@@ -90,9 +92,9 @@ public class WordsOnBoard {
 
         boolean rightAngleCheck = isAnyRightAngleNewWord(direction, tilesSetInto, row, colIdx);
         if (rightAngleCheck) {
-            return new Pair<Pair<String, List<Integer>>, List<Integer>>(new Pair<>(null, null), tilesSetInto);
+            return forReturn;
         }
-        //System.out.println("CHECK 3 done"); //debug
+        System.out.println("CHECK 3 done"); //debug
         // Till here, can ensure that there is not more than one word constructed
         // due to the new adding tiles both horizontally and vertically.
 
@@ -101,16 +103,15 @@ public class WordsOnBoard {
 
         boolean rightAngleExistWordNoOverlap = isRightAngleExistWordNoOverlap(direction, idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3));
         if (rightAngleExistWordNoOverlap) {
-            return new Pair<Pair<String, List<Integer>>, List<Integer>>(new Pair<>(null, null), tilesSetInto);
+            return forReturn;
         }
 
-        //System.out.println("CHECK 4 done"); //debug
+        System.out.println("CHECK 4 done"); //debug
 
         // CHECK 5. not allowed to place a complete word parallel immediately next to a word already played
 
        // If the board does not have the new created word played, then no need to check the following steps for parallel.
-        Pair<Pair<String, List<Integer>>, List<Integer>> forReturn =
-                new Pair<Pair<String, List<Integer>>, List<Integer>>(new Pair<>(newWord, idxOfNewWord), tilesSetInto);
+        forReturn.setValue(new AbstractMap.SimpleEntry<>(newWord, idxOfNewWord));
         if (!words_on_board.containsValue(newWord)) {
             return forReturn;
         }
@@ -165,7 +166,8 @@ public class WordsOnBoard {
         return idxOfNewWord;
     }
 
-    public static Pair<String, List<Integer>> buildWordUsingTileLetters(String inputLetters, int rowIdx, int colIdx, String direction) {
+    public static AbstractMap.SimpleEntry<String, List<Integer>> buildWordUsingTileLetters(String inputLetters, int rowIdx, int colIdx, String direction) {
+
         String newCreatedWordUndone = "";
         List<Integer> tilesSetInto = new ArrayList<>();
         int bitCounter = 0;
@@ -198,7 +200,6 @@ public class WordsOnBoard {
                 if (!Character.isAlphabetic(ch)) {
                     char curLetter = inputLetters.charAt(bitCounter);
                     String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter);
-                    int temp = colIdx + gridCounter;
                     newCreatedWordUndone += curLetter;
                     //same as above in "down" case
                     GameBoard.reviseBoard(rowIdx, colIdx + gridCounter, testContent);  //not score, only letter for testing
@@ -214,12 +215,12 @@ public class WordsOnBoard {
         }
 
         if (bitCounter < inputLetters.length()) {
-            return new Pair<String, List<Integer>>(null, tilesSetInto); // out of legal bounds before using all the tiles
+            return new AbstractMap.SimpleEntry<String, List<Integer>>(null, tilesSetInto); // out of legal bounds before using all the tiles
         }
 //        System.out.println("Create undone word case: tilesSetInto: ");    //debug
 //        for (Integer i : tilesSetInto) System.out.print(i + " ");           //debug
 //        System.out.println();                                                //debug
-        return new Pair<String, List<Integer>>(newCreatedWordUndone, tilesSetInto);
+        return new AbstractMap.SimpleEntry<String, List<Integer>>(newCreatedWordUndone, tilesSetInto); // out of legal bounds before using all the tiles
     }
 
 
@@ -310,13 +311,11 @@ public class WordsOnBoard {
             preWordIsValid = true;
         }
         //System.out.println("line 312. preWord: " + preWord);  //debug
-        //if (legalWordsCounter == 0 || endAT < endIdxCol || startFrom > colIdx) return null;
         if (legalWordsCounter == 0 || legalWordsCounter > 1) return null;
         if (!preWordIsValid) {
             if (endAT < endIdxCol || startFrom > colIdx) return null;
         }
 
-       // System.out.println("!!!!!!!!!!!!!! Validated the only one word: " + newWord); //debug
         ArrayList<Object> res = new ArrayList<>();
         //System.out.println("newWord1: " + newWord1 + "; newWord2: " + newWord2 + "; preWord: " + preWord); //debug
         if (!newWord1.isEmpty()) {

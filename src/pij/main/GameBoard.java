@@ -71,8 +71,6 @@ public class GameBoard {
         // Pass the GameBoard object into SettingBoard to do all the initialisation.
 
         SettingBoard settings = new SettingBoard(userFilePath);
-        settings.setSize();
-        settings.setArr();
     }
 
     /**

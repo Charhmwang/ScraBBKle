@@ -1,7 +1,5 @@
 package pij.main;
 
-import javafx.util.Pair;
-
 import java.util.*;
 
 public class Move {
@@ -16,25 +14,23 @@ public class Move {
     public List<Integer> tilesSetInto;
     public List<Tile> useTiles = new ArrayList<>();
     public String madeNewWord = "";
-
-    // if going right: startfrom: (3,2) endat:(3,8) / if down: (5,8) (10, 8)
     public List<Integer> start_and_endPosOfNewWord = new ArrayList<>();
-
 
     public Move(Player player, String inputLetters, String position, String direction) {
         this.inputLetters = inputLetters;
         this.player = player;
         this.position = position;
         this.direction = direction;
-        //( (newWord, idxOfNewWord), tilesSetInto )
-        Pair<Pair<String, List<Integer>>, List<Integer>> setIntoPosition = validateMove();
+        //( tilesSetInto, (newWord, idxOfNewWord) )
+        AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>>
+                setIntoPosition = validateMove();
         // valid_setIntoPosition will be null
         // 1. if the player's move input form is wrong,
         // 2. if the player try to use the word not coming from its own rack,
         // 3. if the player try to set tile into a grid already been covered by tile
         if (setIntoPosition != null) {
-            tilesSetInto = setIntoPosition.getValue();
-            Pair<String, List<Integer>> newWord_and_idxes = setIntoPosition.getKey();
+            tilesSetInto = setIntoPosition.getKey();
+            AbstractMap.SimpleEntry<String, List<Integer>> newWord_and_idxes = setIntoPosition.getValue();
             if (newWord_and_idxes.getKey() != null) { //there is valid string returned
                 isValid = true;
                 madeNewWord = newWord_and_idxes.getKey();
@@ -46,7 +42,8 @@ public class Move {
         }
     }
 
-    public Pair<Pair<String,List<Integer>>, List<Integer>> validateMove() {
+
+    public AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>> validateMove() {
 
         // 1. Validate player's input position and move direction
         int size = GameBoard.size;
@@ -72,8 +69,6 @@ public class Move {
 //            }
 //            if (useTiles.size() != inputLetters.length()) return null;
 //        } else return null;
-
-
 
         // 3. Check whether anywhere violates the game word rule after these tiles adding
         return WordsOnBoard.validateWord(inputLetters, row, column, direction);

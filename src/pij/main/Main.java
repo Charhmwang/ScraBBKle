@@ -2,6 +2,8 @@ package pij.main;
 
 import java.io.IOException;
 
+//javac --module-path /Library/Java/javafx-sdk-19.0.2.1/lib --add-modules javafx.controls -cp junit-platform-console-standalone-1.9.1.jar:. pij/main/*.java
+//java --module-path /Library/Java/javafx-sdk-19.0.2.1/lib --add-modules javafx.controls -jar junit-platform-console-standalone-1.9.1.jar -cp . -c pij.main.Main
 public class Main {
     public static void main(String[] args) throws IOException {
 

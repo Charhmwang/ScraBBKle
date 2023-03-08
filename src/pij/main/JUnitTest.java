@@ -213,11 +213,8 @@ public class JUnitTest {
         Player human = new Player(true);
         Move move = new Move(human, "GIT", "f8", "r");
         GameBoard.printBoard();
-//        System.out.println("After recover:");
-//        move.recoverBoardGridContent();
-//        GameBoard.printBoard();
 
-        Scoring scoring = new Scoring(move, human);
+        Scoring scoring = new Scoring(move);
         int expected = 8;
         int actual = scoring.getScore();
         Assertions.assertEquals(expected, actual);

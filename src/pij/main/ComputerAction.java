@@ -12,7 +12,6 @@ public class ComputerAction {
         this.computer = computer;
         move = autoMove();
         if (move == null) skipped = true;
-        else move.execute();
     }
 
     public Move getMove() { return move; }
@@ -45,8 +44,7 @@ public class ComputerAction {
                 //========================================================================
                 Random rd = new Random();
                 // change 0->4 for debugging
-                int useTilesAmount = rd.nextInt(3, rackTilesNum + 1); //if 0, pc skip for this move
-                //int useTilesAmount = 7; //debug
+                int useTilesAmount = rd.nextInt(1, rackTilesNum + 1);
 //                System.out.println("PC choosing " + useTilesAmount + " tiles for this move.");// debug
 //
 //                System.out.println(computer.getTileRack());  //debug
@@ -79,8 +77,7 @@ public class ComputerAction {
                     }
                 }
 
-                // TODO: Don't give chance to computer to use 7 tiles for now - Brute force out of memory - fix later
-               for (String s : allTheLetterSequences) {
+                for (String s : allTheLetterSequences) {
                    String pos = "" + (char)('a' + j) + i;  // try each grid on the board to be the starting point
 //                   System.out.println(s + " " + pos);  //debug
                    Move tryMoveRight = new Move(computer, s, pos, "r");

@@ -65,7 +65,11 @@ public class ScraBBKle {
             if (hmSkip) continue;
 
             ComputerAction computerAction = new ComputerAction(computer);
-            if (!computerAction.skipped) pcScoringOperation(computerAction);
+            if (!computerAction.skipped) {
+                pcScoringOperation(computerAction);
+                if (bothBagRackEmpty) break;
+
+            }
             else pcSkip = true;
         }
 
@@ -94,13 +98,12 @@ public class ScraBBKle {
         // Add scores to human, print out the move
         Move hmMove = hmAction.getMove();
         System.out.println();
-        Scoring scoring = new Scoring(hmMove, human);
+        Scoring scoring = new Scoring(hmMove);
         human.addScore(scoring.calculateMoveScore());
         System.out.println(hmMove);
         System.out.println();
         // if move execute return false means tiles bag is empty and one of the player's rack is empty too
         bothBagRackEmpty = hmMove.execute();
-        hmMove.recoverBoardGridContent();
         System.out.println();
         System.out.println(human);
         System.out.println(computer);
@@ -113,13 +116,15 @@ public class ScraBBKle {
         pcSkip = false;
         Move pcMove = computerAction.getMove();
         System.out.println();
-        Scoring scoring = new Scoring(pcMove, computer);
+        Scoring scoring = new Scoring(pcMove);
         computer.addScore(scoring.calculateMoveScore());
+
         System.out.println(pcMove);
         System.out.println("\nThe result is:");
         System.out.println(human);
         System.out.println(computer);
-        pcMove.recoverBoardGridContent();
+        bothBagRackEmpty = pcMove.execute();
+
     }
 
 }
