@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class TileBag { //Needs to be singleton
     private static ArrayList<Tile> tilesInBag;
-    private final static TileBag instance  = new TileBag();
+    private final static TileBag instance = new TileBag();
     public static TileBag getInstance() { return instance; }
 
     private TileBag() {

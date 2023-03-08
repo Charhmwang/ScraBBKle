@@ -381,11 +381,11 @@ public class JUnitTest {
         if (!pcAction.skipped) {
             Move pcMove = pcAction.getMove();
             pcMove.recoverBoardGridContent();
-            int startRow = pcMove.start_and_endPosOfNewWord.get(0);
-            int startCol = pcMove.start_and_endPosOfNewWord.get(1);
-            int endRow = pcMove.start_and_endPosOfNewWord.get(2);
-            int endCol = pcMove.start_and_endPosOfNewWord.get(3);
-            //WordsOnBoard.addWord(startRow, startCol, endRow, endCol, pcMove.madeNewWord);
+//            int startRow = pcMove.start_and_endPosOfNewWord.get(0);
+//            int startCol = pcMove.start_and_endPosOfNewWord.get(1);
+//            int endRow = pcMove.start_and_endPosOfNewWord.get(2);
+//            int endCol = pcMove.start_and_endPosOfNewWord.get(3);
+//            WordsOnBoard.addWord(startRow, startCol, endRow, endCol, pcMove.madeNewWord);
             System.out.println("\n=== After PC move and recovered ===");
             GameBoard.printBoard();
             System.out.println(pcMove.inputLetters);

@@ -16,6 +16,7 @@ public class Move {
     public List<Integer> tilesSetInto;
     public List<Tile> useTiles = new ArrayList<>();
     public String madeNewWord = "";
+
     // if going right: startfrom: (3,2) endat:(3,8) / if down: (5,8) (10, 8)
     public List<Integer> start_and_endPosOfNewWord = new ArrayList<>();
 
@@ -91,6 +92,10 @@ public class Move {
         for (Tile useTile : useTiles) {
             player.getTileRack().takeOutTileFromRack(useTile);
         }
+
+        // Add word to wordsOnBoard map
+        WordsOnBoard.addWord(start_and_endPosOfNewWord.get(0), start_and_endPosOfNewWord.get(1),
+                start_and_endPosOfNewWord.get(2), start_and_endPosOfNewWord.get(3), madeNewWord);
 
         // refill the rack
         int counter = useTiles.size();

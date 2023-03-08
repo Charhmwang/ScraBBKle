@@ -5,7 +5,7 @@ import java.util.*;
 
 public class ComputerAction {
     private final Player computer;
-    private Move move;
+    private final Move move;
     public Boolean skipped = false;
 
     public ComputerAction(Player computer) {

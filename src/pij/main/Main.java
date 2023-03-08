@@ -19,14 +19,17 @@ public class Main {
         TileRack pcRack = new TileRack(computer);
         computer.setTileRack(pcRack);
 
-        // Initiate human action for later use
-        HumanAction hmAction = new HumanAction(human);
+        // Initiate LetterPoints, TileBag, WordList, WordsOnBoard
+        LetterPoints letterPoints = new LetterPoints();
+        TileBag tileBag = TileBag.getInstance();
+        WordList wordList = new WordList();
+        WordsOnBoard wordsOnBoard = WordsOnBoard.getInstance();
 
-        // set the player, tile rack, human action etc. vars into game class Scrabble
-        play.startGame(human, computer, humanRack, pcRack, hmAction);
+        // Set the player, tile rack into game class Scrabble
+        play.startGame(human, computer, humanRack, letterPoints, tileBag, wordsOnBoard);
 
-        // start the game steps
-        play.gameOperations();
+        // Start the game steps
+        play.gameSteps();
 
     }
 }

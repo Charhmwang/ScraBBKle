@@ -3,7 +3,7 @@ package pij.main;
 public class HumanAction {
 
     private final Player human;
-    private Move move;
+    private final Move move;
     public Boolean skipped;
 
 
@@ -14,6 +14,7 @@ public class HumanAction {
         else move.execute();
     }
 
+    public Move getMove() { return move; }
 
     public Move promptMove() {
         String[] strArr = new String[3];

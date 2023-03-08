@@ -12,86 +12,114 @@ public class ScraBBKle {
     private GameBoard board;
     private Player human;
     private Player computer;
-    private TileRack humanRack;
-    private TileRack pcRack;
-    private HumanAction hmAction;
     public static boolean gameOver = false;
+    boolean hmSkip = false;
+    boolean pcSkip = false;
+    boolean bothBagRackEmpty;
+    private TileRack humanRack;
+    public LetterPoints letterPoints;
+    public TileBag tileBag;
+    public WordsOnBoard wordsOnBoard;
 
 
     public ScraBBKle(GameBoard board) {
         this.board = board;
     }
 
-    public void startGame(Player human, Player computer, TileRack humanRack, TileRack pcRack, HumanAction hmAction) {
+    public void startGame(Player human, Player computer, TileRack humanRack, LetterPoints letterPoints,
+                          TileBag tileBag, WordsOnBoard wordsOnBoard) {
         this.human = human;
         this.computer = computer;
         this.humanRack = humanRack;
-        this.pcRack = pcRack;
-        this.hmAction = hmAction;
-
+        this.letterPoints = letterPoints;
+        this.tileBag = tileBag;
+        this.wordsOnBoard = wordsOnBoard;
     }
 
-    public void gameOperations() {
-
+    public void gameSteps() {
 
         // The game ends when the tile bag is empty and one of the player has an empty tile rack.
         // The game also ends if both players pass twice in a row.
-        boolean gameOver = false;
+
         while (!gameOver) {
 
-            // If it is human's turn, print board and current tiles from the rack, and prompt user to enter the move
             GameBoard.printBoard();
             humanRack.displayTiles();
-            Move hmMove = hmAction.promptMove();
-            boolean hmSkip = false;
-            boolean pcSkip = false;
-
-            // The move will must get a valid one, unless the human admit to skip.
-            if (hmMove.isValid) {
-                // Add scores to human, print out the move
-                Scoring scoring = new Scoring(hmMove, human);
-                human.addScore(scoring.calculateMoveScore());
-                System.out.println(hmMove);
-                boolean bothBagRackEmpty = hmMove.execute();
-                hmMove.recoverBoardGridContent();
-                System.out.println(human);
-                System.out.println(computer);
-
+            HumanAction hmAction = new HumanAction(human);
+            if (!hmAction.skipped) {
+                hmScoringOperation(hmAction);
                 if (bothBagRackEmpty) break;
-            } else { //human skip
-                // Computer's turn
+
+            } else { //human skip to Computer's turn
                 hmSkip = true;
+                // If before human's skip, computer already skipped once, now here is 2 skips in a row, game over.
+                if (pcSkip) break;
 
-                //Move pcMove =
-                // The move will must get a valid one, unless the pc choose to skip.
-                //if pc also skips here, means game over, break
-                //otherwise, execute pc's move and add the score for pc,
-                // and print out the move to show human also both sides scores
-
-                //Scoring scoring = new Scoring(pcMove, computer);
-                //...
-
+                ComputerAction computerAction = new ComputerAction(computer);
+                if (!computerAction.skipped) pcScoringOperation(computerAction);
+                else break; // both computer and human skipped, so game over
             }
 
-            // if human skip boolean is true, means the else on top was executed,
-            // so, if both skip values are true means game over -> break;
-            // otherwise continue to the next for loop turn to ask human's move.
+            // If human skipped, means pc already played its move in the else block on top,
+            // so now it should be the human's turn, i.e. go back to the beginning of the while loop.
+            if (hmSkip) continue;
 
-            // if human skip boolean is false, means this round pc not moved yet, so execute the following steps
-            //Move pcMove =
-            // The move will must get a valid one, unless the pc choose to skip.
-            //if pc skip, continue to the next for loop turn prompt human's move action
-            //otherwise, execute pc's move and add the score for pc, and print out the move to show human
-            // and print out the move to show human also both sides scores
-
-            //Scoring scoring = new Scoring(pcMove, computer);
-            //...
-
+            ComputerAction computerAction = new ComputerAction(computer);
+            if (!computerAction.skipped) pcScoringOperation(computerAction);
+            else pcSkip = true;
         }
 
         // Now game over, calculate scores and display the winner
         // use static removeScoresFromRemainedTiles(player) method in Scoring class
+        System.out.println("Game Over!");
+        Scoring.removeScoresFromRemainedTiles(human);
+        Scoring.removeScoresFromRemainedTiles(computer);
+        int humanScore = human.getScore();
+        int pcScore = computer.getScore();
+        System.out.println("The human player scored " + humanScore + " points.");
+        System.out.println("The computer player scored " + pcScore + " points.");
 
+        if (humanScore > pcScore) {
+            System.out.println("The human player wins!");
+        } else if (humanScore < pcScore) {
+            System.out.println("The computer player wins!");
+        } else {
+            System.out.println("It's a draw!");
+        }
+
+    }
+
+    public void hmScoringOperation(HumanAction hmAction) {
+        hmSkip = false;
+        // Add scores to human, print out the move
+        Move hmMove = hmAction.getMove();
+        System.out.println();
+        Scoring scoring = new Scoring(hmMove, human);
+        human.addScore(scoring.calculateMoveScore());
+        System.out.println(hmMove);
+        System.out.println();
+        // if move execute return false means tiles bag is empty and one of the player's rack is empty too
+        bothBagRackEmpty = hmMove.execute();
+        hmMove.recoverBoardGridContent();
+        System.out.println();
+        System.out.println(human);
+        System.out.println(computer);
+        System.out.println();
+        GameBoard.printBoard();
+        System.out.println();
+    }
+
+    public void pcScoringOperation(ComputerAction computerAction) {
+        pcSkip = false;
+        Move pcMove = computerAction.getMove();
+        System.out.println();
+        Scoring scoring = new Scoring(pcMove, computer);
+        computer.addScore(scoring.calculateMoveScore());
+        System.out.println(pcMove);
+        System.out.println("\nThe result is:");
+        System.out.println(human);
+        System.out.println(computer);
+        pcMove.recoverBoardGridContent();
     }
 
 }

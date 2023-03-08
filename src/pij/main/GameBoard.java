@@ -50,7 +50,7 @@ public class GameBoard {
             // Use a default file.
             if (choice.compareTo("d") == 0) {
                 correctInput = true;
-                userFilePath = "./resources/defaultBoard.txt";
+                userFilePath = "/defaultBoard.txt";
             }
             // Load a file.
             else if (choice.compareTo("l") == 0) {
@@ -71,6 +71,8 @@ public class GameBoard {
         // Pass the GameBoard object into SettingBoard to do all the initialisation.
 
         SettingBoard settings = new SettingBoard(userFilePath);
+        settings.setSize();
+        settings.setArr();
     }
 
     /**
