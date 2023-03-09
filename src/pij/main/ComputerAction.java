@@ -6,16 +6,18 @@ import java.util.*;
 public class ComputerAction {
     private final Player computer;
     private final Move move;
+    private boolean firstMove;
     public Boolean skipped;
 
-    public ComputerAction(Player computer) {
+    public ComputerAction(Player computer, boolean firstMove) {
         this.computer = computer;
+        this.firstMove = firstMove;
         move = autoMove();
         if (move == null) skipped = true;
         else {
             skipped = false;
             // To recover the chosen move showing letters on the board leading the factor or a dot - for scoring
-            Move toShowLetterOnBoard = new Move(computer, move.inputLetters, move.position,
+            Move toShowLetterOnBoard = new Move(computer, firstMove, move.inputLetters, move.position,
                     move.direction.substring(0,1));
         }
     }
@@ -47,13 +49,11 @@ public class ComputerAction {
                     continue;  //already covered a tile
                 }
 
-                //========================================================================
                 Random rd = new Random();
-                // change 0->4 for debugging
                 int useTilesAmount = rd.nextInt(1, rackTilesNum + 1);
-//                System.out.println("PC choosing " + useTilesAmount + " tiles for this move.");// debug
-//
-//                System.out.println(computer.getTileRack());  //debug
+                //System.out.println("PC choosing " + useTilesAmount + " tiles for this move.");// debug
+
+                //System.out.println(computer.getTileRack());  //debug
                 List<Tile> tiles = computer.getTileRack().getTiles();
                 List<String> allTheLetterSequences = new ArrayList<>();
 
@@ -84,19 +84,25 @@ public class ComputerAction {
                 }
 
                 for (String s : allTheLetterSequences) {
-                   String pos = "" + (char)('a' + j) + i;  // try each grid on the board to be the starting point
-//                 System.out.println(s + " " + pos);  //debug
-                   Move tryMoveRight = new Move(computer, s, pos, "r");
-                   ifValidMove(tryMoveRight, validMoves);
-                   Move tryMoveDown = new Move(computer, s, pos, "d");
-                   ifValidMove(tryMoveDown, validMoves);
+                    String pos = "" + (char)('a' + j) + i;  // try each grid on the board to be the starting point
+                    //System.out.println(s + " " + pos);  //debug
+                    if (this.firstMove) {
+                        Move tryMoveRight = new Move(computer, true, s, pos, "r");
+                        ifValidMove(tryMoveRight, validMoves);
+                        Move tryMoveDown = new Move(computer, true, s, pos, "d");
+                        ifValidMove(tryMoveDown, validMoves);
+                    } else {
+                        Move tryMoveRight = new Move(computer, false, s, pos, "r");
+                        ifValidMove(tryMoveRight, validMoves);
+                        Move tryMoveDown = new Move(computer, false, s, pos, "d");
+                        ifValidMove(tryMoveDown, validMoves);
+                    }
                }
             }
         }
-
         int validMovesAmount = validMoves.size();
-        //System.out.println("There are " + validMovesAmount + " valid moves");  //debug
-//        System.out.println("They are: "); //debug
+        System.out.println("There are " + validMovesAmount + " valid moves");  //debug
+        //System.out.println("They are: "); //debug
 //        for(Move m : validMoves) {
 //            System.out.println(m); //debug
 //        }

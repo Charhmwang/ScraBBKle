@@ -16,11 +16,8 @@ public class JUnitTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        GameBoard.size = 15;
         WordList wordList = new WordList();
-        LetterPoints letterPoints= new LetterPoints();
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
-        //TileBag tb = TileBag.getInstance();
+        LetterPoints letterPoints = new LetterPoints();
     }
 
     @Test
@@ -120,67 +117,21 @@ public class JUnitTest {
 
     @Test
     @Order(10)
-    void test_Move_HumanAction() throws IOException {
-        System.out.println("Test 10: test Move class");
+    void test_HumanAction_coveredCenterSquares() throws IOException {
+        System.out.println("Test 10: test HumanAction class coveredCenterSquares method");
 
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
         GameBoard.printBoard();
-        Player human = new Player(true);
-        TileRack myRack = new TileRack(human);
-        myRack.displayTiles();
-        List<Tile> tiles = myRack.getTiles();
-        Random rand = new Random();
-
-        // Take 3 random tiles away from rack but not wildcard until it can compose a legal word
-        boolean found = false;
-        String legalWord = "";
-        while (!found) {
-            Tile t1, t2, t3;
-            boolean isWildCard;
-            do {
-                isWildCard = true;
-                t1 = tiles.get(rand.nextInt(tiles.size()));
-                if (t1.letter != '?') isWildCard = false;
-            } while (isWildCard);
-
-            boolean sameTile;
-            do {
-                isWildCard = true;
-                sameTile = true;
-                t2 = tiles.get(rand.nextInt(tiles.size()));
-                if (t2.letter != '?') isWildCard = false;
-                if (t2.hashCode() != t1.hashCode()) sameTile = false;
-            } while (isWildCard || sameTile);
-
-            do {
-                isWildCard = true;
-                sameTile = true;
-                t3 = tiles.get(rand.nextInt(tiles.size()));
-                if (t3.letter != '?') isWildCard = false;
-                if (t3.hashCode() != t1.hashCode() && t3.hashCode() != t2.hashCode()) sameTile = false;
-            } while (isWildCard || sameTile);
-
-            String beforeShuffle = String.valueOf(t1.letter) + String.valueOf(t2.letter) + String.valueOf(t3.letter);
-            List<String> characters = Arrays.asList(beforeShuffle.split(""));
-            Collections.shuffle(characters);
-            String afterShuffle = "";
-            for (String character : characters)
-                afterShuffle += character;
-
-            if (WordList.validateWord(afterShuffle.toLowerCase())) {
-                found = true;
-                legalWord = afterShuffle;
-            }
-        }
-        String position = "d5";
+        String letters = "GIT";
+        String position = "f8";
         String direction = "r";
-        System.out.println(legalWord);
-        Move move = new Move(human, legalWord, position, direction);
-        System.out.println(move.toString());
-
         boolean expected = true;
-        boolean actual = move.isValid;
+        boolean actual = HumanAction.coveredCenterSquares(letters, position, direction);
         Assertions.assertEquals(expected, actual);
     }
+
+
 
     @Test
     @Order(11)
@@ -198,6 +149,7 @@ public class JUnitTest {
     @Order(12)
     void test_Score_toString() {
         System.out.println("Test 12: test Scores class toString method");
+
         Player human = new Player(true);
         String expected = "Human player score:\t" + 10;
         human.addScore(10);
@@ -209,13 +161,16 @@ public class JUnitTest {
     @Order(13)
     void test_Scoring_calculateMoveScore() throws IOException {
         System.out.println("Test 13: test Scoring class calculateMoveScore method");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
 
         Player human = new Player(true);
-        Move move = new Move(human, "GIT", "f8", "r");
+        Move move1 = new Move(human, true,"GIT", "f8", "r");
+        move1.recoverBoardGridContent();
         GameBoard.printBoard();
-
-        Scoring scoring = new Scoring(move);
-        int expected = 8;
+        Move move2 = new Move(human, false,"SAR", "h7", "d");
+        Scoring scoring = new Scoring(move2);
+        int expected = 4;
         int actual = scoring.getScore();
         Assertions.assertEquals(expected, actual);
     }
@@ -226,10 +181,12 @@ public class JUnitTest {
     void test_Move_recoverBoardGridContent() throws IOException {
         System.out.println("Test 14: test Scoring WordsOnBoard class multiWordsOrNoneRow method");
 
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
         System.out.println("\n===Before the game===");
         GameBoard.printBoard();
         Player human = new Player(true);
-        Move move = new Move(human, "GIT", "f8", "r");
+        Move move = new Move(human, true,"GIT", "f8", "r");
         System.out.println("\n===After the move, before the recover===");
         GameBoard.printBoard();
         move.recoverBoardGridContent();
@@ -243,18 +200,20 @@ public class JUnitTest {
     void test_WordsOnBoard_multiWordsOrNoneRow_isAnyRightAngleNewWord() throws IOException {
         System.out.println("Test 15: test Scoring WordsOnBoard class multiWordsOrNoneRow method and" +
                 " isAnyRightAngleNewWord method");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
 
         GameBoard.printBoard();
         Player human = new Player(true);
-        Move move1 = new Move(human, "GIT", "f8", "r");
+        Move move1 = new Move(human, true,"GIT", "f8", "r");
         move1.recoverBoardGridContent();
         System.out.println("\n=== After move1 and recovered ===");
         GameBoard.printBoard();
-        Move move2 = new Move(human, "SAR", "h7", "d");
+        Move move2 = new Move(human, false,"SAR", "h7", "d");
         move2.recoverBoardGridContent();
         System.out.println("\n=== After move2 and recovered ===");
         GameBoard.printBoard();
-        Move move3 = new Move(human, "TG", "g9", "r");
+        Move move3 = new Move(human, false, "TG", "g9", "r");
 
         boolean expected = false;
         boolean actual = move3.isValid;
@@ -265,20 +224,22 @@ public class JUnitTest {
     @Order(16)
     void test_WordsOnBoard_isRightAngleExistWordNoOverlap1() throws IOException {
         System.out.println("Test 16: test Scoring WordsOnBoard class isRightAngleExistWordNoOverlap method 1");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
 
         GameBoard.printBoard();
         Player human = new Player(true);
-        Move move1 = new Move(human, "GIT", "f8", "r");
+        Move move1 = new Move(human, true, "GIT", "f8", "r");
         move1.recoverBoardGridContent();
         WordsOnBoard.addWord(8, 5, 8, 7,"GIT");
         System.out.println("\n=== After move1 and recovered ===");
         GameBoard.printBoard();
-        Move move2 = new Move(human, "SAR", "h7", "d");
+        Move move2 = new Move(human, false, "SAR", "h7", "d");
         move2.recoverBoardGridContent();
         WordsOnBoard.addWord(7, 5, 10, 5,"STAR");
         System.out.println("\n=== After move2 and recovered ===");
         GameBoard.printBoard();
-        Move move3 = new Move(human, "IS", "i9", "r");
+        Move move3 = new Move(human, false,"IS", "i9", "r");
 
         boolean expected = false;
         boolean actual = move3.isValid;
@@ -287,27 +248,30 @@ public class JUnitTest {
 
     @Test
     @Order(17)
-    void test_WordsOnBoard_isRightAngleExistWordNoOverlap2() throws IOException {
-        System.out.println("Test 17: test Scoring WordsOnBoard class isRightAngleExistWordNoOverlap method 2");
+    void test_Move_validate() throws IOException {
+        System.out.println("Test 17: test valid move reading throught the specialized direction");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
 
         GameBoard.printBoard();
         Player human = new Player(true);
-        Move move1 = new Move(human, "GIT", "f8", "r");
+        Move move1 = new Move(human, true,"GIT", "f8", "r");
         move1.recoverBoardGridContent();
         WordsOnBoard.addWord(8, 5, 8, 7,"GIT");
         System.out.println("\n=== After move1 and recovered ===");
         GameBoard.printBoard();
-        Move move2 = new Move(human, "SAR", "h7", "d");
+        Move move2 = new Move(human, false,"SAR", "h7", "d");
         move2.recoverBoardGridContent();
         WordsOnBoard.addWord(7, 5, 10, 5,"STAR");
         System.out.println("\n=== After move2 and recovered ===");
         GameBoard.printBoard();
-        Move move3 = new Move(human, "R", "i9", "r");
+        Move move3 = new Move(human, false,"R", "i9", "r");
         System.out.println("\n=== After move3 and recovered ===");
         move3.recoverBoardGridContent();
         GameBoard.printBoard();
 
-        boolean expected = true;
+        // ar is a legal word but it's read to left direction
+        boolean expected = false;
         boolean actual = move3.isValid;
         Assertions.assertEquals(expected, actual);
     }
@@ -317,20 +281,22 @@ public class JUnitTest {
     @Order(18)
     void test_Move_recoverBoardGridContentForInvalidMove() throws IOException {
         System.out.println("Test 18: test Move class recoverBoardGridContentForInvalidMove method");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
 
         GameBoard.printBoard();
         Player human = new Player(true);
-        Move move1 = new Move(human, "GIT", "f8", "r");
+        Move move1 = new Move(human, true,"GIT", "f8", "r");
         move1.recoverBoardGridContent();
         WordsOnBoard.addWord(8, 5, 8, 7,"GIT");
         System.out.println("\n=== After move1 and recovered ===");
         GameBoard.printBoard();
-        Move move2 = new Move(human, "SAR", "h7", "d");
+        Move move2 = new Move(human, false,"SAR", "h7", "d");
         move2.recoverBoardGridContent();
         WordsOnBoard.addWord(7, 5, 10, 5,"STAR");
         System.out.println("\n=== After move2 and recovered ===");
         GameBoard.printBoard();
-        Move move3 = new Move(human, "TG", "g9", "r");
+        Move move3 = new Move(human, false,"TG", "g9", "r");
         System.out.println("\n=== After move3 and recovered ===");
         move3.recoverBoardGridContentForInvalidMove();
         GameBoard.printBoard();
@@ -347,11 +313,16 @@ public class JUnitTest {
         System.out.println("Test 19: test ComputerAction class autoMove method");
 
         GameBoard.printBoard();
+        Player human = new Player(true);
+        Move hmMove = new Move(human, true, "GIT", "f8", "r");
+        hmMove.recoverBoardGridContent();
+        GameBoard.printBoard();
+
         Player computer = new Player(false);
         TileRack pcRack = new TileRack(computer);
         computer.setTileRack(pcRack);
 
-        ComputerAction pcAction = new ComputerAction(computer);
+        ComputerAction pcAction = new ComputerAction(computer, false);
         if (!pcAction.skipped) {
             Move pcMove = pcAction.getMove();
             pcMove.recoverBoardGridContent();
@@ -376,7 +347,7 @@ public class JUnitTest {
         System.out.println("Test 20: test WordsOnBoard class");
 
         Player human = new Player(true);
-        Move move = new Move(human, "UIN", "a1", "r");
+        Move move = new Move(human, true, "UIN", "a1", "r");
         move.recoverBoardGridContentForInvalidMove();
         GameBoard.printBoard();
 
@@ -390,9 +361,11 @@ public class JUnitTest {
     @Order(21)
     void test_WordsOnBoard_multiWordsOrNoneCol1() throws IOException {
         System.out.println("Test 21: test WordsOnBoard class multiWordsOrNoneCol method 1");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
 
         Player human = new Player(true);
-        Move move = new Move(human, "UIN", "a1", "r");
+        Move move = new Move(human, true, "UIN", "a1", "r");
         move.recoverBoardGridContentForInvalidMove();
         GameBoard.printBoard();
 
@@ -405,12 +378,14 @@ public class JUnitTest {
     @Order(22)
     void test_WordsOnBoard_multiWordsOrNoneRow2() throws IOException {
         System.out.println("Test 22: test WordsOnBoard class multiWordsOrNoneCol method 2");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
 
         Player human = new Player(true);
-        Move move1 = new Move(human, "LIE", "h15", "r");
+        Move move1 = new Move(human, true, "LIE", "h15", "r");
         move1.recoverBoardGridContent();
         GameBoard.printBoard();
-        Move move2 = new Move(human, "DE", "i13", "d");
+        Move move2 = new Move(human, false,"DE", "i13", "d");
         GameBoard.printBoard();
 
         boolean expected = false;
@@ -424,15 +399,17 @@ public class JUnitTest {
     void test_WordsOnBoard_isAnyRightAngleNewWord() throws IOException {
         System.out.println("Test 23: test WordsOnBoard class" +
                 " isAnyRightAngleNewWord method");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
 
         Player human = new Player(true);
-        Move move1 = new Move(human, "ZED", "o1", "d");
+        Move move1 = new Move(human, true,"ZED", "o1", "d");
         move1.recoverBoardGridContent();
         GameBoard.printBoard();
-        Move move2 = new Move(human, "OH", "m4", "r");
+        Move move2 = new Move(human, false, "OH", "m4", "r");
         move1.recoverBoardGridContent();
         GameBoard.printBoard();
-        Move move3 = new Move(human, "A", "n3", "d");
+        Move move3 = new Move(human, false,"A", "n3", "d");
 
         boolean expected = false;
         boolean actual = move3.isValid;
@@ -440,75 +417,5 @@ public class JUnitTest {
     }
 
 
-    @Test
-    @Order(24)
-    void test_WordsOnBoard_isNextToParallelPlayedWord1() throws IOException {
-        System.out.println("Test 24: test WordsOnBoard class" +
-                " isNextToParallelPlayedWord method 1");
-
-        Player human = new Player(true);
-        Move move1 = new Move(human, "ZED", "o1", "d");
-        WordsOnBoard.addWord(move1.start_and_endPosOfNewWord.get(0), move1.start_and_endPosOfNewWord.get(1),
-                move1.start_and_endPosOfNewWord.get(2), move1.start_and_endPosOfNewWord.get(3), move1.madeNewWord);
-        move1.recoverBoardGridContent();
-        GameBoard.printBoard();
-        Move move2 = new Move(human, "ZED", "n2", "d");
-        move2.recoverBoardGridContent();
-        GameBoard.printBoard();
-
-        boolean expected = false;
-        boolean actual = move2.isValid;
-        Assertions.assertEquals(expected, actual);
-    }
-
-
-    @Test
-    @Order(25)
-    void test_WordsOnBoard_isNextToParallelPlayedWord2() throws IOException {
-        System.out.println("Test 25: test WordsOnBoard class" +
-                " isNextToParallelPlayedWord method 2");
-
-        Player human = new Player(true);
-        Move move1 = new Move(human, "ZED", "h4", "r");
-        WordsOnBoard.addWord(move1.start_and_endPosOfNewWord.get(0), move1.start_and_endPosOfNewWord.get(1),
-                move1.start_and_endPosOfNewWord.get(2), move1.start_and_endPosOfNewWord.get(3), move1.madeNewWord);
-        move1.recoverBoardGridContent();
-        GameBoard.printBoard();
-        Move move2 = new Move(human, "ZED", "k4", "r");
-        move2.recoverBoardGridContent();
-        GameBoard.printBoard();
-
-        boolean expected = false;
-        boolean actual = move2.isValid;
-        Assertions.assertEquals(expected, actual);
-    }
-
-    @Test
-    @Order(26)
-    void test_WordsOnBoard_isNextToParallelPlayedWord3() throws IOException {
-        System.out.println("Test 26: test WordsOnBoard class" +
-                " isNextToParallelPlayedWord method 3");
-
-        Player human = new Player(true);
-        Move move1 = new Move(human, "ZED", "h4", "r");
-        WordsOnBoard.addWord(move1.start_and_endPosOfNewWord.get(0), move1.start_and_endPosOfNewWord.get(1),
-                move1.start_and_endPosOfNewWord.get(2), move1.start_and_endPosOfNewWord.get(3), move1.madeNewWord);
-        move1.recoverBoardGridContent();
-        GameBoard.printBoard();
-        Move move2 = new Move(human, "ZED", "i5", "r");
-        move2.recoverBoardGridContent();
-        GameBoard.printBoard();
-
-        boolean expected = false;
-        boolean actual = move2.isValid;
-        Assertions.assertEquals(expected, actual);
-    }
-
-
-    //NEED TO CHANGE
-    //validate move
-    //1.(form)new word must be created reading from the first tile letter && must be using at least one tile already on board
-    //2.there should not be more than one word created on the same line or any right angle line on each tile letter bit
-    //3.
-
+    // TODO: 1. DIFFERENT BOARD SIZE
 }

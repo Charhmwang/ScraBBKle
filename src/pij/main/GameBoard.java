@@ -1,5 +1,7 @@
 package pij.main;
 
+import java.util.List;
+
 /**
  * Initialize the game board.
  * A GameBoard has a board in form of 2D string array, and a size(S x S).
@@ -17,6 +19,8 @@ public class GameBoard {
 
     /** The size of a GameBoard. Must between (including) 12 and 26. */
     public static int size;
+
+    public static List<List<Integer>> CenterSquares;
 
     /**
      * Constructs a new GameBoard with no parameter.
@@ -50,7 +54,7 @@ public class GameBoard {
             // Use a default file.
             if (choice.compareTo("d") == 0) {
                 correctInput = true;
-                userFilePath = "./resources/defaultBoard.txt";
+                userFilePath = "../resources/defaultBoard.txt";
             }
             // Load a file.
             else if (choice.compareTo("l") == 0) {

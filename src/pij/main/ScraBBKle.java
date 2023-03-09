@@ -15,7 +15,7 @@ public class ScraBBKle {
     public static boolean gameOver = false;
     boolean hmSkip = false;
     boolean pcSkip = false;
-    boolean BagRackNotEmpty;
+    boolean BagRackNotEmpty = false;
     private TileRack humanRack;
     public LetterPoints letterPoints;
     public TileBag tileBag;
@@ -40,17 +40,25 @@ public class ScraBBKle {
 
         // The game ends when the tile bag is empty and one of the player has an empty tile rack.
         // The game also ends if both players pass twice in a row.
+        boolean firstMoveDone = false;
 
         while (!gameOver) {
-
             GameBoard.printBoard();
             humanRack.displayTiles();
-            HumanAction hmAction = new HumanAction(human);
+            HumanAction hmAction;
+            // If the first step of game not done by any player yet
+            if (!firstMoveDone) {
+                hmAction = new HumanAction(human, true);
+            } else {
+                hmAction = new HumanAction(human, false);
+            }
+
             if (!hmAction.skipped) {
+                firstMoveDone = true;
                 hmScoringOperation(hmAction);
                 if (!BagRackNotEmpty) break;
-
-            } else { //human skip to Computer's turn
+            } else {
+                //human skip to Computer's turn
                 System.out.println("You skipped!");
                 hmSkip = true;
                 // If before human's skip, computer already skipped once, now here is 2 skips in a row, game over.
@@ -59,22 +67,34 @@ public class ScraBBKle {
                     break;
                 }
 
-                ComputerAction computerAction = new ComputerAction(computer);
-                if (!computerAction.skipped) pcScoringOperation(computerAction);
-                else break; // both computer and human skipped, so game over
+                ComputerAction computerAction;
+                if (!firstMoveDone) {
+                    computerAction = new ComputerAction(computer, true);
+                } else {
+                    computerAction = new ComputerAction(computer, false);
+                }
+                if (!computerAction.skipped) {
+                    firstMoveDone = true;
+                    pcScoringOperation(computerAction);
+                } else {
+                    System.out.println("Computer skipped!");
+                    break; // both computer and human skipped, so game over
+                }
             }
 
             // If human skipped, means pc already played its move in the else block on top,
             // so now it should be the human's turn, i.e. go back to the beginning of the while loop.
             if (hmSkip) continue;
 
-            ComputerAction computerAction = new ComputerAction(computer);
+            ComputerAction computerAction = new ComputerAction(computer, false);
             if (!computerAction.skipped) {
                 pcScoringOperation(computerAction);
                 if (!BagRackNotEmpty) break;
-
             }
-            else pcSkip = true;
+            else {
+                System.out.println("Computer skipped!");
+                pcSkip = true;
+            }
         }
 
         // Now game over, calculate scores and display the winner

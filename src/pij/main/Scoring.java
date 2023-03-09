@@ -32,8 +32,6 @@ public class Scoring {
             // check grid content, if it's new added letter, content is in form of "G{3}", "G(2)", "T." or "t." or "t{3}"(if used wildcard)
             // if it's existed letter, content is in form of "G2" "I1" "g3"(if used wildcard)
             char letter = grid.charAt(0);
-            //System.out.println(letter);  //debug
-            //System.out.println();
             if (grid.charAt(1) == '{' || grid.charAt(1) == '(' || grid.charAt(1) == '.') {
                 if (grid.charAt(1) == '.') {
                     if (Character.isUpperCase(letter))

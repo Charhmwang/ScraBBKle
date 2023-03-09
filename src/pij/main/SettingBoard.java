@@ -1,6 +1,8 @@
 package pij.main;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A SettingBoard has a size(S x S),  a boardArr in form of 2D string array, and
@@ -26,6 +28,7 @@ public class SettingBoard {
         this.f = new File(userFilePath);
         setSize();
         setArr();
+        setCenter();
     }
 
     /**
@@ -117,6 +120,22 @@ public class SettingBoard {
             }
         } catch (IOException e) {
             System.out.println("An I/O Error Occurred");
+        }
+    }
+
+    public void setCenter() {
+        GameBoard.CenterSquares = new ArrayList<>();
+        int s = GameBoard.size;
+        // If game board size is odd, there is only one center square, else there are 4.
+        if (s % 2 == 1) {
+            List<Integer> centerIdx = List.of( (s + 1)/2, (s - 1)/2 );
+            GameBoard.CenterSquares = List.of(centerIdx);
+        } else {
+            List<Integer> center1idx = List.of( s/2, (s - 2)/2 );
+            List<Integer> center2idx = List.of( s/2, s/2 );
+            List<Integer> center3idx = List.of( (s + 2)/2, (s - 2)/2 );
+            List<Integer> center4idx = List.of( (s + 2)/2, s/2 );
+            GameBoard.CenterSquares = List.of(center1idx, center2idx, center3idx, center4idx);
         }
     }
 }
