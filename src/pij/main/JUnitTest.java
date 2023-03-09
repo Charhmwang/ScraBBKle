@@ -504,4 +504,11 @@ public class JUnitTest {
         Assertions.assertEquals(expected, actual);
     }
 
+
+    //NEED TO CHANGE
+    //validate move
+    //1.(form)new word must be created reading from the first tile letter && must be using at least one tile already on board
+    //2.there should not be more than one word created on the same line or any right angle line on each tile letter bit
+    //3.
+
 }

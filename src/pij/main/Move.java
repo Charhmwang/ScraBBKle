@@ -12,7 +12,6 @@ public class Move {
     public Player player;
     public boolean isValid;
     public List<Integer> tilesSetInto;
-    //public List<Tile> useTiles = new ArrayList<>();
     public String madeNewWord = "";
     public List<Integer> start_and_endPosOfNewWord = new ArrayList<>();
 
@@ -66,19 +65,7 @@ public class Move {
             }
         } else return null;
 
-        // 2. Validate whether the player is using tiles from its own tiles rack
-//        TileRack tileRack = player.getTileRack();
-//        if (inputLetters.length() <= tileRack.getTilesAmount()) {
-//            for (int i = 0; i < inputLetters.length(); i++) {
-//                Tile t = tileRack.isTileExisting(inputLetters.charAt(i));
-//                if (t != null) {
-//                    useTiles.add(t);
-//                } else return null;
-//            }
-//            if (useTiles.size() != inputLetters.length()) return null;
-//        } else return null;
-//
-        // 3. Check whether anywhere violates the game word rule after these tiles adding
+        // 2. Check whether anywhere violates the game word rule after these tiles adding
         return WordsOnBoard.validateWord(inputLetters, row, column, direction);
     }
 

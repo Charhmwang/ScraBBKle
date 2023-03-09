@@ -179,6 +179,7 @@ public class WordsOnBoard {
         int bitCounter = 0;
         int gridCounter = 0;
         int bound1 = 0, bound2 = 0;
+        boolean crossed = false;
 
         while (bitCounter < inputLetters.length() && bound1 < GameBoard.size && bound2 < GameBoard.size) {
 
@@ -198,6 +199,7 @@ public class WordsOnBoard {
                     //e.g. (3) is changed into G(3) at this stage, will be reset into (3)
                     bitCounter++;
                 } else {
+                    crossed = true;
                     newCreatedWordUndone += ch;
                 }
             }
@@ -214,6 +216,7 @@ public class WordsOnBoard {
                     tilesSetInto.add(colIdx + gridCounter);
                     bitCounter++;
                 } else {
+                    crossed = true;
                     newCreatedWordUndone += ch;
                 }
             }
@@ -222,9 +225,12 @@ public class WordsOnBoard {
             if (direction.equals("right")) bound2 = colIdx + gridCounter;
         }
 
-        if (bitCounter < inputLetters.length()) {
-            return new AbstractMap.SimpleEntry<String, List<Integer>>(null, tilesSetInto); // out of legal bounds before using all the tiles
+        // Out of legal bounds before using all the tiles,
+        // or Tiles did not go through any letter on board to contribute new word.
+        if (bitCounter < inputLetters.length() || !crossed) {
+            return new AbstractMap.SimpleEntry<String, List<Integer>>(null, tilesSetInto);
         }
+
 //        System.out.println("Create undone word case: tilesSetInto: ");    //debug
 //        for (Integer i : tilesSetInto) System.out.print(i + " ");           //debug
 //        System.out.println();                                                //debug
@@ -326,10 +332,15 @@ public class WordsOnBoard {
 
         ArrayList<Object> res = new ArrayList<>();
         //System.out.println("newWord1: " + newWord1 + "; newWord2: " + newWord2 + "; preWord: " + preWord); //debug
+
         if (!newWord1.isEmpty()) {
-            res.add(newWord1); res.add(startFrom); res.add(endAT);
+            if (startFrom == colIdx) {
+                res.add(newWord1); res.add(startFrom); res.add(endAT);
+            } else return null;
         } else if (!newWord2.isEmpty()) {
-            res.add(newWord2); res.add(startFrom); res.add(endAT);
+            if (startFrom == colIdx) {
+                res.add(newWord2); res.add(startFrom); res.add(endAT);
+            } else return null;
         } else {
             res.add(preWord); res.add(colIdx); res.add(endIdxCol);
         }
@@ -429,9 +440,13 @@ public class WordsOnBoard {
         ArrayList<Object> res = new ArrayList<>();
         //System.out.println("newWord1: " + newWord1 + "; newWord2: " + newWord2 + "; preWord: " + preWord); //debug
         if (!newWord1.isEmpty()) {
-            res.add(newWord1); res.add(startFrom); res.add(endAT);
+            if (startFrom == rowIdx) {
+                res.add(newWord1); res.add(startFrom); res.add(endAT);
+            } else return null;
         } else if (!newWord2.isEmpty()) {
-            res.add(newWord2); res.add(startFrom); res.add(endAT);
+            if (startFrom == rowIdx) {
+                res.add(newWord2); res.add(startFrom); res.add(endAT);
+            } else return null;
         } else {
             res.add(preWord); res.add(rowIdx); res.add(endIdxRow);
             //System.out.println(preWord);
