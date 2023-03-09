@@ -33,21 +33,28 @@ public class Scoring {
             // if it's existed letter, content is in form of "G2" "I1" "g3"(if used wildcard)
             char letter = grid.charAt(0);
             //System.out.println(letter);  //debug
+            //System.out.println();
             if (grid.charAt(1) == '{' || grid.charAt(1) == '(' || grid.charAt(1) == '.') {
                 if (grid.charAt(1) == '.') {
-                    scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
+                    if (Character.isUpperCase(letter))
+                        scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
+                    else scoreWithoutPremiumWord += 3;
                 }
                 if (grid.charAt(1) == '(') {  // premium letter, multiply factor of the current letter
                     int factor = getFactor(grid);
-                    scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter) * factor;
+                    if (Character.isUpperCase(letter))
+                        scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter) * factor;
+                    else scoreWithoutPremiumWord += 3 * factor;
                 }
                 if (grid.charAt(1) == '{') {  // !premium word, multiply the whole word value with factor
                     hasPremiumWordSqr = true;
-                    scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
+                    if (Character.isUpperCase(letter))
+                        scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
+                    else scoreWithoutPremiumWord += 3;
                     factorInPremiumWordSqr = getFactor(grid);
                 }
             } else {
-                scoreWithoutPremiumWord += Integer.parseInt(grid.substring(1));
+                scoreWithoutPremiumWord += Integer.parseInt(grid.substring(1,grid.length()-1));
             }
         }
 

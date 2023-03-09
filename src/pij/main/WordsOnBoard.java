@@ -39,6 +39,7 @@ public class WordsOnBoard {
         // CHECK 1. is the starting position already having a letter
         boolean occupied = Character.isAlphabetic(GameBoard.getBoardGridContent(row, colIdx).charAt(0));
         if (occupied) return null;
+        //System.out.println("CHECK 0 done");
 
 
         // First fill up the row/column (depends on the direction) skipping the grid already had a letter
@@ -60,7 +61,7 @@ public class WordsOnBoard {
         if (preWord == null) { // means user's input out of the board bound
             return forReturn;
         }
-        System.out.println("CHECK 1 done"); //debug
+        //System.out.println("CHECK 1 done"); //debug
 
 
         // CHECK 2. is there one and only one legal word constructed on the current row (if right)/ col (if down)?
@@ -80,7 +81,7 @@ public class WordsOnBoard {
             //System.out.println("res == null"); //debug
             return forReturn;
         };
-        System.out.println("CHECK 2 done"); //debug
+        //System.out.println("CHECK 2 done"); //debug
 
         // Check 3. is there any new legal word constructed on each tile's right angle direction because of this tile?
         // if yes, return null;
@@ -94,7 +95,7 @@ public class WordsOnBoard {
         if (rightAngleCheck) {
             return forReturn;
         }
-        System.out.println("CHECK 3 done"); //debug
+        //System.out.println("CHECK 3 done"); //debug
         // Till here, can ensure that there is not more than one word constructed
         // due to the new adding tiles both horizontally and vertically.
 
@@ -106,7 +107,7 @@ public class WordsOnBoard {
             return forReturn;
         }
 
-        System.out.println("CHECK 4 done"); //debug
+        //System.out.println("CHECK 4 done"); //debug
 
         // CHECK 5. not allowed to place a complete word parallel immediately next to a word already played
 
@@ -168,6 +169,7 @@ public class WordsOnBoard {
 
     public static AbstractMap.SimpleEntry<String, List<Integer>> buildWordUsingTileLetters(String inputLetters, int rowIdx, int colIdx, String direction) {
 
+        //System.out.println("Try to build word with tiles"); //debug
         String newCreatedWordUndone = "";
         List<Integer> tilesSetInto = new ArrayList<>();
         int bitCounter = 0;
@@ -183,6 +185,7 @@ public class WordsOnBoard {
                     String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx);
                     newCreatedWordUndone += curLetter;
                     GameBoard.reviseBoard(rowIdx + gridCounter, colIdx, testContent);
+                    //System.out.println(GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx));//debug
                     tilesSetInto.add(rowIdx + gridCounter);
                     //not score, only letter for testing
                     //if move is valid, board content needs to add the corresponding scores
@@ -203,6 +206,7 @@ public class WordsOnBoard {
                     newCreatedWordUndone += curLetter;
                     //same as above in "down" case
                     GameBoard.reviseBoard(rowIdx, colIdx + gridCounter, testContent);  //not score, only letter for testing
+                    //System.out.println(GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter));//debug
                     tilesSetInto.add(colIdx + gridCounter);
                     bitCounter++;
                 } else {
@@ -220,7 +224,7 @@ public class WordsOnBoard {
 //        System.out.println("Create undone word case: tilesSetInto: ");    //debug
 //        for (Integer i : tilesSetInto) System.out.print(i + " ");           //debug
 //        System.out.println();                                                //debug
-        return new AbstractMap.SimpleEntry<String, List<Integer>>(newCreatedWordUndone, tilesSetInto); // out of legal bounds before using all the tiles
+        return new AbstractMap.SimpleEntry<String, List<Integer>>(newCreatedWordUndone, tilesSetInto);
     }
 
 
@@ -265,7 +269,7 @@ public class WordsOnBoard {
         for (int i = allFilledFrom; i < colIdx; i++) preCap += GameBoard.getBoardGridContent(rowIdx, i).charAt(0);
         //System.out.println("preCap: " + preCap); //debug
         String postCap = "";
-        for (int i = endIdxCol + 1; i < allFilledTo; i++) postCap += GameBoard.getBoardGridContent(rowIdx, i).charAt(0);
+        for (int i = endIdxCol + 1; i <= allFilledTo; i++) postCap += GameBoard.getBoardGridContent(rowIdx, i).charAt(0);
         //System.out.println("postCap: " + postCap); //debug
 
         // Try pre-cap plus each letter after using tiles
@@ -289,12 +293,12 @@ public class WordsOnBoard {
         String newWord2 = "";
         // Try post-cap plus each letter before using the last tiles
         for (int i = 0; i < postCap.length(); i++) {
-            String currentPostCap = preCap.substring(0,postCap.length()-i);
+            String currentPostCap = postCap.substring(0,postCap.length()-i);
             String useTilesGrids = "";
             for (int j = 0; j <= endIdxCol - allFilledFrom; j++) {
                 useTilesGrids = GameBoard.getBoardGridContent(rowIdx, endIdxCol - j).charAt(0) + useTilesGrids;
                 String outcome = useTilesGrids + currentPostCap;
-                System.out.println("Outcome: " + outcome); //debug
+                //System.out.println("Outcome: " + outcome); //debug
                 if (WordList.validateWord(outcome.toLowerCase())) {
                     legalWordsCounter++;
                     newWord2 = outcome;
@@ -334,6 +338,7 @@ public class WordsOnBoard {
 
     public static ArrayList<Object> multiWordsOrNoneCol(String preWord, int rowIdx, int colIdx, int endIdxRow) {
 
+        //System.out.println("Coming into multiCol check"); //debug
         int allFilledFrom = rowIdx;
         int allFilledTo = endIdxRow;
 
@@ -347,11 +352,13 @@ public class WordsOnBoard {
             }
         }
 
-        for (int down = endIdxRow; down < GameBoard.size; down++) {
+        for (int down = endIdxRow; down <= GameBoard.size; down++) {
             char letter = GameBoard.getBoardGridContent(down, colIdx).charAt(0);
             if (!Character.isAlphabetic(letter)) {
                 allFilledTo = down - 1;
                 break;
+            } else {
+                allFilledTo = down;
             }
         }
 
@@ -361,9 +368,10 @@ public class WordsOnBoard {
 
         String preCap = "";
         for (int i = allFilledFrom; i < rowIdx; i++) preCap += GameBoard.getBoardGridContent(i, colIdx).charAt(0);
-        //System.out.println("preCap: " + preCap);  //debug
+        // System.out.println("preCap: " + preCap);  //debug
         String postCap = "";
-        for (int i = endIdxRow + 1; i < allFilledTo; i++) postCap += GameBoard.getBoardGridContent(rowIdx, i).charAt(0);
+        for (int i = endIdxRow + 1; i <= allFilledTo; i++) postCap += GameBoard.getBoardGridContent(i ,colIdx).charAt(0);
+        // System.out.println("postCap: " + postCap);
 
         // Try pre-cap plus each letter after using tiles
         for (int i = 0; i < preCap.length(); i++) {
@@ -372,8 +380,9 @@ public class WordsOnBoard {
             for (int j = 0; j <= allFilledTo - rowIdx; j++) {
                 currentTilesWithPostCap += GameBoard.getBoardGridContent(rowIdx + j, colIdx).charAt(0);
                 String outcome = currentPreCap + currentTilesWithPostCap;
-                //System.out.println("Outcome: " + outcome); //debug
+                // System.out.println("Outcome: " + outcome); //debug
                 if (WordList.validateWord(outcome.toLowerCase())) {
+                    // System.out.println("Validated word " + outcome); // debug
                     legalWordsCounter++;
                     newWord1 = outcome;
                     startFrom = allFilledFrom + i;
@@ -386,13 +395,14 @@ public class WordsOnBoard {
         // Try post-cap plus each letter before using the last tiles
         String newWord2 = "";
         for (int i = 0; i < postCap.length(); i++) {
-            String currentPostCap = preCap.substring(0, postCap.length() - i);
+            String currentPostCap = postCap.substring(0, postCap.length() - i);
             String useTilesGrids = "";
             for (int j = 0; j <= endIdxRow - allFilledFrom; j++) {
                 useTilesGrids = GameBoard.getBoardGridContent(endIdxRow - j, colIdx).charAt(0) + useTilesGrids;
                 String outcome = useTilesGrids + currentPostCap;
-                //System.out.println("Outcome: " + outcome); //debug
+                // System.out.println("Outcome: " + outcome); //debug
                 if (WordList.validateWord(outcome.toLowerCase())) {
+                    // System.out.println("Validated word " + outcome);
                     legalWordsCounter++;
                     newWord2 = outcome;
                     startFrom = endIdxRow - j;
@@ -420,6 +430,7 @@ public class WordsOnBoard {
             res.add(newWord2); res.add(startFrom); res.add(endAT);
         } else {
             res.add(preWord); res.add(rowIdx); res.add(endIdxRow);
+            //System.out.println(preWord);
         }
 //        System.out.println("Legal word startFrom=" + startFrom + "; endAT=" + endAT);  //debug
 //        System.out.println("Pre-word filledFrom: " + allFilledFrom + "; filledTo: " + allFilledTo);  //debug

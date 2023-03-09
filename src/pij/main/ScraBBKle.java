@@ -15,7 +15,7 @@ public class ScraBBKle {
     public static boolean gameOver = false;
     boolean hmSkip = false;
     boolean pcSkip = false;
-    boolean bothBagRackEmpty;
+    boolean BagRackNotEmpty;
     private TileRack humanRack;
     public LetterPoints letterPoints;
     public TileBag tileBag;
@@ -48,12 +48,16 @@ public class ScraBBKle {
             HumanAction hmAction = new HumanAction(human);
             if (!hmAction.skipped) {
                 hmScoringOperation(hmAction);
-                if (bothBagRackEmpty) break;
+                if (!BagRackNotEmpty) break;
 
             } else { //human skip to Computer's turn
+                System.out.println("You skipped!");
                 hmSkip = true;
                 // If before human's skip, computer already skipped once, now here is 2 skips in a row, game over.
-                if (pcSkip) break;
+                if (pcSkip) {
+                    System.out.println("Computer skipped!");
+                    break;
+                }
 
                 ComputerAction computerAction = new ComputerAction(computer);
                 if (!computerAction.skipped) pcScoringOperation(computerAction);
@@ -67,7 +71,7 @@ public class ScraBBKle {
             ComputerAction computerAction = new ComputerAction(computer);
             if (!computerAction.skipped) {
                 pcScoringOperation(computerAction);
-                if (bothBagRackEmpty) break;
+                if (!BagRackNotEmpty) break;
 
             }
             else pcSkip = true;
@@ -97,14 +101,12 @@ public class ScraBBKle {
         hmSkip = false;
         // Add scores to human, print out the move
         Move hmMove = hmAction.getMove();
-        System.out.println();
         Scoring scoring = new Scoring(hmMove);
         human.addScore(scoring.calculateMoveScore());
         System.out.println(hmMove);
         System.out.println();
         // if move execute return false means tiles bag is empty and one of the player's rack is empty too
-        bothBagRackEmpty = hmMove.execute();
-        System.out.println();
+        BagRackNotEmpty = hmMove.execute();
         System.out.println(human);
         System.out.println(computer);
         System.out.println();
@@ -115,15 +117,13 @@ public class ScraBBKle {
     public void pcScoringOperation(ComputerAction computerAction) {
         pcSkip = false;
         Move pcMove = computerAction.getMove();
-        System.out.println();
         Scoring scoring = new Scoring(pcMove);
         computer.addScore(scoring.calculateMoveScore());
-
         System.out.println(pcMove);
         System.out.println("\nThe result is:");
         System.out.println(human);
         System.out.println(computer);
-        bothBagRackEmpty = pcMove.execute();
+        BagRackNotEmpty = pcMove.execute();
 
     }
 

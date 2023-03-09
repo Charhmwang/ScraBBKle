@@ -6,12 +6,18 @@ import java.util.*;
 public class ComputerAction {
     private final Player computer;
     private final Move move;
-    public Boolean skipped = false;
+    public Boolean skipped;
 
     public ComputerAction(Player computer) {
         this.computer = computer;
         move = autoMove();
         if (move == null) skipped = true;
+        else {
+            skipped = false;
+            // To recover the chosen move showing letters on the board leading the factor or a dot - for scoring
+            Move toShowLetterOnBoard = new Move(computer, move.inputLetters, move.position,
+                    move.direction.substring(0,1));
+        }
     }
 
     public Move getMove() { return move; }
@@ -79,7 +85,7 @@ public class ComputerAction {
 
                 for (String s : allTheLetterSequences) {
                    String pos = "" + (char)('a' + j) + i;  // try each grid on the board to be the starting point
-//                   System.out.println(s + " " + pos);  //debug
+//                 System.out.println(s + " " + pos);  //debug
                    Move tryMoveRight = new Move(computer, s, pos, "r");
                    ifValidMove(tryMoveRight, validMoves);
                    Move tryMoveDown = new Move(computer, s, pos, "d");
@@ -89,7 +95,7 @@ public class ComputerAction {
         }
 
         int validMovesAmount = validMoves.size();
-        System.out.println("There are " + validMovesAmount + " valid moves");  //debug
+        //System.out.println("There are " + validMovesAmount + " valid moves");  //debug
 //        System.out.println("They are: "); //debug
 //        for(Move m : validMoves) {
 //            System.out.println(m); //debug
@@ -98,7 +104,7 @@ public class ComputerAction {
         if (validMovesAmount > 0) {
             Random rdm = new Random();
             int choose = rdm.nextInt(0, validMovesAmount);
-            System.out.println(validMoves.get(choose)); //debug
+            //System.out.println(validMoves.get(choose)); //debug
             return validMoves.get(choose);
         } else
             return null;
@@ -110,7 +116,8 @@ public class ComputerAction {
             //because it's need to be recovered as original for other potential possible moves validation
             validMoves.add(tryMove);
         } else {
-            tryMove.recoverBoardGridContentForInvalidMove();
+            if (tryMove.tilesSetInto != null)
+                tryMove.recoverBoardGridContentForInvalidMove();
         }
     }
 

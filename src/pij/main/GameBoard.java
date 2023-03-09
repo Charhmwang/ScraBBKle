@@ -50,7 +50,7 @@ public class GameBoard {
             // Use a default file.
             if (choice.compareTo("d") == 0) {
                 correctInput = true;
-                userFilePath = "/defaultBoard.txt";
+                userFilePath = "./resources/defaultBoard.txt";
             }
             // Load a file.
             else if (choice.compareTo("l") == 0) {

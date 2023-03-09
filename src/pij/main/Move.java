@@ -12,7 +12,7 @@ public class Move {
     public Player player;
     public boolean isValid;
     public List<Integer> tilesSetInto;
-    public List<Tile> useTiles = new ArrayList<>();
+    //public List<Tile> useTiles = new ArrayList<>();
     public String madeNewWord = "";
     public List<Integer> start_and_endPosOfNewWord = new ArrayList<>();
 
@@ -51,14 +51,21 @@ public class Move {
                 direction.length() == 1 && (direction.charAt(0) == 'r' || direction.charAt(0) == 'd')) {
             this.direction = direction.charAt(0) == 'r' ? "right" : "down";
             char col = position.charAt(0);
-            int row = Integer.parseInt(position.substring(1));
+            int row = 0;
+            // Initiate then use try catch to prevent player enter in a wrong form
+            // such like "8f" instead of the supposed form "f8"
+            try {
+                row = Integer.parseInt(position.substring(1));
+            } catch (NumberFormatException e) {
+                return null;
+            }
             if (col >= 'a' && col < ('a' + size) && row >= 1 && row <= size) {
                 this.column = col;
                 this.row = row;
             }
         } else return null;
 
-//        // 2. Validate whether the player is using tiles from its own tiles rack
+        // 2. Validate whether the player is using tiles from its own tiles rack
 //        TileRack tileRack = player.getTileRack();
 //        if (inputLetters.length() <= tileRack.getTilesAmount()) {
 //            for (int i = 0; i < inputLetters.length(); i++) {
@@ -69,7 +76,7 @@ public class Move {
 //            }
 //            if (useTiles.size() != inputLetters.length()) return null;
 //        } else return null;
-
+//
         // 3. Check whether anywhere violates the game word rule after these tiles adding
         return WordsOnBoard.validateWord(inputLetters, row, column, direction);
     }
@@ -84,8 +91,13 @@ public class Move {
 
         recoverBoardGridContent();
         // Take each tile out of rack
-        for (Tile useTile : useTiles) {
-            player.getTileRack().takeOutTileFromRack(useTile);
+//        for (Tile useTile : useTiles) {
+//            player.getTileRack().takeOutTileFromRack(useTile);
+//        }
+
+        for (int i = 0; i < inputLetters.length(); i++) {
+            char letter = inputLetters.charAt(i);
+            player.getTileRack().takeOutTileFromRack(letter);
         }
 
         // Add word to wordsOnBoard map
@@ -93,7 +105,8 @@ public class Move {
                 start_and_endPosOfNewWord.get(2), start_and_endPosOfNewWord.get(3), madeNewWord);
 
         // refill the rack
-        int counter = useTiles.size();
+        //int counter = useTiles.size();
+        int counter = inputLetters.length();
         while (counter-- > 0) {
             boolean filled = player.getTileRack().fillUp();
             if (!filled) {

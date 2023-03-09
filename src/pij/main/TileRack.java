@@ -37,7 +37,12 @@ public class TileRack {
                 .collect(Collectors.joining(", ")));
     }
 
-    public void takeOutTileFromRack(Tile tile) { tiles.remove(tile); }
+    //public void takeOutTileFromRack(Tile tile) { tiles.remove(tile); }
+
+    public void takeOutTileFromRack(char letter) {
+        Tile tile = isTileExisting(letter);
+        tiles.remove(tile);
+    }
 
 
     // TODO: ! if user only have 1 wildcard but input having more than 1 lowercase letter
