@@ -422,7 +422,7 @@ public class JUnitTest {
     @Test
     @Order(23)
     void test_WordsOnBoard_isAnyRightAngleNewWord() throws IOException {
-        System.out.println("Test 22: test Scoring WordsOnBoard class" +
+        System.out.println("Test 23: test Scoring WordsOnBoard class" +
                 " isAnyRightAngleNewWord method");
 
         Player human = new Player(true);

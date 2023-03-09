@@ -442,7 +442,7 @@ public class WordsOnBoard {
     public static boolean isAnyRightAngleNewWord(String direction, List<Integer> tilesSetInto, int rowIdx, int colIdx) {
 
         for (int i : tilesSetInto) {
-            String curTry = "";
+            //System.out.println(i); //debug
             int allFilledFrom = 0, allFilledTo = GameBoard.size - 1;
             if (direction.equals("right")) {
                 //check each col the tile is set in
@@ -452,6 +452,8 @@ public class WordsOnBoard {
                     if (!Character.isAlphabetic(letter)) {
                         allFilledFrom = up + 1;
                         break;
+                    } else {
+                        allFilledFrom = up;
                     }
                 }
                 for (int down = rowIdx + 1; down <= GameBoard.size; down++) {
@@ -459,16 +461,36 @@ public class WordsOnBoard {
                     if (!Character.isAlphabetic(letter)) {
                         allFilledTo = down - 1;
                         break;
+                    } else {
+                        allFilledTo = down;
                     }
                 }
 
+//                for (int a = allFilledFrom; a <= rowIdx; a++) {
+//                    for (int b = rowIdx; b <= allFilledTo; b++) {
+//                        for (int c = a; c <= b; c++) {
+//                            if (c == 0) continue;
+//                            curTry += (GameBoard.getBoardGridContent(c, i).charAt(0));
+//                        }
+//                        if (WordList.validateWord(curTry.toLowerCase())) return true;
+//                    }
+//                }
+
                 for (int a = allFilledFrom; a <= rowIdx; a++) {
-                    for (int b = rowIdx; b <= allFilledTo; b++) {
-                        for (int c = a; c <= b; c++) {
-                            if (c == 0) continue;
-                            curTry += (GameBoard.getBoardGridContent(c, i).charAt(0));
-                        }
+                    String curTry = "";
+                    // build each pre-cap including the tile letter
+                    for (int b = a; b <= rowIdx; b++) {
+                        curTry += GameBoard.getBoardGridContent(b, i).charAt(0);
+                    }
+                    if (rowIdx == allFilledTo) {
+                        // there is not post-cap on this line after tile
                         if (WordList.validateWord(curTry.toLowerCase())) return true;
+                    } else {
+                        // combine each pre-cap with different length of post-cap
+                        for (int c = rowIdx + 1; c <= allFilledTo; c++) {
+                            curTry += GameBoard.getBoardGridContent(c, i).charAt(0);
+                            if (WordList.validateWord(curTry.toLowerCase())) return true;
+                        }
                     }
                 }
             } else {
@@ -479,6 +501,8 @@ public class WordsOnBoard {
                     if (!Character.isAlphabetic(letter)) {
                         allFilledFrom = left + 1;
                         break;
+                    } else {
+                        allFilledFrom = left;
                     }
                 }
                 for (int right = colIdx + 1; right < GameBoard.size; right++) {
@@ -486,14 +510,25 @@ public class WordsOnBoard {
                     if (!Character.isAlphabetic(letter)) {
                         allFilledTo = right - 1;
                         break;
+                    } else {
+                        allFilledTo = right;
                     }
                 }
                 for (int a = allFilledFrom; a <= colIdx; a++) {
-                    for (int b = colIdx; b <= allFilledTo; b++) {
-                        for (int c = a; c <= b; c++) {
-                            curTry += (GameBoard.getBoardGridContent(i, c).charAt(0));
-                        }
+                    String curTry = "";
+                    // build each pre-cap including the tile letter
+                    for (int b = a; b <= colIdx; b++) {
+                        curTry += GameBoard.getBoardGridContent(i, b).charAt(0);
+                    }
+                    if (colIdx == allFilledTo) {
+                        // there is not post-cap on this line after tile
                         if (WordList.validateWord(curTry.toLowerCase())) return true;
+                    } else {
+                        // combine each pre-cap with different length of post-cap
+                        for (int c = colIdx + 1; c <= allFilledTo; c++) {
+                            curTry += GameBoard.getBoardGridContent(i, c).charAt(0);
+                            if (WordList.validateWord(curTry.toLowerCase())) return true;
+                        }
                     }
                 }
             }
