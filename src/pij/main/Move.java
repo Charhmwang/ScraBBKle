@@ -30,6 +30,7 @@ public class Move {
         // 3. if the player try to set tile into a grid already been covered by tile
         if (setIntoPosition != null) {
             tilesSetInto = setIntoPosition.getKey();
+            //for (int i : tilesSetInto) System.out.println(i);  //debug
             AbstractMap.SimpleEntry<String, List<Integer>> newWord_and_idxes = setIntoPosition.getValue();
             if (newWord_and_idxes.getKey() != null) { //there is valid string returned
                 isValid = true;

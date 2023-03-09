@@ -136,10 +136,14 @@ public class WordsOnBoard {
                 int exWord_rowEnd = list.get(2);
                 int exWord_colEnd = list.get(3);
 
-                boolean nextToParallelExistWord = isNextToParallelExistWord(direction,
+                boolean nextToParallelPlayedWord = isNextToParallelPlayedWord(direction,
                         idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3),
                         exWord_rowStart, exWord_colStart, exWord_rowEnd, exWord_colEnd);
-                if (nextToParallelExistWord) return null;
+
+                if (nextToParallelPlayedWord) {
+                    forReturn.setValue(new AbstractMap.SimpleEntry<>(null, null));
+                    return forReturn;
+                }
             }
 
         return forReturn;
@@ -443,7 +447,7 @@ public class WordsOnBoard {
 
         for (int i : tilesSetInto) {
             //System.out.println(i); //debug
-            int allFilledFrom = 0, allFilledTo = GameBoard.size - 1;
+            int allFilledFrom = 1, allFilledTo = GameBoard.size - 1;
             if (direction.equals("right")) {
                 //check each col the tile is set in
                 //first find out the consist word with the tile
@@ -465,17 +469,6 @@ public class WordsOnBoard {
                         allFilledTo = down;
                     }
                 }
-
-//                for (int a = allFilledFrom; a <= rowIdx; a++) {
-//                    for (int b = rowIdx; b <= allFilledTo; b++) {
-//                        for (int c = a; c <= b; c++) {
-//                            if (c == 0) continue;
-//                            curTry += (GameBoard.getBoardGridContent(c, i).charAt(0));
-//                        }
-//                        if (WordList.validateWord(curTry.toLowerCase())) return true;
-//                    }
-//                }
-
                 for (int a = allFilledFrom; a <= rowIdx; a++) {
                     String curTry = "";
                     // build each pre-cap including the tile letter
@@ -587,10 +580,10 @@ public class WordsOnBoard {
     //2. on left or right parallel: (start col == nw start col+1 || start col == nw start col-1 && start col == end col)
     //                       && ((start row >= nw start row && start row <= nw end row) || (end row >= nw start row && end row <= nw end row))
 
-    public static boolean isNextToParallelExistWord (String direction,
-    int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol,
-    int startRow, int startCol,
-    int endRow, int endCol){
+    public static boolean isNextToParallelPlayedWord(String direction,
+                                                     int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol,
+                                                     int startRow, int startCol,
+                                                     int endRow, int endCol){
         boolean nextTo = false;
         if (direction.equals("right")) {
             if ( ((endCol == nwStartCol - 1 || startCol == nwEndCol + 1) && (startRow == nwStartRow && startRow == endRow))

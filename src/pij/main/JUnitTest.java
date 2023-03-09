@@ -422,7 +422,7 @@ public class JUnitTest {
     @Test
     @Order(23)
     void test_WordsOnBoard_isAnyRightAngleNewWord() throws IOException {
-        System.out.println("Test 23: test Scoring WordsOnBoard class" +
+        System.out.println("Test 23: test WordsOnBoard class" +
                 " isAnyRightAngleNewWord method");
 
         Player human = new Player(true);
@@ -436,6 +436,71 @@ public class JUnitTest {
 
         boolean expected = false;
         boolean actual = move3.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
+
+
+    @Test
+    @Order(24)
+    void test_WordsOnBoard_isNextToParallelPlayedWord1() throws IOException {
+        System.out.println("Test 24: test WordsOnBoard class" +
+                " isNextToParallelPlayedWord method 1");
+
+        Player human = new Player(true);
+        Move move1 = new Move(human, "ZED", "o1", "d");
+        WordsOnBoard.addWord(move1.start_and_endPosOfNewWord.get(0), move1.start_and_endPosOfNewWord.get(1),
+                move1.start_and_endPosOfNewWord.get(2), move1.start_and_endPosOfNewWord.get(3), move1.madeNewWord);
+        move1.recoverBoardGridContent();
+        GameBoard.printBoard();
+        Move move2 = new Move(human, "ZED", "n2", "d");
+        move2.recoverBoardGridContent();
+        GameBoard.printBoard();
+
+        boolean expected = false;
+        boolean actual = move2.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
+
+
+    @Test
+    @Order(25)
+    void test_WordsOnBoard_isNextToParallelPlayedWord2() throws IOException {
+        System.out.println("Test 25: test WordsOnBoard class" +
+                " isNextToParallelPlayedWord method 2");
+
+        Player human = new Player(true);
+        Move move1 = new Move(human, "ZED", "h4", "r");
+        WordsOnBoard.addWord(move1.start_and_endPosOfNewWord.get(0), move1.start_and_endPosOfNewWord.get(1),
+                move1.start_and_endPosOfNewWord.get(2), move1.start_and_endPosOfNewWord.get(3), move1.madeNewWord);
+        move1.recoverBoardGridContent();
+        GameBoard.printBoard();
+        Move move2 = new Move(human, "ZED", "k4", "r");
+        move2.recoverBoardGridContent();
+        GameBoard.printBoard();
+
+        boolean expected = false;
+        boolean actual = move2.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    @Order(26)
+    void test_WordsOnBoard_isNextToParallelPlayedWord3() throws IOException {
+        System.out.println("Test 26: test WordsOnBoard class" +
+                " isNextToParallelPlayedWord method 3");
+
+        Player human = new Player(true);
+        Move move1 = new Move(human, "ZED", "h4", "r");
+        WordsOnBoard.addWord(move1.start_and_endPosOfNewWord.get(0), move1.start_and_endPosOfNewWord.get(1),
+                move1.start_and_endPosOfNewWord.get(2), move1.start_and_endPosOfNewWord.get(3), move1.madeNewWord);
+        move1.recoverBoardGridContent();
+        GameBoard.printBoard();
+        Move move2 = new Move(human, "ZED", "i5", "r");
+        move2.recoverBoardGridContent();
+        GameBoard.printBoard();
+
+        boolean expected = false;
+        boolean actual = move2.isValid;
         Assertions.assertEquals(expected, actual);
     }
 
