@@ -28,7 +28,7 @@ public class Main {
         WordsOnBoard wordsOnBoard = WordsOnBoard.getInstance();
 
         // Set the player, tile rack into game class Scrabble
-        play.startGame(human, computer, humanRack, letterPoints, tileBag, wordsOnBoard);
+        play.startGame(human, computer, wordsOnBoard);
 
         // Start the game steps
         play.gameSteps();

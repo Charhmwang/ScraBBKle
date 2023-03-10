@@ -16,7 +16,6 @@ public class ScraBBKle {
     boolean hmSkip = false;
     boolean pcSkip = false;
     boolean BagRackNotEmpty = false;
-    private TileRack humanRack;
     public LetterPoints letterPoints;
     public TileBag tileBag;
     public WordsOnBoard wordsOnBoard;
@@ -26,13 +25,9 @@ public class ScraBBKle {
         this.board = board;
     }
 
-    public void startGame(Player human, Player computer, TileRack humanRack, LetterPoints letterPoints,
-                          TileBag tileBag, WordsOnBoard wordsOnBoard) {
+    public void startGame(Player human, Player computer, WordsOnBoard wordsOnBoard) {
         this.human = human;
         this.computer = computer;
-        this.humanRack = humanRack;
-        this.letterPoints = letterPoints;
-        this.tileBag = tileBag;
         this.wordsOnBoard = wordsOnBoard;
     }
 
@@ -43,8 +38,11 @@ public class ScraBBKle {
         boolean firstMoveDone = false;
 
         while (!gameOver) {
-            GameBoard.printBoard();
-            humanRack.displayTiles();
+            // If pc skipped, there is no need to print the same game board again
+            //if (!pcSkip)
+                GameBoard.printBoard();
+
+            human.getTileRack().displayTiles();
             HumanAction hmAction;
             // If the first step of game not done by any player yet
             if (!firstMoveDone) {
@@ -76,6 +74,7 @@ public class ScraBBKle {
                 if (!computerAction.skipped) {
                     firstMoveDone = true;
                     pcScoringOperation(computerAction);
+                    if (!BagRackNotEmpty) break;
                 } else {
                     System.out.println("Computer skipped!");
                     break; // both computer and human skipped, so game over

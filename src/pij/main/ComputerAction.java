@@ -1,6 +1,5 @@
 package pij.main;
 
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class ComputerAction {
@@ -17,6 +16,7 @@ public class ComputerAction {
         else {
             skipped = false;
             // To recover the chosen move showing letters on the board leading the factor or a dot - for scoring
+            System.out.println("Active the chosen move");
             Move toShowLetterOnBoard = new Move(computer, firstMove, move.inputLetters, move.position,
                     move.direction.substring(0,1));
         }
@@ -45,15 +45,17 @@ public class ComputerAction {
 
         for (int i = 1; i <= GameBoard.size; i++) { //row
             for (int j = 0; j < GameBoard.size; j++) { //col
-                if (Character.isAlphabetic(GameBoard.getBoardGridContent(i,j).charAt(0))) {
-                    continue;  //already covered a tile
-                }
+
+                String curGrid = GameBoard.getBoardGridContent(i,j);
+                if (curGrid.length() > 1) {
+                    if (Character.isAlphabetic(curGrid.charAt(1))) continue;
+                } //already covered a tile
 
                 Random rd = new Random();
                 int useTilesAmount = rd.nextInt(1, rackTilesNum + 1);
                 //System.out.println("PC choosing " + useTilesAmount + " tiles for this move.");// debug
 
-                //System.out.println(computer.getTileRack());  //debug
+                //System.out.println("Computer tile rack:" + computer.getTileRack());  //debug
                 List<Tile> tiles = computer.getTileRack().getTiles();
                 List<String> allTheLetterSequences = new ArrayList<>();
 
@@ -85,7 +87,7 @@ public class ComputerAction {
 
                 for (String s : allTheLetterSequences) {
                     String pos = "" + (char)('a' + j) + i;  // try each grid on the board to be the starting point
-                    //System.out.println(s + " " + pos);  //debug
+                    System.out.println(s + " " + pos);  //debug
                     if (this.firstMove) {
                         Move tryMoveRight = new Move(computer, true, s, pos, "r");
                         ifValidMove(tryMoveRight, validMoves);
