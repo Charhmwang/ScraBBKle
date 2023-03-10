@@ -103,7 +103,7 @@ public class Move {
             int letterPoints = 0;
             if (Character.isLowerCase(letter)) letterPoints = 3;
             else letterPoints = LetterPoints.letterMap.get(letter);
-            String letter_with_points = String.valueOf(letter) + letterPoints + " ";
+            String letter_with_points = " " + String.valueOf(letter) + letterPoints + " ";
 
             if (direction.equals("right")) {
                 GameBoard.reviseBoard(row, tilesSetInto.get(i), letter_with_points);

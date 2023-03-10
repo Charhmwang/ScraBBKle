@@ -1,8 +1,12 @@
 package pij.main;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+
+import static java.lang.System.exit;
 
 /**
  * A SettingBoard has a size(S x S),  a boardArr in form of 2D string array, and
@@ -18,6 +22,8 @@ public class SettingBoard {
      * Always non-null after object creation. */
     private final File f;
 
+    private final String fileName;
+
     /**
      * Constructs a new SettingBoard with pathname and GameBoard object,
      * feed the board by contents in the userFilePath file.
@@ -26,6 +32,7 @@ public class SettingBoard {
      */
     public SettingBoard(String userFilePath) {
         this.f = new File(userFilePath);
+        this.fileName = userFilePath;
         setSize();
         setArr();
         setCenter();
@@ -39,26 +46,14 @@ public class SettingBoard {
      * @throws NumberFormatException if reading the size number in the file unsuccessfully
      */
     public void setSize() {
-        int size = 0;
-        try {
-            FileReader fr = new FileReader(f);
-            try (BufferedReader br = new BufferedReader(fr)) {
-                int c = 0;
-                // Read the first line of the board file to recognize the board scale(S x S).
-                String s = "";
-                // Read char by char until the new line
-                while (Character.compare((char)(c = br.read()), '\n') != 0) {
-                    s += (char) c;
-                }
-                size = Integer.parseInt(s);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-            ;
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+
+        try (var sc = new Scanner(new File(fileName), StandardCharsets.UTF_8)) {
+            String s = sc.nextLine();
+            GameBoard.size = Integer.parseInt(s);
+        } catch(RuntimeException | IOException e){
+            System.out.println("Error at reading board size from txt file");
+            exit(1);
         }
-        GameBoard.size = size;
     }
 
     /**
@@ -69,6 +64,7 @@ public class SettingBoard {
      * @catch FileNotFoundException if the file is not found
      */
     public void setArr() {
+
         int size  = GameBoard.size;
         GameBoard.board = new String[size+1][size];
         GameBoard.board[0][0] = String.valueOf(size);
@@ -81,12 +77,12 @@ public class SettingBoard {
                     // If it is not the first row which shows the size number of the board
                     if (row != 0) {
                         // When it meets a dot
-                        if (Character.compare((char) c, '.') == 0) {
+                        if ((char) c == '.') {
                             GameBoard.board[row][col] = ".";
                         }
 
                         // When it meets a Premium Word Square
-                        if (Character.compare((char) c, '{') == 0) {
+                        if ((char) c == '{') {
                             GameBoard.board[row][col] = "{";
                             while (Character.compare((char)(c = br.read()), '}') != 0) {
                                 GameBoard.board[row][col] += (char) c;
@@ -95,23 +91,23 @@ public class SettingBoard {
                         }
 
                         // When it meets a Premium Letter Square
-                        if (Character.compare((char) c, '(') == 0) {
+                        if ((char) c == '(') {
                             GameBoard.board[row][col] = "(";
-                            while (Character.compare((char)(c = br.read()), ')') != 0) {
+                            while ((char)(c = br.read()) != ')') {
                                 GameBoard.board[row][col] += (char) c;
                             }
                             GameBoard.board[row][col] += ")";
                         }
                         col++;
                         // When it meets a \n
-                        if (Character.compare((char) c, '\n') == 0) {
+                        if ((char)c == '\n') {
                             row++;
                             col = 0;
                         }
                     }
                     // else it is the first row which shows the size number of the board
                     else {
-                        while (Character.compare((char)(c = br.read()), '\n') != 0) ;
+                        while ( (char)(c = br.read()) != '\n') ;
                         row++;
                     }
                 }
@@ -124,17 +120,18 @@ public class SettingBoard {
     }
 
     public void setCenter() {
+
         GameBoard.CenterSquares = new ArrayList<>();
         int s = GameBoard.size;
-        // If game board size is odd, there is only one center square, else there are 4.
+        // If game board size is odd, there is only one center square, else they are 4 corners of the board.
         if (s % 2 == 1) {
             List<Integer> centerIdx = List.of( (s + 1)/2, (s - 1)/2 );
             GameBoard.CenterSquares = List.of(centerIdx);
         } else {
-            List<Integer> center1idx = List.of( s/2, (s - 2)/2 );
-            List<Integer> center2idx = List.of( s/2, s/2 );
-            List<Integer> center3idx = List.of( (s + 2)/2, (s - 2)/2 );
-            List<Integer> center4idx = List.of( (s + 2)/2, s/2 );
+            List<Integer> center1idx = List.of( 1, 0 );
+            List<Integer> center2idx = List.of( 1, s-1 );
+            List<Integer> center3idx = List.of( s, 0 );
+            List<Integer> center4idx = List.of( s, s-1 );
             GameBoard.CenterSquares = List.of(center1idx, center2idx, center3idx, center4idx);
         }
     }

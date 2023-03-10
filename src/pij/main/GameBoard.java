@@ -52,12 +52,12 @@ public class GameBoard {
             String choice = System.console().readLine();
 
             // Use a default file.
-            if (choice.compareTo("d") == 0) {
+            if (choice.equals("d")) {
                 correctInput = true;
                 userFilePath = "../resources/defaultBoard.txt";
             }
             // Load a file.
-            else if (choice.compareTo("l") == 0) {
+            else if (choice.equals("l")) {
                 System.out.print("Please enter the file name of the board: ");
                 userFilePath = System.console().readLine();
                 ValidateUserBoard tester = new ValidateUserBoard(userFilePath);
@@ -82,12 +82,12 @@ public class GameBoard {
      */
     public static void printBoard() {
         // Print the col numbers as the first line
-        System.out.print("   ");
+        System.out.print("    ");
         char letter = 'a';
         for (int i = 1; i <= size; i++, letter++) {
             System.out.print(" ");
             System.out.print(letter);
-            System.out.print(" ");
+            System.out.print("  ");
         }
         System.out.println();
 
@@ -98,10 +98,12 @@ public class GameBoard {
 
             for (int j = 0; j < size; j++) {
                 // When it meets a dot
-                if (board[i][j].compareTo(".") == 0)
-                    System.out.print(" " + board[i][j] + " ");
-                else if (board[i][j].startsWith("{") || board[i][j].startsWith("("))
-                    System.out.print(board[i][j]);
+                if (board[i][j].equals("."))
+                    System.out.print("  " + board[i][j] + " ");
+                else if (board[i][j].startsWith("{") || board[i][j].startsWith("(")) {
+                    if (board[i][j].length() > 3) System.out.print("" + board[i][j]);
+                    else System.out.print(" " + board[i][j]);
+                }
                 else System.out.print(board[i][j]);
             }
             System.out.println();
