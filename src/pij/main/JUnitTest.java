@@ -424,5 +424,72 @@ public class JUnitTest {
     }
 
 
+    @Test
+    @Order(23)
+    void test_Scoring_calculateMoveScore2() throws IOException {
+        System.out.println("Test 20: test Scoring class calculateMoveScore method 2");
+        SettingBoard s = new SettingBoard("./test_res/26.txt");
+        GameBoard.size = 26;
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+
+        System.out.println("Original board:");
+        GameBoard.printBoard();
+        Player human = new Player(true);
+        Move move = new Move(human, true,"CODE", "m13", "r"); //3121
+        Scoring scoring = new Scoring(move);
+        move.recoverBoardGridContent();
+        GameBoard.printBoard();
+        int expected = 90;
+        int actual = scoring.getScore();
+        Assertions.assertEquals(expected, actual);
+    }
+
+
+    @Test
+    @Order(24)
+    void test_Scoring_calculateMoveScore3() throws IOException {
+        System.out.println("Test 20: test Scoring class calculateMoveScore method 3");
+        SettingBoard s = new SettingBoard("./test_res/26.txt");
+        GameBoard.size = 26;
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+
+        System.out.println("Original board:");
+        GameBoard.printBoard();
+        Player human = new Player(true);
+        Move move = new Move(human, true,"COdE", "m13", "r");
+        Scoring scoring = new Scoring(move);
+        move.recoverBoardGridContent();
+        GameBoard.printBoard();
+        int expected = 110;
+        int actual = scoring.getScore();
+        Assertions.assertEquals(expected, actual);
+    }
+
+
+    @Test
+    @Order(25)
+    void test_Scoring_calculateMoveScore4() throws IOException {
+        System.out.println("Test 20: test Scoring class calculateMoveScore method 4");
+        SettingBoard s = new SettingBoard("./test_res/26.txt");
+        GameBoard.size = 26;
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+
+        System.out.println("Original board:");
+        GameBoard.printBoard();
+        Player human = new Player(true);
+        Move move = new Move(human, true,"PREMIUM", "m13", "r"); //plus 70 extra
+        Scoring scoring = new Scoring(move);
+        move.recoverBoardGridContent();
+        GameBoard.printBoard();
+        int expected = 240;
+        int actual = scoring.getScore();
+        Assertions.assertEquals(expected, actual);
+    }
+
+
+
 
 }
