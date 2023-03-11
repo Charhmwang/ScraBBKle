@@ -248,7 +248,7 @@ public class Move {
             return forReturn;
         }
 
-        System.out.println("CHECK 4 done"); //debug
+        //System.out.println("CHECK 4 done"); //debug
 
         // CHECK 5. not allowed to place a complete word parallel immediately next to a word already played
 
@@ -273,6 +273,8 @@ public class Move {
                                                 .collect(Collectors.toList())
                                 ))
                         ));
+        // list of all the same existing word's indexes, for example, if there are 3 same word played on the board,
+        // there are 3 items in the ArrayList: can be (3,2,3,5), (1,3,1,6), (5,7,8,7)
         ArrayList<ArrayList<Integer>> idxes = reverseMap.get(newWord);
         for (ArrayList<Integer> list : idxes) {
 
@@ -833,20 +835,20 @@ public class Move {
             int startCol = idxes.get(1);
             int endRow = idxes.get(2);
             int endCol = idxes.get(3);
-            System.out.println("Word " + words_on_board.get(idxes) + ": indexes: [" + startRow + "," + startCol +
-                    "], [" + endRow + "," + endCol + "].");
-
-            //if the direction is not opposite, then continue to the next one
-
+            //System.out.println("Word " + words_on_board.get(idxes) + ": indexes: [" + startRow + "," + startCol +
+            //        "], [" + endRow + "," + endCol + "].");
 
             if (direction.equals("right")) {
-                if ( ((startCol == nwStartCol - 1 || startCol == nwStartCol + 1) && (nwStartRow >= startRow && nwStartRow <= endRow))
+                // if the existing word is in same direction, continue
+                if (startRow == endRow) continue;
+                if ( ((startCol == nwStartCol - 1 || startCol == nwEndCol + 1) && (nwStartRow >= startRow && nwStartRow <= endRow))
                         || ((startRow == nwStartRow + 1 || endRow == nwStartRow - 1) && (startCol >= nwStartCol && startCol <= nwEndCol)) )
                     rightAngleNoOverlap = true;
             }
             if (direction.equals("down")) {
+                if (startCol == endCol) continue;
                 if ( ((endCol == nwStartCol - 1 || startCol == nwStartCol + 1) && (nwStartRow <= startRow && nwEndRow >= startRow))
-                        || ((startRow == nwStartRow - 1 || startRow == nwEndRow + 1) && (startCol >= nwStartCol && endCol <= nwStartCol)) )
+                        || ((startRow == nwStartRow - 1 || startRow == nwEndRow + 1) && (startCol <= nwStartCol && endCol >= nwStartCol)) )
                     rightAngleNoOverlap = true;
             }
         }
@@ -873,14 +875,19 @@ public class Move {
                                                      int endRow, int endCol){
         boolean nextTo = false;
         if (direction.equals("right")) {
-            if ( ((endCol == nwStartCol - 1 || startCol == nwEndCol + 1) && (startRow == nwStartRow && startRow == endRow))
-                    || ((startRow == nwStartRow + 1 || startRow == nwStartRow - 1 && startRow == endRow) &&
+            if (startRow != endRow) return false; //the existed word is not parallel with the new one
+
+            if ( ((endCol == nwStartCol - 1 || startCol == nwEndCol + 1) && (startRow == nwStartRow))
+                    || ((startRow == nwStartRow + 1 || startRow == nwStartRow - 1) &&
                     ((startCol >= nwStartCol && startCol <= nwEndCol) || (endCol >= nwStartCol && endCol <= nwEndCol))) )
                 nextTo = true;
         }
+
         if (direction.equals("down")) {
-            if ( ((endRow == nwStartRow - 1 || startRow == nwEndRow + 1) && (startCol == nwStartCol && startCol == endCol))
-                    || ((startCol == nwStartCol + 1 || startCol == nwStartCol - 1 && startCol == endCol) &&
+            if (startRow == endRow) return false;
+
+            if ( ((endRow == nwStartRow - 1 || startRow == nwEndRow + 1) && (startCol == nwStartCol))
+                    || ((startCol == nwStartCol + 1 || startCol == nwStartCol - 1) &&
                     ((startRow >= nwStartRow && startRow <= nwEndRow) || (endRow >= nwStartRow && endRow <= nwEndRow))) ) {
                 nextTo = true;
             }

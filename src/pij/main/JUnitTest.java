@@ -325,9 +325,9 @@ public class JUnitTest {
 
     @Test
     @Order(19)
-    void test_Move_isRightAngleExistWordNoOverlap() throws IOException {
+    void test_Move_isRightAngleExistWordNoOverlap1() throws IOException {
         System.out.println("Test 19: test Move class" +
-                " isRightAngleExistWordNoOverlap method");
+                " isRightAngleExistWordNoOverlap method 1");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         WordList wordList = new WordList();
@@ -403,8 +403,8 @@ public class JUnitTest {
 
     @Test
     @Order(22)
-    void test_Move() throws IOException {
-        System.out.println("Test 22: test Move class");
+    void test_Move_isRightAngleExistWordNoOverlap2() throws IOException {
+        System.out.println("Test 22: test Move class isRightAngleExistWordNoOverlap method 2");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         WordList wordList = new WordList();
@@ -419,10 +419,37 @@ public class JUnitTest {
         move2.recoverBoardGridContent();
         GameBoard.printBoard();
         WordsOnBoard.addWord(9, 7, 9, 9,"TOo");
-        Move move3 = new Move(human, false,"SD", "g8", "r"); //SNOD why not pass
+        Move move3 = new Move(human, false,"SD", "g8", "r");
+        move3.recoverBoardGridContent();
+        GameBoard.printBoard();
+
 
         boolean expected = true;
         boolean actual = move3.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
+
+
+    @Test
+    @Order(23)
+    void test_Move_isNextToParallelPlayedWord() throws IOException {
+        System.out.println("Test 23: test Move class isNextToParallelPlayedWord method");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+
+        Player human = new Player(true);
+        Move move1 = new Move(human, true,"BAN", "f8", "r");
+        move1.recoverBoardGridContent();
+        WordsOnBoard.addWord(8, 5, 8, 7,"BAN");
+        GameBoard.printBoard();
+        Move move2 = new Move(human, false,"BAN", "h9", "r");
+        move2.recoverBoardGridContent();
+        GameBoard.printBoard();
+
+        boolean expected = false;
+        boolean actual = move2.isValid;
         Assertions.assertEquals(expected, actual);
     }
 
