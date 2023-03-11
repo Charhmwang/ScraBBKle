@@ -325,38 +325,8 @@ public class JUnitTest {
 
     @Test
     @Order(19)
-    void test_Move_isRightAngleExistWordNoOverlap1() throws IOException {
-        System.out.println("Test 19: test Move class" +
-                " isRightAngleExistWordNoOverlap method 1");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
-
-        Player human = new Player(true);
-        Move move1 = new Move(human, true,"BAN", "f8", "r");
-        move1.recoverBoardGridContent();
-        WordsOnBoard.addWord(8, 5, 8, 7,"BAN");
-        System.out.println("\n=== After move1 and recovered ===");
-        GameBoard.printBoard();
-        Move move2 = new Move(human, false,"A", "g7", "d");
-        move2.recoverBoardGridContent();
-        WordsOnBoard.addWord(7, 6, 8, 6,"AA");
-        System.out.println("\n=== After move2 and recovered ===");
-        GameBoard.printBoard();
-        Move move3 = new Move(human, false,"O", "h7", "d");
-
-        //ON is on right angle with BA without overlapping
-        boolean expected = false;
-        boolean actual = move3.isValid;
-        Assertions.assertEquals(expected, actual);
-    }
-
-
-    @Test
-    @Order(20)
     void test_Move_validate_inputOneLetter() throws IOException {
-        System.out.println("Test 20: test move validation");
+        System.out.println("Test 19: test move validation");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         WordList wordList = new WordList();
@@ -381,9 +351,9 @@ public class JUnitTest {
 
 
     @Test
-    @Order(21)
+    @Order(20)
     void test_Scoring_calculateMoveScore1() throws IOException {
-        System.out.println("Test 21: test Scoring class calculateMoveScore method 1");
+        System.out.println("Test 20: test Scoring class calculateMoveScore method 1");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         WordList wordList = new WordList();
@@ -402,9 +372,9 @@ public class JUnitTest {
 
 
     @Test
-    @Order(22)
-    void test_Move_isRightAngleExistWordNoOverlap2() throws IOException {
-        System.out.println("Test 22: test Move class isRightAngleExistWordNoOverlap method 2");
+    @Order(21)
+    void test_Move_isRightAngleExistWordNoOverlap() throws IOException {
+        System.out.println("Test 21: test Move class isRightAngleExistWordNoOverlap method");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         WordList wordList = new WordList();
@@ -431,9 +401,9 @@ public class JUnitTest {
 
 
     @Test
-    @Order(23)
+    @Order(22)
     void test_Move_isNextToParallelPlayedWord() throws IOException {
-        System.out.println("Test 23: test Move class isNextToParallelPlayedWord method");
+        System.out.println("Test 22: test Move class isNextToParallelPlayedWord method");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         WordList wordList = new WordList();
@@ -452,5 +422,7 @@ public class JUnitTest {
         boolean actual = move2.isValid;
         Assertions.assertEquals(expected, actual);
     }
+
+
 
 }

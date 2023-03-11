@@ -276,20 +276,22 @@ public class Move {
         // list of all the same existing word's indexes, for example, if there are 3 same word played on the board,
         // there are 3 items in the ArrayList: can be (3,2,3,5), (1,3,1,6), (5,7,8,7)
         ArrayList<ArrayList<Integer>> idxes = reverseMap.get(newWord);
-        for (ArrayList<Integer> list : idxes) {
+        if (idxes != null) {
+            for (ArrayList<Integer> list : idxes) {
 
-            int exWord_rowStart = list.get(0);
-            int exWord_colStart = list.get(1);
-            int exWord_rowEnd = list.get(2);
-            int exWord_colEnd = list.get(3);
+                int exWord_rowStart = list.get(0);
+                int exWord_colStart = list.get(1);
+                int exWord_rowEnd = list.get(2);
+                int exWord_colEnd = list.get(3);
 
-            boolean nextToParallelPlayedWord = isNextToParallelPlayedWord(direction,
-                    idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3),
-                    exWord_rowStart, exWord_colStart, exWord_rowEnd, exWord_colEnd);
+                boolean nextToParallelPlayedWord = isNextToParallelPlayedWord(direction,
+                        idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3),
+                        exWord_rowStart, exWord_colStart, exWord_rowEnd, exWord_colEnd);
 
-            if (nextToParallelPlayedWord) {
-                forReturn.setValue(new AbstractMap.SimpleEntry<>(null, null));
-                return forReturn;
+                if (nextToParallelPlayedWord) {
+                    forReturn.setValue(new AbstractMap.SimpleEntry<>(null, null));
+                    return forReturn;
+                }
             }
         }
         return forReturn;
@@ -472,18 +474,22 @@ public class Move {
         //System.out.println("allFilledFrom: " + allFilledFrom + "; allFilledTo: " + allFilledTo);// debug
 
         for (int left = colIdx - 1; left >= 0; left--) {
-            Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(rowIdx, left));
+            Character letter = getLetter(GameBoard.getBoardGridContent(rowIdx, left));
             if (letter == null) {
                 allFilledFrom = left + 1;
                 break;
+            } else {
+                allFilledFrom = left;
             }
         }
 
         for (int right = endIdxCol; right < GameBoard.size; right++) {
-            Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(rowIdx, right));
+            Character letter = getLetter(GameBoard.getBoardGridContent(rowIdx, right));
             if (letter == null) {
                 allFilledTo = right - 1;
                 break;
+            } else {
+                allFilledTo = right;
             }
         }
 
@@ -604,15 +610,17 @@ public class Move {
         //System.out.println("allFilledFrom: " + allFilledFrom + "; allFilledTo: " + allFilledTo);// debug
 
         for (int up = rowIdx - 1; up >= 1; up--) {
-            Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(up, colIdx));
+            Character letter = getLetter(GameBoard.getBoardGridContent(up, colIdx));
             if (letter == null) {
                 allFilledFrom = up + 1;
                 break;
+            } else {
+                allFilledFrom = up;
             }
         }
 
         for (int down = endIdxRow; down <= GameBoard.size; down++) {
-            Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(down, colIdx));
+            Character letter = getLetter(GameBoard.getBoardGridContent(down, colIdx));
             if (letter == null) {
                 allFilledTo = down - 1;
                 break;
@@ -626,11 +634,11 @@ public class Move {
         int startFrom = 0, endAT = 0;
 
         String preCap = "";
-        for (int i = allFilledFrom; i < rowIdx; i++) preCap += isGridCoveredByTile(GameBoard.getBoardGridContent(i, colIdx));
+        for (int i = allFilledFrom; i < rowIdx; i++) preCap += getLetter(GameBoard.getBoardGridContent(i, colIdx));
         // System.out.println("preCap: " + preCap);  //debug
         String postCap = "";
-        for (int i = endIdxRow + 1; i <= allFilledTo; i++) postCap += isGridCoveredByTile(GameBoard.getBoardGridContent(i, colIdx));
-         //System.out.println("postCap: " + postCap);
+        for (int i = endIdxRow + 1; i <= allFilledTo; i++) postCap += getLetter(GameBoard.getBoardGridContent(i, colIdx));
+         System.out.println("postCap: " + postCap);
 
         // Try pre-cap plus each letter after using tiles
         for (int i = 0; i < preCap.length(); i++) {
@@ -659,6 +667,7 @@ public class Move {
         for (int i = 0; i < postCap.length(); i++) {
             String currentPostCap = postCap.substring(0, postCap.length() - i);
             String useTilesGrids = "";
+            int temp = endIdxRow - allFilledFrom;
             for (int j = 0; j <= endIdxRow - allFilledFrom; j++) {
                 useTilesGrids = getLetter(GameBoard.getBoardGridContent(endIdxRow - j, colIdx)) + useTilesGrids;
                 String outcome = useTilesGrids + currentPostCap;
@@ -684,6 +693,7 @@ public class Move {
         }
         //System.out.println(legalWordsCounter);
         if (legalWordsCounter == 0 || legalWordsCounter > 1) {
+            System.out.println(legalWordsCounter); //0
             //System.out.println("Flag 3");
             return null;
         }
@@ -737,8 +747,8 @@ public class Move {
                 //check each col the tile is set in
                 //first find out the consist word with the tile
                 for (int up = rowIdx - 1; up >= 1; up--) {
-                    char letter = GameBoard.getBoardGridContent(up, i).charAt(0);
-                    if (!Character.isAlphabetic(letter)) {
+                    Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(up, i));
+                    if (letter == null) {
                         allFilledFrom = up + 1;
                         break;
                     } else {
@@ -746,8 +756,8 @@ public class Move {
                     }
                 }
                 for (int down = rowIdx + 1; down <= GameBoard.size; down++) {
-                    char letter = GameBoard.getBoardGridContent(down, i).charAt(0);
-                    if (!Character.isAlphabetic(letter)) {
+                    Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(down, i));
+                    if (letter == null) {
                         allFilledTo = down - 1;
                         break;
                     } else {
@@ -758,7 +768,7 @@ public class Move {
                     String curTry = "";
                     // build each pre-cap including the tile letter
                     for (int b = a; b <= rowIdx; b++) {
-                        curTry += GameBoard.getBoardGridContent(b, i).charAt(0);
+                        curTry += getLetter(GameBoard.getBoardGridContent(b, i));
                     }
                     if (rowIdx == allFilledTo) {
                         // there is not post-cap on this line after tile
@@ -766,7 +776,7 @@ public class Move {
                     } else {
                         // combine each pre-cap with different length of post-cap
                         for (int c = rowIdx + 1; c <= allFilledTo; c++) {
-                            curTry += GameBoard.getBoardGridContent(c, i).charAt(0);
+                            curTry += getLetter(GameBoard.getBoardGridContent(c, i));
                             if (WordList.validateWord(curTry.toLowerCase())) return true;
                         }
                     }
@@ -775,8 +785,8 @@ public class Move {
                 //check each row the tile is set in
                 //first find out the consist word with the tile
                 for (int left = colIdx - 1; left >= 0; left--) {
-                    char letter = GameBoard.getBoardGridContent(i, left).charAt(0);
-                    if (!Character.isAlphabetic(letter)) {
+                    Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(i, left));
+                    if (letter == null) {
                         allFilledFrom = left + 1;
                         break;
                     } else {
@@ -784,8 +794,8 @@ public class Move {
                     }
                 }
                 for (int right = colIdx + 1; right < GameBoard.size; right++) {
-                    char letter = GameBoard.getBoardGridContent(i, right).charAt(0);
-                    if (!Character.isAlphabetic(letter)) {
+                    Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(i, right));
+                    if (letter == null) {
                         allFilledTo = right - 1;
                         break;
                     } else {
@@ -796,7 +806,7 @@ public class Move {
                     String curTry = "";
                     // build each pre-cap including the tile letter
                     for (int b = a; b <= colIdx; b++) {
-                        curTry += GameBoard.getBoardGridContent(i, b).charAt(0);
+                        curTry += getLetter(GameBoard.getBoardGridContent(i, b));
                     }
                     if (colIdx == allFilledTo) {
                         // there is not post-cap on this line after tile
@@ -804,7 +814,7 @@ public class Move {
                     } else {
                         // combine each pre-cap with different length of post-cap
                         for (int c = colIdx + 1; c <= allFilledTo; c++) {
-                            curTry += GameBoard.getBoardGridContent(i, c).charAt(0);
+                            curTry += getLetter(GameBoard.getBoardGridContent(i, c));
                             if (WordList.validateWord(curTry.toLowerCase())) return true;
                         }
                     }
@@ -830,13 +840,16 @@ public class Move {
     public boolean isRightAngleExistWordNoOverlap(String direction, int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol) {
 
         boolean rightAngleNoOverlap = false;
+//        System.out.println("nwStartRow: " + nwStartRow + "; nwStartCol: " + nwStartCol + "; nwEndRow: " + nwEndRow +
+//                "; nwEndCol: " + nwEndCol);
+
         for (ArrayList<Integer> idxes : words_on_board.keySet()) {
             int startRow = idxes.get(0);
             int startCol = idxes.get(1);
             int endRow = idxes.get(2);
             int endCol = idxes.get(3);
-            //System.out.println("Word " + words_on_board.get(idxes) + ": indexes: [" + startRow + "," + startCol +
-            //        "], [" + endRow + "," + endCol + "].");
+//            System.out.println("Word " + words_on_board.get(idxes) + ": indexes: [" + startRow + "," + startCol +
+//                    "], [" + endRow + "," + endCol + "].");
 
             if (direction.equals("right")) {
                 // if the existing word is in same direction, continue
