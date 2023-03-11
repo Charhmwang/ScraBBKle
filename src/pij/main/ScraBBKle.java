@@ -121,7 +121,7 @@ public class ScraBBKle {
         // Add scores to human, print out the move
         Move hmMove = hmAction.getMove();
         Scoring scoring = new Scoring(hmMove);
-        human.addScore(scoring.calculateMoveScore());
+        human.addScore(scoring.getScore());
         System.out.println(hmMove);
         System.out.println();
         // if move execute return false means tiles bag is empty and one of the player's rack is empty too
@@ -137,7 +137,7 @@ public class ScraBBKle {
         pcSkip = false;
         Move pcMove = computerAction.getMove();
         Scoring scoring = new Scoring(pcMove);
-        computer.addScore(scoring.calculateMoveScore());
+        computer.addScore(scoring.getScore());
         System.out.println(pcMove);
         System.out.println("\nThe result is:");
         System.out.println(human);

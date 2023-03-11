@@ -27,7 +27,7 @@ public class WordsOnBoard {
         list.add(1, startCol);
         list.add(2, endRow);
         list.add(3, endCol);
-        words_on_board.put(list, word);
+        words_on_board.put(list, word.toLowerCase());
     }
 
 }

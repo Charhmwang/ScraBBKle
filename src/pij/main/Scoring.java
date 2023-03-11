@@ -23,16 +23,21 @@ public class Scoring {
         int wordSize = move.madeNewWord.length();
         //( (newWord, idxOfNewWord), tilesSetInto )
         int startRow = move.start_and_endPosOfNewWord.get(0), startCol = move.start_and_endPosOfNewWord.get(1);
-        //System.out.println("startRow: " + startRow + "; startCol: " + startCol);  //debug
+        //System.out.println("startRow: " + startRow + "; startCol: " + startCol);  //debug found!! startRow is 1 higher num
         boolean hasPremiumWordSqr  = false;
         List<Integer> factorInPremiumWordSqr = new ArrayList<>();
         for (int i = 0; i < wordSize; i++) {
+            //System.out.println("i: " + i);//debug
             String grid = "";
-            if (move.direction.equals("right"))
+            if (move.direction.equals("right")) {
                 grid = GameBoard.getBoardGridContent(startRow, startCol + i);
-            else grid = GameBoard.getBoardGridContent(startRow + i, startCol);
+            }
+            else {
+                grid = GameBoard.getBoardGridContent(startRow + i, startCol);
+            }
 
-            System.out.println(grid);
+
+            //System.out.println(grid); //debug
             // check grid content, if it's new added letter, content is in form of "G{3}", "G(2)", "T." or "t." or "t{3}"(if used wildcard)
             // if it's existed letter, content is in form of "G2" "I1" "g3"(if used wildcard)
             if (Move.isGridCoveredByTile(grid) != null) { // already covered by a tile
@@ -43,12 +48,14 @@ public class Scoring {
                     if (Character.isUpperCase(letter))
                         scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
                     else scoreWithoutPremiumWord += 3;
+                    //System.out.println("Plus this grid gained score: " + scoreWithoutPremiumWord); //debug
                 }
                 if (grid.charAt(1) == '(') {  // premium letter, multiply factor of the current letter
                     int factor = getNumber(grid);
                     if (Character.isUpperCase(letter))
                         scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter) * factor;
                     else scoreWithoutPremiumWord += 3 * factor;
+                    //System.out.println("Plus this grid gained score: " + scoreWithoutPremiumWord); //debug
                 }
                 if (grid.charAt(1) == '{') {  // !premium word, multiply the whole word value with factor
                     hasPremiumWordSqr = true;
@@ -56,6 +63,7 @@ public class Scoring {
                         scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
                     else scoreWithoutPremiumWord += 3;
                     factorInPremiumWordSqr.add(getNumber(grid));
+                    //System.out.println("Plus this grid gained score: " + scoreWithoutPremiumWord); //debug
                 }
             }
         }
@@ -63,12 +71,14 @@ public class Scoring {
         if (hasPremiumWordSqr) {
             // Calculate the product in list
             int factorProduct = getWordFactorProduct(factorInPremiumWordSqr);
-            totalScoreOfThisMove = score * factorProduct;
+            totalScoreOfThisMove = scoreWithoutPremiumWord * factorProduct;
         }
         else totalScoreOfThisMove = scoreWithoutPremiumWord;
 
         // Check whether player used all 7 tiles in this move to get awarded 70 extra points
         if (move.tilesSetInto.size() == 7) totalScoreOfThisMove += 70;
+
+        //System.out.println("Word gained total score: " + totalScoreOfThisMove);// debug
 
         return totalScoreOfThisMove;
     }

@@ -151,29 +151,11 @@ public class JUnitTest {
         Assertions.assertEquals(expected, actual);
     }
 
+
     @Test
     @Order(13)
-    void test_Scoring_calculateMoveScore() throws IOException {
-        System.out.println("Test 13: test Scoring class calculateMoveScore method");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
-
-        Player human = new Player(true);
-        Move move1 = new Move(human, true,"GIT", "f8", "r");
-        move1.recoverBoardGridContent();
-        GameBoard.printBoard();
-        Move move2 = new Move(human, false,"SAR", "h7", "d");
-        Scoring scoring = new Scoring(move2);
-        int expected = 4;
-        int actual = scoring.getScore();
-        Assertions.assertEquals(expected, actual);
-    }
-
-
-    @Test
-    @Order(14)
     void test_Move_recoverBoardGridContent() throws IOException {
-        System.out.println("Test 14: test Scoring WordsOnBoard class multiWordsOrNoneRow method");
+        System.out.println("Test 13: test Scoring WordsOnBoard class multiWordsOrNoneRow method");
 
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
@@ -190,9 +172,9 @@ public class JUnitTest {
     }
 
     @Test
-    @Order(15)
+    @Order(14)
     void test_Move_multiWordsOrNoneRow_isAnyRightAngleNewWord() throws IOException {
-        System.out.println("Test 15: test Scoring Move class multiWordsOrNoneRow method and" +
+        System.out.println("Test 14: test Scoring Move class multiWordsOrNoneRow method and" +
                 " isAnyRightAngleNewWord method");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
@@ -219,9 +201,9 @@ public class JUnitTest {
 
 
     @Test
-    @Order(16)
+    @Order(15)
     void test_Move_validate_direction_recognise() throws IOException {
-        System.out.println("Test 16: test valid move reading through the specialized direction");
+        System.out.println("Test 15: test valid move reading through the specialized direction");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         WordList wordList = new WordList();
@@ -252,9 +234,9 @@ public class JUnitTest {
 
 
     @Test
-    @Order(17)
+    @Order(16)
     void test_Move_recoverBoardGridContentForInvalidMove() throws IOException {
-        System.out.println("Test 17: test Move class recoverBoardGridContentForInvalidMove method");
+        System.out.println("Test 16: test Move class recoverBoardGridContentForInvalidMove method");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
 
@@ -282,9 +264,9 @@ public class JUnitTest {
 
 
     @Test
-    @Order(18)
+    @Order(17)
     void test_ComputerAction_autoMove() throws IOException {
-        System.out.println("Test 18: test ComputerAction class autoMove method");
+        System.out.println("Test 17: test ComputerAction class autoMove method");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         WordList wordList = new WordList();
@@ -321,9 +303,9 @@ public class JUnitTest {
 
 
     @Test
-    @Order(19)
+    @Order(18)
     void test_Move_multiWordsOrNoneRow2() throws IOException {
-        System.out.println("Test 19: test WordsOnBoard class multiWordsOrNoneCol method 2");
+        System.out.println("Test 18: test WordsOnBoard class multiWordsOrNoneCol method 2");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
 
@@ -342,9 +324,9 @@ public class JUnitTest {
 
 
     @Test
-    @Order(20)
+    @Order(19)
     void test_Move_isRightAngleExistWordNoOverlap() throws IOException {
-        System.out.println("Test 20: test Move class" +
+        System.out.println("Test 19: test Move class" +
                 " isRightAngleExistWordNoOverlap method");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
@@ -372,9 +354,9 @@ public class JUnitTest {
 
 
     @Test
-    @Order(21)
+    @Order(20)
     void test_Move_validate_inputOneLetter() throws IOException {
-        System.out.println("Test 21: test move validation");
+        System.out.println("Test 20: test move validation");
         SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         WordList wordList = new WordList();
@@ -397,5 +379,51 @@ public class JUnitTest {
         Assertions.assertEquals(expected, actual);
     }
 
+
+    @Test
+    @Order(21)
+    void test_Scoring_calculateMoveScore1() throws IOException {
+        System.out.println("Test 21: test Scoring class calculateMoveScore method 1");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+
+        Player human = new Player(true);
+        Move move1 = new Move(human, true,"GIT", "f8", "r");
+        move1.recoverBoardGridContent();
+        GameBoard.printBoard();
+        Move move2 = new Move(human, false,"SAR", "h7", "d");
+        Scoring scoring = new Scoring(move2);
+        int expected = 4;
+        int actual = scoring.getScore();
+        Assertions.assertEquals(expected, actual);
+    }
+
+
+    @Test
+    @Order(22)
+    void test_Move() throws IOException {
+        System.out.println("Test 22: test Move class");
+        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+        WordList wordList = new WordList();
+        LetterPoints letterPoints = new LetterPoints();
+
+        Player human = new Player(true);
+        Move move1 = new Move(human, true,"NO", "h8", "r");
+        move1.recoverBoardGridContent();
+        WordsOnBoard.addWord(8, 7, 8, 8,"NO");
+        GameBoard.printBoard();
+        Move move2 = new Move(human, false,"To", "i7", "d");
+        move2.recoverBoardGridContent();
+        GameBoard.printBoard();
+        WordsOnBoard.addWord(9, 7, 9, 9,"TOo");
+        Move move3 = new Move(human, false,"SD", "g8", "r"); //SNOD why not pass
+
+        boolean expected = true;
+        boolean actual = move3.isValid;
+        Assertions.assertEquals(expected, actual);
+    }
 
 }

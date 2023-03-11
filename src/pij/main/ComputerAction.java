@@ -16,7 +16,6 @@ public class ComputerAction {
         else {
             skipped = false;
             // To recover the chosen move showing letters on the board leading the factor or a dot - for scoring
-            System.out.println("Active the chosen move");
             int bitCounter = 0;
             for (int i : move.tilesSetInto) {
                 if (move.direction.equals("right")) {
@@ -31,6 +30,10 @@ public class ComputerAction {
                 }
                 bitCounter++;
             }
+            //System.out.print("Computer choose the move: "); //debug
+            //System.out.println(move); //debug
+            //System.out.println("The chosen move is shown like this for scoring before recover to the normal form:");//debug
+            //GameBoard.printBoard(); //debug
         }
     }
 
@@ -131,7 +134,7 @@ public class ComputerAction {
             }
         }
         int validMovesAmount = validMoves.size();
-        System.out.println("There are " + validMovesAmount + " valid moves");  //debug
+        //System.out.println("There are " + validMovesAmount + " valid moves");  //debug
         //System.out.println("They are: "); //debug
 //        for(Move m : validMoves) {
 //            System.out.println(m); //debug

@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class WordList {
     private static HashMap<String, Boolean> map;
 
-    private Scanner sc = new Scanner(new File("../resources/wordlist.txt"), StandardCharsets.UTF_8);
+    private Scanner sc = new Scanner(new File("./resources/wordlist.txt"), StandardCharsets.UTF_8);
 
     public WordList() throws IOException {
         map = new HashMap<>();

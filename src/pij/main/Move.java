@@ -248,7 +248,7 @@ public class Move {
             return forReturn;
         }
 
-        //System.out.println("CHECK 4 done"); //debug
+        System.out.println("CHECK 4 done"); //debug
 
         // CHECK 5. not allowed to place a complete word parallel immediately next to a word already played
 
@@ -258,7 +258,7 @@ public class Move {
         //System.out.println(" new word : " + newWord);  //debug
         //for (int i : idxOfNewWord) System.out.println(i); //debug
 
-        if (!words_on_board.containsValue(newWord)) {
+        if (!words_on_board.containsValue(newWord.toLowerCase())) {
             return forReturn;
         }
 
@@ -317,6 +317,20 @@ public class Move {
 
 
     public static Character isGridCoveredByTile(String curGrid) {
+        if (curGrid.contains(".") || curGrid.contains("(") || curGrid.contains("{")) {
+            return null;
+        } else {
+            for (int i = 0; i < curGrid.length(); i++) {
+                if (Character.isAlphabetic(curGrid.charAt(i))) {
+                    return curGrid.charAt(i);
+                }
+            }
+        }
+        return null;
+    }
+
+
+    public static Character getLetter(String curGrid) {
         for (int i = 0; i < curGrid.length(); i++) {
             if (Character.isAlphabetic(curGrid.charAt(i))) {
                 return curGrid.charAt(i);
@@ -324,6 +338,7 @@ public class Move {
         }
         return null;
     }
+
 
     public AbstractMap.SimpleEntry<String, List<Integer>> buildWordForFirstMove(String inputLetters, int rowIdx, int colIdx, String direction) {
 
@@ -486,7 +501,7 @@ public class Move {
             String currentPreCap = preCap.substring(i);
             String useTilesGrids = "";
             for (int j = 0; j <= allFilledTo - colIdx; j++) {
-                useTilesGrids += isGridCoveredByTile(GameBoard.getBoardGridContent(rowIdx, colIdx + j));
+                useTilesGrids += getLetter(GameBoard.getBoardGridContent(rowIdx, colIdx + j));
                 // useTilesGrids += GameBoard.getBoardGridContent(rowIdx, colIdx + j).charAt(0);
                 String outcome = currentPreCap + useTilesGrids;
                 //System.out.println("Outcome: " + outcome); //debug
@@ -509,7 +524,7 @@ public class Move {
             String currentPostCap = postCap.substring(0,postCap.length()-i);
             String useTilesGrids = "";
             for (int j = 0; j <= endIdxCol - allFilledFrom; j++) {
-                useTilesGrids = isGridCoveredByTile(GameBoard.getBoardGridContent(rowIdx, endIdxCol - j)) + useTilesGrids;
+                useTilesGrids = getLetter(GameBoard.getBoardGridContent(rowIdx, endIdxCol - j)) + useTilesGrids;
                 String outcome = useTilesGrids + currentPostCap;
                 //System.out.println("Outcome: " + outcome); //debug
                 if (WordList.validateWord(outcome.toLowerCase())) {
@@ -563,7 +578,9 @@ public class Move {
         } else {
             //if preWord is including an old tile, then add; else return false
             if (preWord.length() > tilesSetInto.size()) {
-                res.add(preWord); res.add(colIdx); res.add(endIdxCol);
+                res.add(preWord);
+                res.add(colIdx);
+                res.add(endIdxCol);
             } else {
                 //System.out.println("Flag 7");
                 return null;
@@ -618,7 +635,7 @@ public class Move {
             String currentPreCap = preCap.substring(i);
             String currentTilesWithPostCap = "";
             for (int j = 0; j <= allFilledTo - rowIdx; j++) {
-                currentTilesWithPostCap += isGridCoveredByTile(GameBoard.getBoardGridContent(rowIdx + j, colIdx));
+                currentTilesWithPostCap += getLetter(GameBoard.getBoardGridContent(rowIdx + j, colIdx));
                 String outcome = currentPreCap + currentTilesWithPostCap;
                 // System.out.println("Outcome: " + outcome); //debug
                 if (WordList.validateWord(outcome.toLowerCase())) {
@@ -641,7 +658,7 @@ public class Move {
             String currentPostCap = postCap.substring(0, postCap.length() - i);
             String useTilesGrids = "";
             for (int j = 0; j <= endIdxRow - allFilledFrom; j++) {
-                useTilesGrids = isGridCoveredByTile(GameBoard.getBoardGridContent(endIdxRow - j, colIdx)) + useTilesGrids;
+                useTilesGrids = getLetter(GameBoard.getBoardGridContent(endIdxRow - j, colIdx)) + useTilesGrids;
                 String outcome = useTilesGrids + currentPostCap;
                 // System.out.println("Outcome: " + outcome); //debug
                 if (WordList.validateWord(outcome.toLowerCase())) {
@@ -695,7 +712,7 @@ public class Move {
             //if preWord is including an old tile, then add; else return false
             if (preWord.length() > tilesSetInto.size()) {
                 res.add(preWord);
-                res.add(colIdx);
+                res.add(rowIdx);
                 res.add(endIdxRow);
             } else {
                 //System.out.println("Flag 7");
@@ -811,12 +828,16 @@ public class Move {
     public boolean isRightAngleExistWordNoOverlap(String direction, int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol) {
 
         boolean rightAngleNoOverlap = false;
-        int startRow = 0, startCol = 0, endRow = 0, endCol = 0;
         for (ArrayList<Integer> idxes : words_on_board.keySet()) {
-            startRow = idxes.get(0);
-            startCol = idxes.get(1);
-            endRow = idxes.get(2);
-            endCol = idxes.get(3);
+            int startRow = idxes.get(0);
+            int startCol = idxes.get(1);
+            int endRow = idxes.get(2);
+            int endCol = idxes.get(3);
+            System.out.println("Word " + words_on_board.get(idxes) + ": indexes: [" + startRow + "," + startCol +
+                    "], [" + endRow + "," + endCol + "].");
+
+            //if the direction is not opposite, then continue to the next one
+
 
             if (direction.equals("right")) {
                 if ( ((startCol == nwStartCol - 1 || startCol == nwStartCol + 1) && (nwStartRow >= startRow && nwStartRow <= endRow))
