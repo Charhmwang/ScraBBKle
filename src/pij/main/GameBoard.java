@@ -20,7 +20,7 @@ public class GameBoard {
     /** The size of a GameBoard. Must between (including) 12 and 26. */
     public static int size;
 
-    public static List<List<Integer>> CenterSquares;
+    public static List<Integer> CenterSquare;
 
     /**
      * Constructs a new GameBoard with no parameter.

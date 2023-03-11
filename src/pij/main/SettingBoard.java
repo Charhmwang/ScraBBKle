@@ -121,18 +121,15 @@ public class SettingBoard {
 
     public void setCenter() {
 
-        GameBoard.CenterSquares = new ArrayList<>();
+        GameBoard.CenterSquare = new ArrayList<>();
         int s = GameBoard.size;
-        // If game board size is odd, there is only one center square, else they are 4 corners of the board.
+        // If game board size is odd, there is only one center square, else they are four.
+        List<Integer> centerIdx;
         if (s % 2 == 1) {
-            List<Integer> centerIdx = List.of( (s + 1)/2, (s - 1)/2 );
-            GameBoard.CenterSquares = List.of(centerIdx);
+            centerIdx = List.of((s + 1) / 2, (s - 1) / 2);
         } else {
-            List<Integer> center1idx = List.of( 1, 0 );
-            List<Integer> center2idx = List.of( 1, s-1 );
-            List<Integer> center3idx = List.of( s, 0 );
-            List<Integer> center4idx = List.of( s, s-1 );
-            GameBoard.CenterSquares = List.of(center1idx, center2idx, center3idx, center4idx);
+            centerIdx = List.of(s / 2, (s - 2) / 2);
         }
+        GameBoard.CenterSquare = centerIdx;
     }
 }

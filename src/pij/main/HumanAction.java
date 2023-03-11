@@ -43,8 +43,11 @@ public class HumanAction {
 
                 // Check is it the first move of game, if yes, the inputs must cover at least one center square
                 if (firstMove) {
-                    if (!coveredCenterSquares(letters, position, direction)) {
-                        System.out.println("First move must a cover center square! This is not a valid move");
+                    char col = (char) ('a' + GameBoard.CenterSquare.get(1));
+
+                    if (!Move.coveredCenterSquares(letters, position, direction)) {
+                        System.out.println("First move must cover the center square - " +
+                                col + GameBoard.CenterSquare.get(0) + ". This is not a valid move");
                         continue;
                     }
                     move = new Move(human, true, letters, position, direction);
@@ -90,30 +93,6 @@ public class HumanAction {
             char col = position.charAt(0);
             return col >= 'a' && col < ('a' + size) && row >= 1 && row <= size;
         } else return false;
-    }
-
-
-    public static boolean coveredCenterSquares(String letters, String position, String direction) {
-        List<List<Integer>> coveringSquares = new ArrayList<>();
-        int row = Integer.parseInt(position.substring(1));
-        int col = position.charAt(0) - 'a';
-        if (direction.equals("r")) {
-            for (int i = 0; i < letters.length(); i++) {
-                List<Integer> currentSquareIdx = List.of(row, col + i);
-                coveringSquares.add(currentSquareIdx);
-            }
-        } else {
-            for (int i = 0; i < letters.length(); i++) {
-                List<Integer> currentSquareIdx = List.of(row + i, col);
-                coveringSquares.add(currentSquareIdx);
-            }
-        }
-
-        for (List<Integer> center : GameBoard.CenterSquares) {
-            if (coveringSquares.contains(center))
-                return true;
-        }
-        return false;
     }
 
 }
