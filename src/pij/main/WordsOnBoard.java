@@ -2,7 +2,6 @@ package pij.main;
 
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class WordsOnBoard {

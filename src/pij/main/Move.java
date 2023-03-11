@@ -638,7 +638,7 @@ public class Move {
         // System.out.println("preCap: " + preCap);  //debug
         String postCap = "";
         for (int i = endIdxRow + 1; i <= allFilledTo; i++) postCap += getLetter(GameBoard.getBoardGridContent(i, colIdx));
-         System.out.println("postCap: " + postCap);
+        //System.out.println("postCap: " + postCap);
 
         // Try pre-cap plus each letter after using tiles
         for (int i = 0; i < preCap.length(); i++) {
@@ -693,7 +693,6 @@ public class Move {
         }
         //System.out.println(legalWordsCounter);
         if (legalWordsCounter == 0 || legalWordsCounter > 1) {
-            System.out.println(legalWordsCounter); //0
             //System.out.println("Flag 3");
             return null;
         }

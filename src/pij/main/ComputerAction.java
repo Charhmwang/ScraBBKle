@@ -31,6 +31,7 @@ public class ComputerAction {
                 bitCounter++;
             }
             //System.out.print("Computer choose the move: "); //debug
+            //System.out.println("Computer built new word: " + move.madeNewWord); //debug
             //System.out.println(move); //debug
             //System.out.println("The chosen move is shown like this for scoring before recover to the normal form:");//debug
             //GameBoard.printBoard(); //debug
