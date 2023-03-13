@@ -1,7 +1,9 @@
 package pij.main;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TileRack {
@@ -45,7 +47,32 @@ public class TileRack {
     }
 
 
-    // TODO: ! if user only have 1 wildcard but input having more than 1 lowercase letter
+    public static boolean validateTilesFromRack(TileRack rack, String letters) {
+        // memorize the tiles letters and each letter's amounts
+        Map<Character, Integer> letterAmountOnRack = new HashMap<>();
+        for (Tile tile : rack.getTiles()) {
+            if (!letterAmountOnRack.containsKey(tile.letter)) {
+                letterAmountOnRack.put(tile.letter, 1);
+            } else {
+                int oldValue = letterAmountOnRack.get(tile.letter);
+                letterAmountOnRack.replace(tile.letter, oldValue + 1);
+            }
+        }
+
+        // validate letters using memoization
+        for (int i = 0; i < letters.length(); i++) {
+            char ch = letters.charAt(i);
+            // letter not existing or exceed the letter's using amount
+            if (!letterAmountOnRack.containsKey(ch) || letterAmountOnRack.get(ch) == 0) return false;
+            else {
+                int oldValue = letterAmountOnRack.get(ch);
+                letterAmountOnRack.replace(ch, oldValue - 1);
+            }
+        }
+        return true;
+    }
+
+
     public Tile isTileExisting(char letter) {
 
         if (Character.isAlphabetic(letter)) {

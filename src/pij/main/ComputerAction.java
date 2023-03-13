@@ -170,7 +170,7 @@ public class ComputerAction {
     public void getSeqFor1Bit(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
-            allTheLetterSequences.add(each);
+            allTheLetterSequences.add(each);    
         }
     }
 

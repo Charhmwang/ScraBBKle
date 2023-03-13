@@ -1,6 +1,6 @@
 package pij.main;
 
-import javax.swing.*;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,7 +52,6 @@ public class Move {
     public AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>> validateMove() {
 
         this.row = Integer.parseInt(position.substring(1));
-        //column = position.charAt(0);
         this.col = position.charAt(0) - 'a';
         this.direction = direction.charAt(0) == 'r' ? "right" : "down";
 

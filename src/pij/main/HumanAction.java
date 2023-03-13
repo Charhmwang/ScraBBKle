@@ -23,9 +23,9 @@ public class HumanAction {
 
     public Move promptMove() {
         String[] strArr = new String[3];
-        boolean rightForm = false;
+        boolean valid = false;
         Move move = null;
-        while (!rightForm) {
+        while (!valid) {
             System.out.println("Please enter your move with letter sequence, position, and direction (d for down," +
                     " r for right) separated by commas. Entering just two commas passes. (Type \'S\' to skip): ");
             String input = System.console().readLine();
@@ -37,7 +37,14 @@ public class HumanAction {
 
                 // Check is it in the right form and set into position in the bound of board indexes
                 if (!validInputForm(position, direction)) {
-                    System.out.println("Wrong input form! This is not a valid move");
+                    System.out.println("Wrong input format! This is not a valid move");
+                    continue;
+                }
+
+                // Check is it using tiles from rack
+                boolean tilesFromRack = TileRack.validateTilesFromRack(human.getTileRack(), letters);
+                if (!tilesFromRack) {
+                    System.out.println("You must use tiles from your own rack ONLY! This is not a valid move");
                     continue;
                 }
 
@@ -56,7 +63,7 @@ public class HumanAction {
                 }
 
                 if (move.isValid) {
-                    rightForm = true;
+                    valid = true;
                 } else {
                     // Reject invalid move and recover the board content IF the board has been revised while validating,
                     // see explanation in method buildWordUsingTileLetters in WordsOnBoard class
@@ -69,7 +76,7 @@ public class HumanAction {
                      move.recoverBoardGridContentForInvalidMove();
                 }
             } else {
-                System.out.println("Wrong input form! This is not a valid move");
+                System.out.println("Wrong input format! This is not a valid move");
             }
         }
         return move;
