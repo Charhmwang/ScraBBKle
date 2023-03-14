@@ -62,6 +62,7 @@ public class TileRack {
         // validate letters using memoization
         for (int i = 0; i < letters.length(); i++) {
             char ch = letters.charAt(i);
+            if (Character.isLowerCase(ch)) ch = '?';
             // letter not existing or exceed the letter's using amount
             if (!letterAmountOnRack.containsKey(ch) || letterAmountOnRack.get(ch) == 0) return false;
             else {
