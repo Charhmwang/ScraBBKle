@@ -1,6 +1,8 @@
 package pij.main;
 
 
+import java.io.IOException;
+
 /**
  * Start the game process from here.
  *
@@ -9,7 +11,6 @@ package pij.main;
  */
 
 public class ScraBBKle {
-    private GameBoard board;
     private Player human;
     private Player computer;
     public static boolean gameOver = false;
@@ -18,17 +19,26 @@ public class ScraBBKle {
     boolean BagRackNotEmpty = false;
     public LetterPoints letterPoints;
     public TileBag tileBag;
+    public WordList wordList;
     public WordsOnBoard wordsOnBoard;
-
-
-    public ScraBBKle(GameBoard board) {
-        this.board = board;
+    private static ScraBBKle scraBBKleInstance;
+    private ScraBBKle() {}
+    public synchronized static ScraBBKle getInstance() {
+        if (scraBBKleInstance == null) {
+            scraBBKleInstance = new ScraBBKle();
+        }
+        return scraBBKleInstance;
     }
 
-    public void startGame(Player human, Player computer, WordsOnBoard wordsOnBoard) {
+    public void startGame(Player human, Player computer) throws IOException {
         this.human = human;
         this.computer = computer;
-        this.wordsOnBoard = wordsOnBoard;
+        this.tileBag = TileBag.getInstance();
+        this.wordList = WordList.getInstance("../resources/wordlist.txt");
+        this.letterPoints = LetterPoints.getInstance();
+        this.wordsOnBoard = WordsOnBoard.getInstance();
+
+        gameSteps();
     }
 
     public void gameSteps() {

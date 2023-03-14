@@ -1,6 +1,12 @@
 package pij.main;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+
+import static java.lang.System.exit;
 
 /**
  * Initialize the game board.
@@ -14,6 +20,16 @@ import java.util.List;
  */
 public class GameBoard {
 
+    private GameBoard() {}
+    private File file;
+    private static GameBoard gameBoardInstance;
+    public synchronized static GameBoard getInstance() {
+        if (gameBoardInstance == null) {
+            gameBoardInstance = new GameBoard();
+        }
+        return gameBoardInstance;
+    }
+
     /** The name of the GameBoard. Always non-null after object creation. */
     public static String[][] board;
 
@@ -21,13 +37,6 @@ public class GameBoard {
     public static int size;
 
     public static List<Integer> CenterSquare;
-
-    /**
-     * Constructs a new GameBoard with no parameter.
-     */
-    public GameBoard() {
-        this.chooseBoard();
-    }
 
     /**
      * Create and initialize a two-dimensional array of string to represent the board for the game.
@@ -71,11 +80,121 @@ public class GameBoard {
             }
         } while (!correctInput);
 
+        this.file = new File(userFilePath);
+
         // Now the valid board for the game is confirmed.
         // Pass the GameBoard object into SettingBoard to do all the initialisation.
-
-        SettingBoard settings = new SettingBoard(userFilePath);
+        settingBoard();
     }
+
+    // For JUnit tests
+    public void chooseBoard(String userFilePath) {
+        this.file = new File(userFilePath);
+        settingBoard();
+    }
+
+
+    public void settingBoard() {
+        setSize();
+        setArr();
+        setCenter();
+    }
+
+    /**
+     * Read the size number from the first line of the designated file,
+     * and set as the GameBoard object's size feature.
+     *
+     * @throws RuntimeException if accessing the file unsuccessfully
+     * @throws NumberFormatException if reading the size number in the file unsuccessfully
+     */
+    public void setSize() {
+
+        try (var sc = new Scanner(file, StandardCharsets.UTF_8)) {
+            String s = sc.nextLine();
+            GameBoard.size = Integer.parseInt(s);
+        } catch(RuntimeException | IOException e){
+            System.out.println("Error at reading board size from txt file");
+            exit(1);
+        }
+    }
+
+
+    /**
+     * Read the board each grid content from the designated file,
+     * and set into the GameBoard object's board feature.
+     *
+     * @catch IOException if reading the file unsuccessfully
+     * @catch FileNotFoundException if the file is not found
+     */
+    public void setArr() {
+
+        board = new String[size+1][size];
+        board[0][0] = String.valueOf(size);
+
+        int c = 0, row = 0, col = 0;
+        try {
+            FileReader fr = new FileReader(file);
+            try (BufferedReader br = new BufferedReader(fr)) {
+                while ( (c = br.read()) != -1 ) {
+                    // If it is not the first row which shows the size number of the board
+                    if (row != 0) {
+                        // When it meets a dot
+                        if ((char) c == '.') {
+                            GameBoard.board[row][col] = ".";
+                        }
+
+                        // When it meets a Premium Word Square
+                        if ((char) c == '{') {
+                            GameBoard.board[row][col] = "{";
+                            while (Character.compare((char)(c = br.read()), '}') != 0) {
+                                GameBoard.board[row][col] += (char) c;
+                            }
+                            GameBoard.board[row][col] += "}";
+                        }
+
+                        // When it meets a Premium Letter Square
+                        if ((char) c == '(') {
+                            GameBoard.board[row][col] = "(";
+                            while ((char)(c = br.read()) != ')') {
+                                GameBoard.board[row][col] += (char) c;
+                            }
+                            GameBoard.board[row][col] += ")";
+                        }
+                        col++;
+                        // When it meets a \n
+                        if ((char)c == '\n') {
+                            row++;
+                            col = 0;
+                        }
+                    }
+                    // else it is the first row which shows the size number of the board
+                    else {
+                        while ( (char)(c = br.read()) != '\n') ;
+                        row++;
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                System.out.println("Error! File not found!");
+            }
+        } catch (IOException e) {
+            System.out.println("An I/O Error Occurred");
+        }
+    }
+
+
+    public void setCenter() {
+
+        CenterSquare = new ArrayList<>();
+        // If game board size is odd, there is only one center square, else they are four.
+        List<Integer> centerIdx;
+        if (size % 2 == 1) {
+            centerIdx = List.of((size + 1) / 2, (size - 1) / 2);
+        } else {
+            centerIdx = List.of(size / 2, (size - 2) / 2);
+        }
+        GameBoard.CenterSquare = centerIdx;
+    }
+
 
     /**
      * Print board with line tags and spaces.
@@ -119,12 +238,15 @@ public class GameBoard {
      * @param letter the new content
      */
     public static void reviseBoard(int row, int col, String letter) {
-
         board[row][col] = letter;
     }
 
-    public static String getBoardGridContent(int row, int col) { return board[row][col]; }
+    public static boolean isGridRevised(int row, int col) {
+        String gridContent = board[row][col];
+        return (gridContent.charAt(0) != '.' && gridContent.charAt(0) != '{' && gridContent.charAt(0) != '(')
+                && (gridContent.charAt(1) == '.' || gridContent.charAt(1) == '{' || gridContent.charAt(1) == '(');
+    }
 
-    public String[][] getBoard() { return board; }
+    public static String getBoardGridContent(int row, int col) { return board[row][col]; }
 
 }

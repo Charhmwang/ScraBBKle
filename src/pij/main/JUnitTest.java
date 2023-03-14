@@ -6,17 +6,20 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JUnitTest {
-    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     @Test
     @Order(1)
     void testValidateUserBoard1() {
         System.out.println("Test 1: test an invalid board - class ValidateUserBoard");
+
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
+
         String userFilePath = "./test_res/invalidBoard.txt";
         ValidateUserBoard tester = new ValidateUserBoard(userFilePath);
         boolean expected = false;
@@ -113,7 +116,8 @@ public class JUnitTest {
     void test_HumanAction_coveredCenterSquares() throws IOException {
         System.out.println("Test 10: test HumanAction class coveredCenterSquares method");
 
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         GameBoard.printBoard();
         String letters = "GIT";
@@ -156,7 +160,8 @@ public class JUnitTest {
     void test_Move_recoverBoardGridContent() throws IOException {
         System.out.println("Test 13: test Scoring WordsOnBoard class multiWordsOrNoneRow method");
 
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
         System.out.println("\n===Before the game===");
         GameBoard.printBoard();
@@ -175,10 +180,11 @@ public class JUnitTest {
     void test_Move_multiWordsOrNoneRow_isAnyRightAngleNewWord() throws IOException {
         System.out.println("Test 14: test Scoring Move class multiWordsOrNoneRow method and" +
                 " isAnyRightAngleNewWord method");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
 
         GameBoard.printBoard();
         Player human = new Player(true);
@@ -203,10 +209,12 @@ public class JUnitTest {
     @Order(15)
     void test_Move_validate_direction_recognise() throws IOException {
         System.out.println("Test 15: test valid move reading through the specialized direction");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
 
         GameBoard.printBoard();
         Player human = new Player(true);
@@ -236,7 +244,9 @@ public class JUnitTest {
     @Order(16)
     void test_Move_recoverBoardGridContentForInvalidMove() throws IOException {
         System.out.println("Test 16: test Move class recoverBoardGridContentForInvalidMove method");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
 
         GameBoard.printBoard();
@@ -266,10 +276,12 @@ public class JUnitTest {
     @Order(17)
     void test_ComputerAction_autoMove() throws IOException {
         System.out.println("Test 17: test ComputerAction class autoMove method");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
 
 
         GameBoard.printBoard();
@@ -305,9 +317,10 @@ public class JUnitTest {
     @Order(18)
     void test_Move_multiWordsOrNoneRow2() throws IOException {
         System.out.println("Test 18: test WordsOnBoard class multiWordsOrNoneCol method 2");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
 
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
+        GameBoard.size = 15;
         Player human = new Player(true);
         Move move1 = new Move(human, true, "LIE", "h15", "r");
         move1.recoverBoardGridContent();
@@ -326,10 +339,11 @@ public class JUnitTest {
     @Order(19)
     void test_Move_validate_inputOneLetter() throws IOException {
         System.out.println("Test 19: test move validation");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
 
         GameBoard.printBoard();
         Player human = new Player(true);
@@ -353,10 +367,11 @@ public class JUnitTest {
     @Order(20)
     void test_Scoring_calculateMoveScore1() throws IOException {
         System.out.println("Test 20: test Scoring class calculateMoveScore method 1");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
 
         Player human = new Player(true);
         Move move1 = new Move(human, true,"GIT", "f8", "r");
@@ -374,10 +389,12 @@ public class JUnitTest {
     @Order(21)
     void test_Move_isRightAngleExistWordNoOverlap() throws IOException {
         System.out.println("Test 21: test Move class isRightAngleExistWordNoOverlap method");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
 
         Player human = new Player(true);
         Move move1 = new Move(human, true,"NO", "h8", "r");
@@ -403,10 +420,12 @@ public class JUnitTest {
     @Order(22)
     void test_Move_isNextToParallelPlayedWord() throws IOException {
         System.out.println("Test 22: test Move class isNextToParallelPlayedWord method");
-        SettingBoard s = new SettingBoard("./resources/defaultBoard.txt");
+
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./resources/defaultBoard.txt");
         GameBoard.size = 15;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
 
         Player human = new Player(true);
         Move move1 = new Move(human, true,"BAN", "f8", "r");
@@ -426,11 +445,13 @@ public class JUnitTest {
     @Test
     @Order(23)
     void test_Scoring_calculateMoveScore2() throws IOException {
-        System.out.println("Test 20: test Scoring class calculateMoveScore method 2");
-        SettingBoard s = new SettingBoard("./test_res/26.txt");
+        System.out.println("Test 23: test Scoring class calculateMoveScore method 2");
+
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./test_res/26.txt");
         GameBoard.size = 26;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
 
         System.out.println("Original board:");
         GameBoard.printBoard();
@@ -449,10 +470,12 @@ public class JUnitTest {
     @Order(24)
     void test_Scoring_calculateMoveScore3() throws IOException {
         System.out.println("Test 20: test Scoring class calculateMoveScore method 3");
-        SettingBoard s = new SettingBoard("./test_res/26.txt");
+
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./test_res/26.txt");
         GameBoard.size = 26;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
 
         System.out.println("Original board:");
         GameBoard.printBoard();
@@ -471,10 +494,12 @@ public class JUnitTest {
     @Order(25)
     void test_Scoring_calculateMoveScore4() throws IOException {
         System.out.println("Test 20: test Scoring class calculateMoveScore method 4");
-        SettingBoard s = new SettingBoard("./test_res/26.txt");
+
+        GameBoard gameBoard = GameBoard.getInstance();
+        gameBoard.chooseBoard("./test_res/26.txt");
         GameBoard.size = 26;
-        WordList wordList = new WordList();
-        LetterPoints letterPoints = new LetterPoints();
+        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
 
         System.out.println("Original board:");
         GameBoard.printBoard();

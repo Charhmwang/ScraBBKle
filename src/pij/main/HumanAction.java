@@ -1,8 +1,5 @@
 package pij.main;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class HumanAction {
 
     private final Player human;
@@ -51,7 +48,6 @@ public class HumanAction {
                 // Check is it the first move of game, if yes, the inputs must cover at least one center square
                 if (firstMove) {
                     char col = (char) ('a' + GameBoard.CenterSquare.get(1));
-
                     if (!Move.coveredCenterSquares(letters, position, direction)) {
                         System.out.println("First move must cover the center square - " +
                                 col + GameBoard.CenterSquare.get(0) + ". This is not a valid move");
@@ -62,18 +58,15 @@ public class HumanAction {
                     move = new Move(human, false, letters, position, direction);
                 }
 
-                if (move.isValid) {
-                    valid = true;
-                } else {
+                if (move.isValid) valid = true;
+                else {
                     // Reject invalid move and recover the board content IF the board has been revised while validating,
                     // see explanation in method buildWordUsingTileLetters in WordsOnBoard class
                     // need to update the grid content from such as "G{3}" into "{3}" or "T." into "."
                     System.out.println("This is not a valid move");
                     // Check if the grid content was revised
-                    String gridContent = GameBoard.getBoardGridContent(move.row, move.col);
-                    if ((gridContent.charAt(0) != '.' && gridContent.charAt(0) != '{' && gridContent.charAt(0) != '(')
-                            && (gridContent.charAt(1) == '.' || gridContent.charAt(1) == '{' || gridContent.charAt(1) == '('))
-                     move.recoverBoardGridContentForInvalidMove();
+                    if (GameBoard.isGridRevised(move.row, move.col))
+                        move.recoverBoardGridContentForInvalidMove();
                 }
             } else {
                 System.out.println("Wrong input format! This is not a valid move");

@@ -5,8 +5,15 @@ import java.util.Map;
 
 public class LetterPoints {
     public static final Map<Character, Integer> letterMap = new HashMap<>();
+    private static LetterPoints letterPointsInstance;
+    public synchronized static LetterPoints getInstance() {
+        if (letterPointsInstance == null) {
+            letterPointsInstance = new LetterPoints();
+        }
+        return letterPointsInstance;
+    }
 
-    public LetterPoints() {
+    private LetterPoints() {
         letterMap.put('A', 1);
         letterMap.put('B', 3);
         letterMap.put('C', 3);

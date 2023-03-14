@@ -2,14 +2,25 @@ package pij.main;
 
 import java.io.IOException;
 
-//javac -cp junit-platform-console-standalone-1.9.1.jar:. pij/main/*.java
-//java pij/main/*.java
+/**
+ * A shipment consists of 1 or more parcels.
+ * A parcel consists of 1 or more Products.
+ * Objects of this class can currently only store the contents of a Shipment,
+ * provide a String representation, and allow limited access to information
+ * about the contents.
+ *
+ * Further functionality may be provided in a later version of class Shipment.
+ *
+ * @author Carsten Fuhs
+ * @version 0.1
+ */
 public class Main {
     public static void main(String[] args) throws IOException {
 
         // Initiate board and game
-        GameBoard board = new GameBoard();
-        ScraBBKle play = new ScraBBKle(board);
+        GameBoard board = GameBoard.getInstance();
+        board.chooseBoard();
+        ScraBBKle play = ScraBBKle.getInstance();
 
         // Initiate players
         Player human = new Player(true);
@@ -21,17 +32,8 @@ public class Main {
         TileRack pcRack = new TileRack(computer);
         computer.setTileRack(pcRack);
 
-        // Initiate LetterPoints, TileBag, WordList, WordsOnBoard
-        LetterPoints letterPoints = new LetterPoints();
-        TileBag tileBag = TileBag.getInstance();
-        WordList wordList = new WordList();
-        WordsOnBoard wordsOnBoard = WordsOnBoard.getInstance();
-
         // Set the player, tile rack into game class Scrabble
-        play.startGame(human, computer, wordsOnBoard);
-
-        // Start the game steps
-        play.gameSteps();
+        play.startGame(human, computer);
 
     }
 }
