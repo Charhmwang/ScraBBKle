@@ -3,15 +3,18 @@ package pij.main;
 import java.util.Objects;
 
 public class Tile {
-    public char letter;
-    int points;
-    boolean isWildCard;
+    private char letter;
+    private final int points;
+    private final boolean wildCard;
 
     public Tile(char letter, int points) {
         this.letter = letter;
         this.points = points;
-        isWildCard = letter == '?';
+        wildCard = letter == '?';
     }
+
+    public char getLetter() { return this.letter; }
+    public boolean isWildCard() { return wildCard; }
 
     @Override
     public String toString() {
@@ -19,7 +22,7 @@ public class Tile {
     }
 
     @Override
-    public int hashCode() { return Objects.hash(letter, points, isWildCard); }
+    public int hashCode() { return Objects.hash(letter, points, wildCard); }
 
     public void wildCardChar() {
         boolean correctInput = false;

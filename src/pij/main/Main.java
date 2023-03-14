@@ -27,9 +27,9 @@ public class Main {
         Player computer = new Player(false);
 
         // Initiate racks and set into class players
-        TileRack humanRack = new TileRack(human);
+        TileRack humanRack = new TileRack();
         human.setTileRack(humanRack);
-        TileRack pcRack = new TileRack(computer);
+        TileRack pcRack = new TileRack();
         computer.setTileRack(pcRack);
 
         // Set the player, tile rack into game class Scrabble

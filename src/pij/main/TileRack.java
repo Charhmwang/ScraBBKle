@@ -9,11 +9,8 @@ import java.util.stream.Collectors;
 public class TileRack {
     public static final int RACK_SIZE = 7;
     private final List<Tile> tiles = new ArrayList<Tile>();
-    private final Player player;
 
-    public TileRack(Player player) {
-        this.player = player;
-        player.setTileRack(this);
+    public TileRack() {
         fillUp();
     }
 
@@ -51,11 +48,11 @@ public class TileRack {
         // memorize the tiles letters and each letter's amounts
         Map<Character, Integer> letterAmountOnRack = new HashMap<>();
         for (Tile tile : rack.getTiles()) {
-            if (!letterAmountOnRack.containsKey(tile.letter)) {
-                letterAmountOnRack.put(tile.letter, 1);
+            if (!letterAmountOnRack.containsKey(tile.getLetter())) {
+                letterAmountOnRack.put(tile.getLetter(), 1);
             } else {
-                int oldValue = letterAmountOnRack.get(tile.letter);
-                letterAmountOnRack.replace(tile.letter, oldValue + 1);
+                int oldValue = letterAmountOnRack.get(tile.getLetter());
+                letterAmountOnRack.replace(tile.getLetter(), oldValue + 1);
             }
         }
 
@@ -79,11 +76,11 @@ public class TileRack {
         if (Character.isAlphabetic(letter)) {
             if (Character.isUpperCase(letter)) {
                 for (Tile t : tiles)
-                    if (t.letter == letter)
+                    if (t.getLetter() == letter)
                         return t;
             } else {
                 for (Tile t : tiles)
-                    if (t.letter == '?') {
+                    if (t.getLetter() == '?') {
                         return t;
                     }
             }

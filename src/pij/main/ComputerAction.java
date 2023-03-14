@@ -5,8 +5,8 @@ import java.util.*;
 public class ComputerAction {
     private final Player computer;
     private final Move move;
-    private boolean firstMove;
-    public Boolean skipped;
+    private final boolean firstMove;
+    private final Boolean skipped;
 
     public ComputerAction(Player computer, boolean firstMove) {
         this.computer = computer;
@@ -17,16 +17,16 @@ public class ComputerAction {
             skipped = false;
             // To recover the chosen move showing letters on the board leading the factor or a dot - for scoring
             int bitCounter = 0;
-            for (int i : move.tilesSetInto) {
-                if (move.direction.equals("right")) {
-                    char curLetter = move.inputLetters.charAt(bitCounter);
-                    String testContent = curLetter + GameBoard.getBoardGridContent(move.row, i);
-                    GameBoard.reviseBoard(move.row, i, testContent);
+            for (int i : move.getTilesSetInto()) {
+                if (move.getDirection().equals("right")) {
+                    char curLetter = move.getInputLetters().charAt(bitCounter);
+                    String testContent = curLetter + GameBoard.getBoardGridContent(move.getRow(), i);
+                    GameBoard.reviseBoard(move.getRow(), i, testContent);
                 }
-                if (move.direction.equals("down")) {
-                    char curLetter = move.inputLetters.charAt(bitCounter);
-                    String testContent = curLetter + GameBoard.getBoardGridContent(i, move.col);
-                    GameBoard.reviseBoard(i, move.col, testContent);
+                if (move.getDirection().equals("down")) {
+                    char curLetter = move.getInputLetters().charAt(bitCounter);
+                    String testContent = curLetter + GameBoard.getBoardGridContent(i, move.getCol());
+                    GameBoard.reviseBoard(i, move.getCol(), testContent);
                 }
                 bitCounter++;
             }
@@ -39,6 +39,9 @@ public class ComputerAction {
     }
 
     public Move getMove() { return move; }
+
+
+    public Boolean getSkipped() { return this.skipped; }
 
     public Move autoMove() {
 
@@ -57,8 +60,8 @@ public class ComputerAction {
 
         List<Move> validMoves = new ArrayList<>();
 
-        for (int i = 1; i <= GameBoard.size; i++) { //row
-            for (int j = 0; j < GameBoard.size; j++) { //col
+        for (int i = 1; i <= GameBoard.getSize(); i++) { //row
+            for (int j = 0; j < GameBoard.getSize(); j++) { //col
 
                 int rackTilesNum = computer.getTileRack().getTiles().size();
                 String curGrid = GameBoard.getBoardGridContent(i,j);
@@ -151,12 +154,12 @@ public class ComputerAction {
     }
 
     public void ifValidMove(Move tryMove, List<Move> validMoves) {
-        if (tryMove.isValid) {
+        if (tryMove.getIsValid()) {
             tryMove.recoverBoardGridContentForInvalidMove();
             //because it's need to be recovered as original for other potential possible moves validation
             validMoves.add(tryMove);
         } else {
-            if (tryMove.tilesSetInto != null)
+            if (tryMove.getTilesSetInto() != null)
                 tryMove.recoverBoardGridContentForInvalidMove();
         }
     }
@@ -169,17 +172,17 @@ public class ComputerAction {
 
     public void getSeqFor1Bit(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
-            String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
+            String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
             allTheLetterSequences.add(each);    
         }
     }
 
     public void getSeqFor2Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
-            String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
+            String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
             for (int b = 0; b < 7; b++) {
                 if (b != a) {
-                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    each += tiles.get(b).isWildCard() ? "" + randomChar() : "" + tiles.get(b).getLetter();
                     allTheLetterSequences.add(each);
                     break;
                 }
@@ -189,13 +192,13 @@ public class ComputerAction {
 
     public void getSeqFor3Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
-            String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
+            String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
             for (int b = 0; b < 7; b++) {
                 if (b != a) {
-                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    each += tiles.get(b).isWildCard() ? "" + randomChar() : "" + tiles.get(b).getLetter();
                     for (int c = 0; c < 7; c++) {
                         if (c != a && c != b) {
-                            each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
+                            each += tiles.get(c).isWildCard() ? "" + randomChar() : "" + tiles.get(c).getLetter();
                             allTheLetterSequences.add(each);
                             break;
                         }
@@ -208,16 +211,16 @@ public class ComputerAction {
 
     public void getSeqFor4Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
-            String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
+            String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
             for (int b = 0; b < 7; b++) {
                 if (b != a) {
-                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    each += tiles.get(b).isWildCard() ? "" + randomChar() : "" + tiles.get(b).getLetter();
                     for (int c = 0; c < 7; c++) {
                         if (c != a && c != b) {
-                            each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
+                            each += tiles.get(c).isWildCard() ? "" + randomChar() : "" + tiles.get(c).getLetter();
                             for (int d = 0; d < 7; d++) {
                                 if (d != a && d != b && d != c) {
-                                    each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
+                                    each += tiles.get(d).isWildCard() ? "" + randomChar() : "" + tiles.get(d).getLetter();
                                     allTheLetterSequences.add(each);
                                     break;
                                 }
@@ -233,19 +236,19 @@ public class ComputerAction {
 
     public void getSeqFor5Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
-            String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
+            String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
             for (int b = 0; b < 7; b++) {
                 if (b != a) {
-                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    each += tiles.get(b).isWildCard() ? "" + randomChar() : "" + tiles.get(b).getLetter();
                     for (int c = 0; c < 7; c++) {
                         if (c != a && c != b) {
-                            each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
+                            each += tiles.get(c).isWildCard() ? "" + randomChar() : "" + tiles.get(c).getLetter();
                             for (int d = 0; d < 7; d++) {
                                 if (d != a && d != b && d != c) {
-                                    each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
+                                    each += tiles.get(d).isWildCard() ? "" + randomChar() : "" + tiles.get(d).getLetter();
                                     for (int e = 0; e < 7; e++) {
                                         if (e != a && e != b && e != c && e != d) {
-                                            each += tiles.get(e).isWildCard ? "" + randomChar() : "" + tiles.get(e).letter;
+                                            each += tiles.get(e).isWildCard() ? "" + randomChar() : "" + tiles.get(e).getLetter();
                                             allTheLetterSequences.add(each);
                                             break;
                                         }
@@ -264,22 +267,22 @@ public class ComputerAction {
 
     public void getSeqFor6Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
-            String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
+            String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
             for (int b = 0; b < 7; b++) {
                 if (b != a) {
-                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    each += tiles.get(b).isWildCard() ? "" + randomChar() : "" + tiles.get(b).getLetter();
                     for (int c = 0; c < 7; c++) {
                         if (c != a && c != b) {
-                            each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
+                            each += tiles.get(c).isWildCard() ? "" + randomChar() : "" + tiles.get(c).getLetter();
                             for (int d = 0; d < 7; d++) {
                                 if (d != a && d != b && d != c) {
-                                    each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
+                                    each += tiles.get(d).isWildCard() ? "" + randomChar() : "" + tiles.get(d).getLetter();
                                     for (int e = 0; e < 7; e++) {
                                         if (e != a && e != b && e != c && e != d) {
-                                            each += tiles.get(e).isWildCard ? "" + randomChar() : "" + tiles.get(e).letter;
+                                            each += tiles.get(e).isWildCard() ? "" + randomChar() : "" + tiles.get(e).getLetter();
                                             for (int f = 0; f < 7; f++) {
                                                 if (f != a && f != b && f != c && f != d && f != e) {
-                                                    each += tiles.get(f).isWildCard ? "" + randomChar() : "" + tiles.get(f).letter;
+                                                    each += tiles.get(f).isWildCard() ? "" + randomChar() : "" + tiles.get(f).getLetter();
                                                     allTheLetterSequences.add(each);
                                                     break;
                                                 }
@@ -301,25 +304,25 @@ public class ComputerAction {
 
     public void getSeqFor7Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
-            String each = tiles.get(a).isWildCard ? "" + randomChar() : "" + tiles.get(a).letter;
+            String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
             for (int b = 0; b < 7; b++) {
                 if (b != a) {
-                    each += tiles.get(b).isWildCard ? "" + randomChar() : "" + tiles.get(b).letter;
+                    each += tiles.get(b).isWildCard() ? "" + randomChar() : "" + tiles.get(b).getLetter();
                     for (int c = 0; c < 7; c++) {
                         if (c != a && c != b) {
-                            each += tiles.get(c).isWildCard ? "" + randomChar() : "" + tiles.get(c).letter;
+                            each += tiles.get(c).isWildCard() ? "" + randomChar() : "" + tiles.get(c).getLetter();
                             for (int d = 0; d < 7; d++) {
                                 if (d != a && d != b && d != c) {
-                                    each += tiles.get(d).isWildCard ? "" + randomChar() : "" + tiles.get(d).letter;
+                                    each += tiles.get(d).isWildCard() ? "" + randomChar() : "" + tiles.get(d).getLetter();
                                     for (int e = 0; e < 7; e++) {
                                         if (e != a && e != b && e != c && e != d) {
-                                            each += tiles.get(e).isWildCard ? "" + randomChar() : "" + tiles.get(e).letter;
+                                            each += tiles.get(e).isWildCard() ? "" + randomChar() : "" + tiles.get(e).getLetter();
                                             for (int f = 0; f < 7; f++) {
                                                 if (f != a && f != b && f != c && f != d && f != e) {
-                                                    each += tiles.get(f).isWildCard ? "" + randomChar() : "" + tiles.get(f).letter;
+                                                    each += tiles.get(f).isWildCard() ? "" + randomChar() : "" + tiles.get(f).getLetter();
                                                     for (int g = 0; g < 7; g++) {
                                                         if (g != a && g != b && g != c && g != d && g != e && g != f) {
-                                                            each += tiles.get(g).isWildCard ? "" + randomChar() : "" + tiles.get(g).letter;
+                                                            each += tiles.get(g).isWildCard() ? "" + randomChar() : "" + tiles.get(g).getLetter();
                                                             allTheLetterSequences.add(each);
                                                             break;
                                                         }

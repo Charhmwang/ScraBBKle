@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LetterPoints {
-    public static final Map<Character, Integer> letterMap = new HashMap<>();
+    private static final Map<Character, Integer> letterMap = new HashMap<>();
     private static LetterPoints letterPointsInstance;
     public synchronized static LetterPoints getInstance() {
         if (letterPointsInstance == null) {
@@ -42,4 +42,6 @@ public class LetterPoints {
         letterMap.put('Z', 10);
         letterMap.put('?', 3);
     }
+
+    public static Map<Character, Integer> getMap() { return letterMap; }
 }

@@ -5,7 +5,7 @@ public class HumanAction {
     private final Player human;
     private final Move move;
     private final boolean firstMove;
-    public Boolean skipped;
+    private final Boolean skipped;
 
 
     public HumanAction(Player human, boolean firstMove) {
@@ -17,6 +17,9 @@ public class HumanAction {
 
 
     public Move getMove() { return move; }
+
+
+    public Boolean getSkipped() { return this.skipped; }
 
     public Move promptMove() {
         String[] strArr = new String[3];
@@ -47,10 +50,10 @@ public class HumanAction {
 
                 // Check is it the first move of game, if yes, the inputs must cover at least one center square
                 if (firstMove) {
-                    char col = (char) ('a' + GameBoard.CenterSquare.get(1));
+                    char col = (char) ('a' + GameBoard.getCenterSquare().get(1));
                     if (!Move.coveredCenterSquares(letters, position, direction)) {
                         System.out.println("First move must cover the center square - " +
-                                col + GameBoard.CenterSquare.get(0) + ". This is not a valid move");
+                                col + GameBoard.getCenterSquare().get(0) + ". This is not a valid move");
                         continue;
                     }
                     move = new Move(human, true, letters, position, direction);
@@ -58,14 +61,14 @@ public class HumanAction {
                     move = new Move(human, false, letters, position, direction);
                 }
 
-                if (move.isValid) valid = true;
+                if (move.getIsValid()) valid = true;
                 else {
                     // Reject invalid move and recover the board content IF the board has been revised while validating,
                     // see explanation in method buildWordUsingTileLetters in WordsOnBoard class
                     // need to update the grid content from such as "G{3}" into "{3}" or "T." into "."
                     System.out.println("This is not a valid move");
                     // Check if the grid content was revised
-                    if (GameBoard.isGridRevised(move.row, move.col))
+                    if (GameBoard.isGridRevised(move.getRow(), move.getCol()))
                         move.recoverBoardGridContentForInvalidMove();
                 }
             } else {
@@ -78,7 +81,7 @@ public class HumanAction {
     // Validate player's input position and move direction
     public static boolean validInputForm(String position, String direction) {
 
-        int size = GameBoard.size;
+        int size = GameBoard.getSize();
         if (position.length() >= 2 && position.length() <= 3 &&
                 direction.length() == 1 && (direction.charAt(0) == 'r' || direction.charAt(0) == 'd')) {
 

@@ -1,7 +1,7 @@
 package pij.main;
 
 public class Player {
-    public boolean isHuman;
+    private final boolean isHuman;
     private int score;
     private TileRack tileRack;
 

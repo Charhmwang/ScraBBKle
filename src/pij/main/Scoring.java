@@ -6,7 +6,7 @@ import java.util.List;
 // Present the scores getting from each move
 public class Scoring {
 
-    private int score;
+    private final int score;
     private final Move move;
 
     public Scoring(Move move) {
@@ -20,16 +20,16 @@ public class Scoring {
         int totalScoreOfThisMove = 0;
         int scoreWithoutPremiumWord = 0;
 
-        int wordSize = move.madeNewWord.length();
+        int wordSize = move.getMadeNewWord().length();
         //( (newWord, idxOfNewWord), tilesSetInto )
-        int startRow = move.start_and_endPosOfNewWord.get(0), startCol = move.start_and_endPosOfNewWord.get(1);
+        int startRow = move.get_start_and_endPosOfNewWord().get(0), startCol = move.get_start_and_endPosOfNewWord().get(1);
         //System.out.println("startRow: " + startRow + "; startCol: " + startCol);  //debug found!! startRow is 1 higher num
         boolean hasPremiumWordSqr  = false;
         List<Integer> factorInPremiumWordSqr = new ArrayList<>();
         for (int i = 0; i < wordSize; i++) {
             //System.out.println("i: " + i);//debug
             String grid = "";
-            if (move.direction.equals("right")) {
+            if (move.getDirection().equals("right")) {
                 grid = GameBoard.getBoardGridContent(startRow, startCol + i);
             }
             else {
@@ -46,21 +46,21 @@ public class Scoring {
                 char letter = grid.charAt(0);
                 if (grid.charAt(1) == '.') {
                     if (Character.isUpperCase(letter))
-                        scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
+                        scoreWithoutPremiumWord += LetterPoints.getMap().get(letter);
                     else scoreWithoutPremiumWord += 3;
                     //System.out.println("Plus this grid gained score: " + scoreWithoutPremiumWord); //debug
                 }
                 if (grid.charAt(1) == '(') {  // premium letter, multiply factor of the current letter
                     int factor = getNumber(grid);
                     if (Character.isUpperCase(letter))
-                        scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter) * factor;
+                        scoreWithoutPremiumWord += LetterPoints.getMap().get(letter) * factor;
                     else scoreWithoutPremiumWord += 3 * factor;
                     //System.out.println("Plus this grid gained score: " + scoreWithoutPremiumWord); //debug
                 }
                 if (grid.charAt(1) == '{') {  // !premium word, multiply the whole word value with factor
                     hasPremiumWordSqr = true;
                     if (Character.isUpperCase(letter))
-                        scoreWithoutPremiumWord += LetterPoints.letterMap.get(letter);
+                        scoreWithoutPremiumWord += LetterPoints.getMap().get(letter);
                     else scoreWithoutPremiumWord += 3;
                     factorInPremiumWordSqr.add(getNumber(grid));
                     //System.out.println("Plus this grid gained score: " + scoreWithoutPremiumWord); //debug
@@ -76,7 +76,7 @@ public class Scoring {
         else totalScoreOfThisMove = scoreWithoutPremiumWord;
 
         // Check whether player used all 7 tiles in this move to get awarded 70 extra points
-        if (move.tilesSetInto.size() == 7) totalScoreOfThisMove += 70;
+        if (move.getTilesSetInto().size() == 7) totalScoreOfThisMove += 70;
 
         //System.out.println("Word gained total score: " + totalScoreOfThisMove);// debug
 
@@ -114,8 +114,8 @@ public class Scoring {
     public static int getSumValuesOfRack(TileRack tileRack) {
         int sum = 0;
         for (Tile t : tileRack.getTiles()) {
-            if (Character.isLowerCase(t.letter)) sum += 3;
-            else sum += LetterPoints.letterMap.get(t.letter);
+            if (Character.isLowerCase(t.getLetter())) sum += 3;
+            else sum += LetterPoints.getMap().get(t.getLetter());
         }
         return sum;
     }

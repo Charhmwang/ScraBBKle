@@ -2,23 +2,21 @@ package pij.main;
 
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static pij.main.WordsOnBoard.words_on_board;
 
 public class Move {
-    public String inputLetters;
-    public int row;
-    public int col;
-    public String position;
-    public String direction;
-
-    public Player player;
-    public boolean isValid;
-    public boolean isFirstStep;
-    public List<Integer> tilesSetInto;
-    public String madeNewWord = "";
-    public List<Integer> start_and_endPosOfNewWord = new ArrayList<>();
+    private final String inputLetters;
+    private int row;
+    private int col;
+    private final String position;
+    private String direction;
+    private final Player player;
+    private boolean isValid;
+    private final boolean isFirstStep;
+    private List<Integer> tilesSetInto;
+    private String madeNewWord = "";
+    private List<Integer> start_and_endPosOfNewWord;
 
     public Move(Player player, boolean isFirstStep, String inputLetters, String position, String direction) {
         this.inputLetters = inputLetters;
@@ -40,6 +38,7 @@ public class Move {
             if (newWord_and_idxes.getKey() != null) { //there is valid string returned
                 isValid = true;
                 madeNewWord = newWord_and_idxes.getKey();
+                start_and_endPosOfNewWord = new ArrayList<>();
                 start_and_endPosOfNewWord.add(newWord_and_idxes.getValue().get(0));
                 start_and_endPosOfNewWord.add(newWord_and_idxes.getValue().get(1));
                 start_and_endPosOfNewWord.add(newWord_and_idxes.getValue().get(2));
@@ -47,6 +46,16 @@ public class Move {
             }
         }
     }
+
+
+    public String getInputLetters() { return this.inputLetters; }
+    public int getCol() { return this.col; }
+    public int getRow() { return this.row; }
+    public String getDirection() { return this.direction; }
+    public boolean getIsValid() { return this.isValid; }
+    public List<Integer> getTilesSetInto() { return this.tilesSetInto; }
+    public String getMadeNewWord() { return this.madeNewWord; }
+    public List<Integer> get_start_and_endPosOfNewWord() { return this.start_and_endPosOfNewWord; }
 
 
     public AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>> validateMove() {
@@ -77,7 +86,7 @@ public class Move {
             }
         }
 
-        return coveringSquares.contains(GameBoard.CenterSquare);
+        return coveringSquares.contains(GameBoard.getCenterSquare());
     }
 
 
@@ -122,8 +131,8 @@ public class Move {
             char letter = inputLetters.charAt(i);
             int letterPoints = 0;
             if (Character.isLowerCase(letter)) letterPoints = 3;
-            else letterPoints = LetterPoints.letterMap.get(letter);
-            String letter_with_points = " " + String.valueOf(letter) + letterPoints + " "; //" g3 "
+            else letterPoints = LetterPoints.getMap().get(letter);
+            String letter_with_points = " " + letter + letterPoints + " "; //" g3 "
 
             if (direction.equals("right")) {
                 GameBoard.reviseBoard(row, tilesSetInto.get(i), letter_with_points);
@@ -137,17 +146,16 @@ public class Move {
     void recoverBoardGridContentForInvalidMove() {
 
         // Check if the grid content was revised
-        for (int i = 0; i < tilesSetInto.size(); i++) {
+        for (Integer integer : tilesSetInto) {
             String gridContent = "";
             if (direction.equals("right")) {
-                gridContent = GameBoard.getBoardGridContent(row, tilesSetInto.get(i));
+                gridContent = GameBoard.getBoardGridContent(row, integer);
                 gridContent = gridContent.substring(1);
-                GameBoard.reviseBoard(row, tilesSetInto.get(i), gridContent);
-            }
-            else {
-                gridContent = GameBoard.getBoardGridContent(tilesSetInto.get(i), col);
+                GameBoard.reviseBoard(row, integer, gridContent);
+            } else {
+                gridContent = GameBoard.getBoardGridContent(integer, col);
                 gridContent = gridContent.substring(1);
-                GameBoard.reviseBoard(tilesSetInto.get(i), col, gridContent);
+                GameBoard.reviseBoard(integer, col, gridContent);
             }
         }
     }
@@ -318,7 +326,7 @@ public class Move {
         int gridCounter = 0;
         int bound1 = 0, bound2 = 0;
 
-        while (bitCounter < inputLetters.length() && bound1 < GameBoard.size && bound2 < GameBoard.size) {
+        while (bitCounter < inputLetters.length() && bound1 < GameBoard.getSize() && bound2 < GameBoard.getSize()) {
             if (direction.equals("down")) {
                 char curLetter = inputLetters.charAt(bitCounter);
                 String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx);
@@ -363,7 +371,7 @@ public class Move {
         int gridCounter = 0;
         int bound1 = 0, bound2 = 0;
 
-        while (bitCounter < inputLetters.length() && bound1 < GameBoard.size && bound2 < GameBoard.size) {
+        while (bitCounter < inputLetters.length() && bound1 < GameBoard.getSize() && bound2 < GameBoard.getSize()) {
 
             if (direction.equals("down")) {
                 String gridContent = GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx);
@@ -448,7 +456,7 @@ public class Move {
             }
         }
 
-        for (int right = endIdxCol; right < GameBoard.size; right++) {
+        for (int right = endIdxCol; right < GameBoard.getSize(); right++) {
             Character letter = getLetter(GameBoard.getBoardGridContent(rowIdx, right));
             if (letter == null) {
                 allFilledTo = right - 1;
@@ -584,7 +592,7 @@ public class Move {
             }
         }
 
-        for (int down = endIdxRow; down <= GameBoard.size; down++) {
+        for (int down = endIdxRow; down <= GameBoard.getSize(); down++) {
             Character letter = getLetter(GameBoard.getBoardGridContent(down, colIdx));
             if (letter == null) {
                 allFilledTo = down - 1;
@@ -706,7 +714,7 @@ public class Move {
 
         for (int i : tilesSetInto) {
             //System.out.println(i); //debug
-            int allFilledFrom = 1, allFilledTo = GameBoard.size - 1;
+            int allFilledFrom = 1, allFilledTo = GameBoard.getSize() - 1;
             if (direction.equals("right")) {
                 //check each col the tile is set in
                 //first find out the consist word with the tile
@@ -719,7 +727,7 @@ public class Move {
                         allFilledFrom = up;
                     }
                 }
-                for (int down = rowIdx + 1; down <= GameBoard.size; down++) {
+                for (int down = rowIdx + 1; down <= GameBoard.getSize(); down++) {
                     Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(down, i));
                     if (letter == null) {
                         allFilledTo = down - 1;
@@ -757,7 +765,7 @@ public class Move {
                         allFilledFrom = left;
                     }
                 }
-                for (int right = colIdx + 1; right < GameBoard.size; right++) {
+                for (int right = colIdx + 1; right < GameBoard.getSize(); right++) {
                     Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(i, right));
                     if (letter == null) {
                         allFilledTo = right - 1;

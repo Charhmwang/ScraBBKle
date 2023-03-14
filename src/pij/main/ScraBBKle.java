@@ -13,14 +13,9 @@ import java.io.IOException;
 public class ScraBBKle {
     private Player human;
     private Player computer;
-    public static boolean gameOver = false;
-    boolean hmSkip = false;
-    boolean pcSkip = false;
-    boolean BagRackNotEmpty = false;
-    public LetterPoints letterPoints;
-    public TileBag tileBag;
-    public WordList wordList;
-    public WordsOnBoard wordsOnBoard;
+    private boolean hmSkip = false;
+    private boolean pcSkip = false;
+    private boolean BagRackNotEmpty = false;
     private static ScraBBKle scraBBKleInstance;
     private ScraBBKle() {}
     public synchronized static ScraBBKle getInstance() {
@@ -31,12 +26,12 @@ public class ScraBBKle {
     }
 
     public void startGame(Player human, Player computer) throws IOException {
+        TileBag tileBag = TileBag.getInstance();
+        WordList wordList = WordList.getInstance("../resources/wordlist.txt");
+        LetterPoints letterPoints = LetterPoints.getInstance();
+        WordsOnBoard wordsOnBoard = WordsOnBoard.getInstance();
         this.human = human;
         this.computer = computer;
-        this.tileBag = TileBag.getInstance();
-        this.wordList = WordList.getInstance("../resources/wordlist.txt");
-        this.letterPoints = LetterPoints.getInstance();
-        this.wordsOnBoard = WordsOnBoard.getInstance();
 
         gameSteps();
     }
@@ -47,7 +42,7 @@ public class ScraBBKle {
         // The game also ends if both players pass twice in a row.
         boolean firstMoveDone = false;
 
-        while (!gameOver) {
+        while (true) {
             // If pc skipped, there is no need to print the same game board again
             //if (!pcSkip)
                 GameBoard.printBoard();
@@ -61,7 +56,7 @@ public class ScraBBKle {
                 hmAction = new HumanAction(human, false);
             }
 
-            if (!hmAction.skipped) {
+            if (!hmAction.getSkipped()) {
                 firstMoveDone = true;
                 hmScoringOperation(hmAction);
                 if (!BagRackNotEmpty) break;
@@ -81,7 +76,7 @@ public class ScraBBKle {
                 } else {
                     computerAction = new ComputerAction(computer, false);
                 }
-                if (!computerAction.skipped) {
+                if (!computerAction.getSkipped()) {
                     firstMoveDone = true;
                     pcScoringOperation(computerAction);
                     if (!BagRackNotEmpty) break;
@@ -96,7 +91,7 @@ public class ScraBBKle {
             if (hmSkip) continue;
 
             ComputerAction computerAction = new ComputerAction(computer, false);
-            if (!computerAction.skipped) {
+            if (!computerAction.getSkipped()) {
                 pcScoringOperation(computerAction);
                 if (!BagRackNotEmpty) break;
             }

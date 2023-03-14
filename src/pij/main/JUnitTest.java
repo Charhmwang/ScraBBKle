@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,7 +17,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
 
         String userFilePath = "./test_res/invalidBoard.txt";
         ValidateUserBoard tester = new ValidateUserBoard(userFilePath);
@@ -90,7 +89,8 @@ public class JUnitTest {
     void test_Player_with_TileRack() {
         System.out.println("Test 8: test Player class and TileRack class");
         Player human = new Player(true);
-        TileRack myRack = new TileRack(human);
+        TileRack myRack = new TileRack();
+        human.setTileRack(myRack);
         myRack.displayTiles();
         int expected = 7;
         int actual = myRack.getTilesAmount();
@@ -102,11 +102,12 @@ public class JUnitTest {
     void test_Player_with_TileRack_isTileExisting() {
         System.out.println("Test 9: test method takeOutTileFromRack in TileRack class");
         Player human = new Player(true);
-        TileRack myRack = new TileRack(human);
+        TileRack myRack = new TileRack();
+        human.setTileRack(myRack);
         Tile tileG = myRack.isTileExisting('G');
         if (tileG != null) {
             char expected = 'G';
-            char actual = tileG.letter;
+            char actual = tileG.getLetter();
             Assertions.assertEquals(expected, actual);
         }
     }
@@ -118,7 +119,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
         GameBoard.printBoard();
         String letters = "GIT";
         String position = "f8";
@@ -162,7 +163,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
         System.out.println("\n===Before the game===");
         GameBoard.printBoard();
         Player human = new Player(true);
@@ -182,7 +183,7 @@ public class JUnitTest {
                 " isAnyRightAngleNewWord method");
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
         WordList wordList = WordList.getInstance("./resources/wordlist.txt");
         LetterPoints letterPoints = LetterPoints.getInstance();
 
@@ -199,7 +200,7 @@ public class JUnitTest {
         Move move3 = new Move(human, false, "TG", "g9", "r");
 
         boolean expected = false;
-        boolean actual = move3.isValid;
+        boolean actual = move3.getIsValid();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -212,7 +213,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
         WordList wordList = WordList.getInstance("./resources/wordlist.txt");
         LetterPoints letterPoints = LetterPoints.getInstance();
 
@@ -235,7 +236,7 @@ public class JUnitTest {
 
         // ar is a legal word but it's read to left direction
         boolean expected = false;
-        boolean actual = move3.isValid;
+        boolean actual = move3.getIsValid();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -247,7 +248,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
 
         GameBoard.printBoard();
         Player human = new Player(true);
@@ -267,7 +268,7 @@ public class JUnitTest {
         GameBoard.printBoard();
 
         boolean expected = false;
-        boolean actual = move3.isValid;
+        boolean actual = move3.getIsValid();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -279,7 +280,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
         WordList wordList = WordList.getInstance("./resources/wordlist.txt");
         LetterPoints letterPoints = LetterPoints.getInstance();
 
@@ -291,23 +292,23 @@ public class JUnitTest {
         GameBoard.printBoard();
 
         Player computer = new Player(false);
-        TileRack pcRack = new TileRack(computer);
+        TileRack pcRack = new TileRack();
         computer.setTileRack(pcRack);
 
         ComputerAction pcAction = new ComputerAction(computer, false);
-        if (!pcAction.skipped) {
+        if (!pcAction.getSkipped()) {
             Move pcMove = pcAction.getMove();
             pcMove.recoverBoardGridContent();
             System.out.println("\n=== After PC move and recovered ===");
             GameBoard.printBoard();
-            System.out.println(pcMove.inputLetters);
+            System.out.println(pcMove.getInputLetters());
             boolean expected = true;
-            boolean actual = pcMove.isValid;
+            boolean actual = pcMove.getIsValid();
             Assertions.assertEquals(expected, actual);
         } else {
             System.out.println("Computer skipped");
             boolean expected = true;
-            boolean actual = pcAction.skipped;
+            boolean actual = pcAction.getSkipped();
             Assertions.assertEquals(expected, actual);
         }
     }
@@ -320,7 +321,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
         Player human = new Player(true);
         Move move1 = new Move(human, true, "LIE", "h15", "r");
         move1.recoverBoardGridContent();
@@ -329,7 +330,7 @@ public class JUnitTest {
         GameBoard.printBoard();
 
         boolean expected = false;
-        boolean actual = move2.isValid;
+        boolean actual = move2.getIsValid();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -341,7 +342,7 @@ public class JUnitTest {
         System.out.println("Test 19: test move validation");
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
         WordList wordList = WordList.getInstance("./resources/wordlist.txt");
         LetterPoints letterPoints = LetterPoints.getInstance();
 
@@ -358,7 +359,7 @@ public class JUnitTest {
         GameBoard.printBoard();
 
         boolean expected = true;
-        boolean actual = move2.isValid;
+        boolean actual = move2.getIsValid();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -369,7 +370,7 @@ public class JUnitTest {
         System.out.println("Test 20: test Scoring class calculateMoveScore method 1");
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
         WordList wordList = WordList.getInstance("./resources/wordlist.txt");
         LetterPoints letterPoints = LetterPoints.getInstance();
 
@@ -392,7 +393,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
         WordList wordList = WordList.getInstance("./resources/wordlist.txt");
         LetterPoints letterPoints = LetterPoints.getInstance();
 
@@ -411,7 +412,7 @@ public class JUnitTest {
 
 
         boolean expected = true;
-        boolean actual = move3.isValid;
+        boolean actual = move3.getIsValid();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -423,7 +424,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        GameBoard.size = 15;
+        gameBoard.setSize(15);
         WordList wordList = WordList.getInstance("./resources/wordlist.txt");
         LetterPoints letterPoints = LetterPoints.getInstance();
 
@@ -437,7 +438,7 @@ public class JUnitTest {
         GameBoard.printBoard();
 
         boolean expected = false;
-        boolean actual = move2.isValid;
+        boolean actual = move2.getIsValid();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -449,7 +450,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./test_res/26.txt");
-        GameBoard.size = 26;
+        gameBoard.setSize(26);
         WordList wordList = WordList.getInstance("./resources/wordlist.txt");
         LetterPoints letterPoints = LetterPoints.getInstance();
 
@@ -473,7 +474,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./test_res/26.txt");
-        GameBoard.size = 26;
+        gameBoard.setSize(26);
         WordList wordList = WordList.getInstance("./resources/wordlist.txt");
         LetterPoints letterPoints = LetterPoints.getInstance();
 
@@ -497,7 +498,7 @@ public class JUnitTest {
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./test_res/26.txt");
-        GameBoard.size = 26;
+        gameBoard.setSize(26);
         WordList wordList = WordList.getInstance("./resources/wordlist.txt");
         LetterPoints letterPoints = LetterPoints.getInstance();
 

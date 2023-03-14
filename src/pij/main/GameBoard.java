@@ -31,12 +31,12 @@ public class GameBoard {
     }
 
     /** The name of the GameBoard. Always non-null after object creation. */
-    public static String[][] board;
+    private static String[][] board;
 
     /** The size of a GameBoard. Must between (including) 12 and 26. */
-    public static int size;
+    private static int size;
 
-    public static List<Integer> CenterSquare;
+    private static List<Integer> CenterSquare;
 
     /**
      * Create and initialize a two-dimensional array of string to represent the board for the game.
@@ -111,12 +111,15 @@ public class GameBoard {
 
         try (var sc = new Scanner(file, StandardCharsets.UTF_8)) {
             String s = sc.nextLine();
-            GameBoard.size = Integer.parseInt(s);
+            size = Integer.parseInt(s);
         } catch(RuntimeException | IOException e){
             System.out.println("Error at reading board size from txt file");
             exit(1);
         }
     }
+
+
+    public void setSize(int s) { size = s; }
 
 
     /**
@@ -140,25 +143,25 @@ public class GameBoard {
                     if (row != 0) {
                         // When it meets a dot
                         if ((char) c == '.') {
-                            GameBoard.board[row][col] = ".";
+                            board[row][col] = ".";
                         }
 
                         // When it meets a Premium Word Square
                         if ((char) c == '{') {
-                            GameBoard.board[row][col] = "{";
+                            board[row][col] = "{";
                             while (Character.compare((char)(c = br.read()), '}') != 0) {
-                                GameBoard.board[row][col] += (char) c;
+                                board[row][col] += (char) c;
                             }
-                            GameBoard.board[row][col] += "}";
+                            board[row][col] += "}";
                         }
 
                         // When it meets a Premium Letter Square
                         if ((char) c == '(') {
                             GameBoard.board[row][col] = "(";
                             while ((char)(c = br.read()) != ')') {
-                                GameBoard.board[row][col] += (char) c;
+                                board[row][col] += (char) c;
                             }
-                            GameBoard.board[row][col] += ")";
+                            board[row][col] += ")";
                         }
                         col++;
                         // When it meets a \n
@@ -192,7 +195,7 @@ public class GameBoard {
         } else {
             centerIdx = List.of(size / 2, (size - 2) / 2);
         }
-        GameBoard.CenterSquare = centerIdx;
+        CenterSquare = centerIdx;
     }
 
 
@@ -230,6 +233,11 @@ public class GameBoard {
     }
 
 
+    public static int getSize() { return size; }
+
+    public static List<Integer> getCenterSquare() { return CenterSquare; }
+
+
     /**
      * Edit board square contents.
      *
@@ -237,9 +245,7 @@ public class GameBoard {
      * @param col the targeting column
      * @param letter the new content
      */
-    public static void reviseBoard(int row, int col, String letter) {
-        board[row][col] = letter;
-    }
+    public static void reviseBoard(int row, int col, String letter) { board[row][col] = letter; }
 
     public static boolean isGridRevised(int row, int col) {
         String gridContent = board[row][col];
