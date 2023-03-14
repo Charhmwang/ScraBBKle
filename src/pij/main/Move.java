@@ -250,49 +250,15 @@ public class Move {
         //System.out.println("CHECK 4 done"); //debug
 
         // CHECK 5. not allowed to place a complete word parallel immediately next to a word already played
-
-        // If the board does not have the new created word played, then no need to check the following steps for parallel.
-        forReturn.setValue(new AbstractMap.SimpleEntry<>(newWord, idxOfNewWord));
-
         //System.out.println(" new word : " + newWord);  //debug
         //for (int i : idxOfNewWord) System.out.println(i); //debug
 
-        if (!words_on_board.containsValue(newWord.toLowerCase())) {
+        boolean parallelNextToAWord = isNextToParallelPlayedWord(direction, idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3));
+        if (parallelNextToAWord) {
             return forReturn;
         }
 
-        Map<String, ArrayList<ArrayList<Integer>>> reverseMap = new HashMap<>(
-                words_on_board.entrySet().stream()
-                        .collect(Collectors.groupingBy(Map.Entry::getValue)).values().stream()
-                        .collect(Collectors.toMap(
-                                item -> item.get(0).getValue(),
-                                item -> new ArrayList<>(
-                                        item.stream()
-                                                .map(Map.Entry::getKey)
-                                                .collect(Collectors.toList())
-                                ))
-                        ));
-        // list of all the same existing word's indexes, for example, if there are 3 same word played on the board,
-        // there are 3 items in the ArrayList: can be (3,2,3,5), (1,3,1,6), (5,7,8,7)
-        ArrayList<ArrayList<Integer>> idxes = reverseMap.get(newWord);
-        if (idxes != null) {
-            for (ArrayList<Integer> list : idxes) {
-
-                int exWord_rowStart = list.get(0);
-                int exWord_colStart = list.get(1);
-                int exWord_rowEnd = list.get(2);
-                int exWord_colEnd = list.get(3);
-
-                boolean nextToParallelPlayedWord = isNextToParallelPlayedWord(direction,
-                        idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3),
-                        exWord_rowStart, exWord_colStart, exWord_rowEnd, exWord_colEnd);
-
-                if (nextToParallelPlayedWord) {
-                    forReturn.setValue(new AbstractMap.SimpleEntry<>(null, null));
-                    return forReturn;
-                }
-            }
-        }
+        forReturn.setValue(new AbstractMap.SimpleEntry<>(newWord, idxOfNewWord));
         return forReturn;
     }
 
@@ -881,26 +847,36 @@ public class Move {
     //                       && ((start row >= nw start row && start row <= nw end row) || (end row >= nw start row && end row <= nw end row))
 
     public boolean isNextToParallelPlayedWord(String direction,
-                                                     int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol,
-                                                     int startRow, int startCol,
-                                                     int endRow, int endCol){
+                                                     int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol) {
+
+
         boolean nextTo = false;
-        if (direction.equals("right")) {
-            if (startRow != endRow) return false; //the existed word is not parallel with the new one
+//        System.out.println("nwStartRow: " + nwStartRow + "; nwStartCol: " + nwStartCol + "; nwEndRow: " + nwEndRow +
+//                "; nwEndCol: " + nwEndCol);
 
-            if ( ((endCol == nwStartCol - 1 || startCol == nwEndCol + 1) && (startRow == nwStartRow))
-                    || ((startRow == nwStartRow + 1 || startRow == nwStartRow - 1) &&
-                    ((startCol >= nwStartCol && startCol <= nwEndCol) || (endCol >= nwStartCol && endCol <= nwEndCol))) )
-                nextTo = true;
-        }
+        for (ArrayList<Integer> idxes : words_on_board.keySet()) {
+            int startRow = idxes.get(0);
+            int startCol = idxes.get(1);
+            int endRow = idxes.get(2);
+            int endCol = idxes.get(3);
+//            System.out.println("Word " + words_on_board.get(idxes) + ": indexes: [" + startRow + "," + startCol +
+//                    "], [" + endRow + "," + endCol + "].");
 
-        if (direction.equals("down")) {
-            if (startRow == endRow) return false;
-
-            if ( ((endRow == nwStartRow - 1 || startRow == nwEndRow + 1) && (startCol == nwStartCol))
-                    || ((startCol == nwStartCol + 1 || startCol == nwStartCol - 1) &&
-                    ((startRow >= nwStartRow && startRow <= nwEndRow) || (endRow >= nwStartRow && endRow <= nwEndRow))) ) {
-                nextTo = true;
+            if (direction.equals("right")) {
+                // if the existing word is not in same direction, continue
+                if (startRow != endRow) continue;
+                if (((endCol == nwStartCol - 1 || startCol == nwEndCol + 1) && (startRow == nwStartRow))
+                        || ((startRow == nwStartRow + 1 || startRow == nwStartRow - 1) &&
+                        ((startCol >= nwStartCol && startCol <= nwEndCol) || (endCol >= nwStartCol && endCol <= nwEndCol))))
+                    nextTo = true;
+            }
+            if (direction.equals("down")) {
+                if (startCol != endCol) continue;
+                if (((endRow == nwStartRow - 1 || startRow == nwEndRow + 1) && (startCol == nwStartCol))
+                        || ((startCol == nwStartCol + 1 || startCol == nwStartCol - 1) &&
+                        ((startRow >= nwStartRow && startRow <= nwEndRow) || (endRow >= nwStartRow && endRow <= nwEndRow)))) {
+                    nextTo = true;
+                }
             }
         }
         return nextTo;

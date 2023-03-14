@@ -3,8 +3,8 @@ package pij.main;
 public class HumanAction {
 
     private final Player human;
-    private Move move;
-    private boolean firstMove;
+    private final Move move;
+    private final boolean firstMove;
     public Boolean skipped;
 
 

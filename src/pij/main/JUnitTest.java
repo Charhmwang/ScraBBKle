@@ -428,11 +428,11 @@ public class JUnitTest {
         LetterPoints letterPoints = LetterPoints.getInstance();
 
         Player human = new Player(true);
-        Move move1 = new Move(human, true,"BAN", "f8", "r");
+        Move move1 = new Move(human, true,"DOG", "f8", "r");
         move1.recoverBoardGridContent();
         WordsOnBoard.addWord(8, 5, 8, 7,"BAN");
         GameBoard.printBoard();
-        Move move2 = new Move(human, false,"BAN", "h9", "r");
+        Move move2 = new Move(human, false,"CAT", "h9", "r");
         move2.recoverBoardGridContent();
         GameBoard.printBoard();
 
