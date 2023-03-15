@@ -2,48 +2,36 @@ package pij.main;
 
 import java.util.*;
 
-public class ComputerAction {
-    private final Player computer;
-    private final Move move;
-    private final boolean firstMove;
-    private final Boolean skipped;
+public class ComputerAction extends Action {
 
     public ComputerAction(Player computer, boolean firstMove) {
-        this.computer = computer;
-        this.firstMove = firstMove;
-        this.move = autoMove();
-        if (move == null) skipped = true;
-        else {
-            skipped = false;
-            // To recover the chosen move showing letters on the board leading the factor or a dot - for scoring
-            int bitCounter = 0;
-            for (int i : move.getTilesSetInto()) {
-                if (move.getDirection().equals("right")) {
-                    char curLetter = move.getInputLetters().charAt(bitCounter);
-                    String testContent = curLetter + GameBoard.getBoardGridContent(move.getRow(), i);
-                    GameBoard.reviseBoard(move.getRow(), i, testContent);
-                }
-                if (move.getDirection().equals("down")) {
-                    char curLetter = move.getInputLetters().charAt(bitCounter);
-                    String testContent = curLetter + GameBoard.getBoardGridContent(i, move.getCol());
-                    GameBoard.reviseBoard(i, move.getCol(), testContent);
-                }
-                bitCounter++;
+        super(computer, firstMove);
+        setMove();
+        setSkipped();
+        if (!skipped) reviseBoardContentForTheChosenMove();
+    }
+
+    // To recover the chosen move showing letters on the board leading the factor or a dot - for scoring
+    private void reviseBoardContentForTheChosenMove() {
+        int bitCounter = 0;
+        for (int i : move.getTilesSetInto()) {
+            if (move.getDirection().equals("right")) {
+                char curLetter = move.getInputLetters().charAt(bitCounter);
+                String testContent = curLetter + GameBoard.getBoardGridContent(move.getRow(), i);
+                GameBoard.reviseBoard(move.getRow(), i, testContent);
             }
-            //System.out.print("Computer choose the move: "); //debug
-            //System.out.println("Computer built new word: " + move.madeNewWord); //debug
-            //System.out.println(move); //debug
-            //System.out.println("The chosen move is shown like this for scoring before recover to the normal form:");//debug
-            //GameBoard.printBoard(); //debug
+            if (move.getDirection().equals("down")) {
+                char curLetter = move.getInputLetters().charAt(bitCounter);
+                String testContent = curLetter + GameBoard.getBoardGridContent(i, move.getCol());
+                GameBoard.reviseBoard(i, move.getCol(), testContent);
+            }
+            bitCounter++;
         }
     }
 
-    public Move getMove() { return move; }
 
-
-    public Boolean getSkipped() { return this.skipped; }
-
-    public Move autoMove() {
+    @Override
+    public void setMove() {
 
         // Create a list to store the possible moves, choose one of them randomly as the return:
 
@@ -63,25 +51,15 @@ public class ComputerAction {
         for (int i = 1; i <= GameBoard.getSize(); i++) { //row
             for (int j = 0; j < GameBoard.getSize(); j++) { //col
 
-                int rackTilesNum = computer.getTileRack().getTiles().size();
+                int rackTilesNum = player.getTileRack().getTiles().size();
                 String curGrid = GameBoard.getBoardGridContent(i,j);
-                //System.out.println(curGrid);  //debug
 
                 //If the current try grid already covered a tile, then no need to check
                 if (Move.isGridCoveredByTile(curGrid) != null) continue;
-
-//                Random rd = new Random();
-//                int useTilesAmount = rd.nextInt(1, rackTilesNum + 1);
-
-                //System.out.println("PC choosing " + useTilesAmount + " tiles for this move.");// debug
-
-                //System.out.println("Computer tile rack:" + computer.getTileRack());  //debug
-                List<Tile> tiles = computer.getTileRack().getTiles();
+                List<Tile> tiles = player.getTileRack().getTiles();
                 List<String> allTheLetterSequences = new ArrayList<>();
-                //System.out.println("rack tiles num: " + rackTilesNum);
 
                 while (rackTilesNum-- > 0) {
-                    //switch (useTilesAmount) {
                     switch (rackTilesNum) {
                         case 1 -> {
                             getSeqFor1Bit(tiles, allTheLetterSequences);
@@ -121,36 +99,29 @@ public class ComputerAction {
                     //System.out.println(s + " " + pos);  //debug
                     if (this.firstMove) {
                         if (Move.coveredCenterSquares(s, pos, "r")) {
-                            Move tryMoveRight = new Move(computer, true, s, pos, "r");
+                            Move tryMoveRight = new Move(player, true, s, pos, "r");
                             ifValidMove(tryMoveRight, validMoves);
                         }
                         if (Move.coveredCenterSquares(s, pos, "d")) {
-                            Move tryMoveDown = new Move(computer, true, s, pos, "d");
+                            Move tryMoveDown = new Move(player, true, s, pos, "d");
                             ifValidMove(tryMoveDown, validMoves);
                         }
                     } else {
-                        Move tryMoveRight = new Move(computer, false, s, pos, "r");
+                        Move tryMoveRight = new Move(player, false, s, pos, "r");
                         ifValidMove(tryMoveRight, validMoves);
-                        Move tryMoveDown = new Move(computer, false, s, pos, "d");
+                        Move tryMoveDown = new Move(player, false, s, pos, "d");
                         ifValidMove(tryMoveDown, validMoves);
                     }
                }
             }
         }
         int validMovesAmount = validMoves.size();
-        //System.out.println("There are " + validMovesAmount + " valid moves");  //debug
-        //System.out.println("They are: "); //debug
-//        for(Move m : validMoves) {
-//            System.out.println(m); //debug
-//        }
         // if there was no valid move found, return null meaning skip
         if (validMovesAmount > 0) {
             Random rdm = new Random();
             int choose = rdm.nextInt(0, validMovesAmount);
-            //System.out.println(validMoves.get(choose)); //debug
-            return validMoves.get(choose);
-        } else
-            return null;
+            move = validMoves.get(choose);
+        } else move = null;
     }
 
     public void ifValidMove(Move tryMove, List<Move> validMoves) {

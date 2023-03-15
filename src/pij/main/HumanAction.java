@@ -1,27 +1,15 @@
 package pij.main;
 
-public class HumanAction {
-
-    private final Player human;
-    private final Move move;
-    private final boolean firstMove;
-    private final Boolean skipped;
-
+public class HumanAction extends Action{
 
     public HumanAction(Player human, boolean firstMove) {
-        this.human = human;
-        this.firstMove = firstMove;
-        this.move = promptMove();
-        this.skipped = move == null;
+        super(human, firstMove);
+        setMove();
+        setSkipped();
     }
 
-
-    public Move getMove() { return move; }
-
-
-    public Boolean getSkipped() { return this.skipped; }
-
-    public Move promptMove() {
+    @Override
+    public void setMove() {
         String[] strArr = new String[3];
         boolean valid = false;
         Move move = null;
@@ -29,7 +17,7 @@ public class HumanAction {
             System.out.println("Please enter your move with letter sequence, position, and direction (d for down," +
                     " r for right) separated by commas. Entering just two commas passes. (Type \'S\' to skip): ");
             String input = System.console().readLine();
-            if (input.equals("S")) return null;
+            if (input.equals("S")) break;
 
             if (input.chars().filter(ch -> ch == ',').count() == 2) {
                 strArr = input.split(",");
@@ -42,7 +30,7 @@ public class HumanAction {
                 }
 
                 // Check is it using tiles from rack
-                boolean tilesFromRack = TileRack.validateTilesFromRack(human.getTileRack(), letters);
+                boolean tilesFromRack = TileRack.validateTilesFromRack(player.getTileRack(), letters);
                 if (!tilesFromRack) {
                     System.out.println("You must use tiles from your own rack ONLY! This is not a valid move");
                     continue;
@@ -56,9 +44,9 @@ public class HumanAction {
                                 col + GameBoard.getCenterSquare().get(0) + ". This is not a valid move");
                         continue;
                     }
-                    move = new Move(human, true, letters, position, direction);
+                    move = new Move(player, true, letters, position, direction);
                 } else {
-                    move = new Move(human, false, letters, position, direction);
+                    move = new Move(player, false, letters, position, direction);
                 }
 
                 if (move.getIsValid()) valid = true;
@@ -75,7 +63,7 @@ public class HumanAction {
                 System.out.println("Wrong input format! This is not a valid move");
             }
         }
-        return move;
+        this.move = move;
     }
 
     // Validate player's input position and move direction

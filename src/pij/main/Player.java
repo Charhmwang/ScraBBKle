@@ -17,9 +17,7 @@ public class Player {
 
     public TileRack getTileRack() { return tileRack; }
 
-    void addScore(int score) {
-        this.score += score;
-    }
+    public void addScore(int score) { this.score += score; }
 
     public void reduceScore(int reducing) { score -= reducing; }
 
