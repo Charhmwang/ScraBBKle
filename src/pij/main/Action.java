@@ -32,6 +32,8 @@ public abstract class Action {
     public Action(Player player, boolean firstMove) {
         this.player = player;
         this.firstMove = firstMove;
+        setMove();
+        setSkipped();
     }
 
     /**
@@ -42,9 +44,10 @@ public abstract class Action {
 
     /**
      * Set the attribute skipped based on the move assignment value after setMove method in the corresponding subclass.
+     * If player skipped or tried some invalid moves then skipped, attribute skipped will be assigned as true.
      */
     public void setSkipped() {
-        skipped = move == null || !move.getIsValid(); //player skipped or tried some invalid moves then skipped
+        skipped = move == null || !move.getIsValid();
     }
 
     /**

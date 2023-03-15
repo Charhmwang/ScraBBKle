@@ -11,14 +11,12 @@ public class HumanAction extends Action{
     /**
      * Constructs a new HumanAction with player's role, and whether first move.
      * Assign values to the attributes move and skipped in base class.
-     *；
+     *
      * @param human the role of the Player; must not be null
      * @param firstMove whether the first move of game; must not be null
      */
     public HumanAction(Player human, boolean firstMove) {
         super(human, firstMove);
-        setMove();
-        setSkipped();
     }
 
 
@@ -87,24 +85,20 @@ public class HumanAction extends Action{
 
 
     /**
-     * Procedure of human player making a move decision and assign to attribute move.
-     * If the player's input format is illegal, or using letters not from its own rack tiles,
-     * or the created word violates the game rules, the move will be rejected and requests another input.
-     * This continues until the user provides a valid file, or choose to skip.
+     * Validate the human player's input whether in the format of three elements after being split by a comma,
+     * and each one is in the supposed format.
      *
      * @param position the position of the move target square; must not be null
      * @param direction the direction of reading the created word; must not be null
      * @return boolean value represents whether the player's input format is legal
      */
-    public static boolean validInputForm(String position, String direction) {
+    public boolean validInputForm(String position, String direction) {
 
         int size = GameBoard.getSize();
         if (position.length() >= 2 && position.length() <= 3 &&
                 direction.length() == 1 && (direction.charAt(0) == 'r' || direction.charAt(0) == 'd')) {
 
             int row = 0;
-            // Initiate then use try catch to prevent player enter in a wrong form
-            // such like "8f" instead of the supposed form "f8"
             try {
                 row = Integer.parseInt(position.substring(1));
             } catch (NumberFormatException e) {

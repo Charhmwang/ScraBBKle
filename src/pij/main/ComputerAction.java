@@ -10,10 +10,15 @@ import java.util.*;
  */
 public class ComputerAction extends Action {
 
+    /**
+     * Constructs a new ComputerAction with player's role, and whether first move.
+     * Assign values to the attributes move and skipped in base class.
+     *
+     * @param computer the role of the Player; must not be null
+     * @param firstMove whether the first move of game; must not be null
+     */
     public ComputerAction(Player computer, boolean firstMove) {
         super(computer, firstMove);
-        setMove();
-        setSkipped();
         if (!skipped) reviseBoardContentForTheChosenMove();
     }
 

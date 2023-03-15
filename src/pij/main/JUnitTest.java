@@ -404,8 +404,8 @@ public class JUnitTest {
         GameBoard.printBoard();
         Move move2 = new Move(human, false,"To", "i7", "d");
         move2.recoverBoardGridContent();
+        WordsOnBoard.addWord(7, 9, 9, 9,"TOo");
         GameBoard.printBoard();
-        WordsOnBoard.addWord(9, 7, 9, 9,"TOo");
         Move move3 = new Move(human, false,"SD", "g8", "r");
         move3.recoverBoardGridContent();
         GameBoard.printBoard();
