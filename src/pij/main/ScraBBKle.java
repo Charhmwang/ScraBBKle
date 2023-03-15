@@ -44,8 +44,7 @@ public class ScraBBKle {
 
         while (true) {
             // If pc skipped, there is no need to print the same game board again
-            //if (!pcSkip)
-                GameBoard.printBoard();
+            GameBoard.printBoard();
 
             human.getTileRack().displayTiles();
             HumanAction hmAction;

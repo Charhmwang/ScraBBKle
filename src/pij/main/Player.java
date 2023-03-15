@@ -14,7 +14,7 @@ public class Player {
 
     public int getScore() { return score; }
 
-
+    public boolean isHuman() { return isHuman; }
     public TileRack getTileRack() { return tileRack; }
 
     public void addScore(int score) { this.score += score; }

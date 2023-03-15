@@ -1,16 +1,40 @@
 package pij.main;
 
+/**
+ * Subclass of Action. Represents human player's action of making one move.
+ *
+ * @author Haomeng
+ * @version 1.0
+ */
 public class HumanAction extends Action{
 
+    /**
+     * Constructs a new HumanAction with player's role, and whether first move.
+     * Assign values to the attributes move and skipped in base class.
+     *
+     * @param human the role of the Player; must not be null
+     * @param firstMove whether the first move of game; must not be null
+     */
     public HumanAction(Player human, boolean firstMove) {
         super(human, firstMove);
         setMove();
         setSkipped();
     }
 
+    public void setSkipped() {
+        super();
+    }
+
+
+    /**
+     * Procedure of human player making a move decision and assign to attribute move.
+     * If the player's input format is illegal, or using letters not from its own rack tiles,
+     * or the created word violates the game rules, the move will be rejected and requests another input.
+     * This continues until the user provides a valid file, or choose to skip.
+     */
     @Override
     public void setMove() {
-        String[] strArr = new String[3];
+        String[] strArr;
         boolean valid = false;
         Move move = null;
         while (!valid) {
@@ -23,7 +47,7 @@ public class HumanAction extends Action{
                 strArr = input.split(",");
                 String letters = strArr[0], position = strArr[1], direction = strArr[2];
 
-                // Check is it in the right form and set into position in the bound of board indexes
+                // Check is it in the legal format
                 if (!validInputForm(position, direction)) {
                     System.out.println("Wrong input format! This is not a valid move");
                     continue;
@@ -36,7 +60,7 @@ public class HumanAction extends Action{
                     continue;
                 }
 
-                // Check is it the first move of game, if yes, the inputs must cover at least one center square
+                // Check is it the first move of game, if yes, the inputs must cover the center square
                 if (firstMove) {
                     char col = (char) ('a' + GameBoard.getCenterSquare().get(1));
                     if (!Move.coveredCenterSquares(letters, position, direction)) {
@@ -51,11 +75,10 @@ public class HumanAction extends Action{
 
                 if (move.getIsValid()) valid = true;
                 else {
-                    // Reject invalid move and recover the board content IF the board has been revised while validating,
-                    // see explanation in method buildWordUsingTileLetters in WordsOnBoard class
-                    // need to update the grid content from such as "G{3}" into "{3}" or "T." into "."
+                    // Reject invalid move and recover the board if and only if the board content has been revised
+                    // while validating - See explanation in method buildWordUsingTileLetters in Move class
+                    // For example recover the square content from "G{3}" into "{3}", or "T." into ".", etc.
                     System.out.println("This is not a valid move");
-                    // Check if the grid content was revised
                     if (GameBoard.isGridRevised(move.getRow(), move.getCol()))
                         move.recoverBoardGridContentForInvalidMove();
                 }
@@ -66,7 +89,17 @@ public class HumanAction extends Action{
         this.move = move;
     }
 
-    // Validate player's input position and move direction
+
+    /**
+     * Procedure of human player making a move decision and assign to attribute move.
+     * If the player's input format is illegal, or using letters not from its own rack tiles,
+     * or the created word violates the game rules, the move will be rejected and requests another input.
+     * This continues until the user provides a valid file, or choose to skip.
+     *
+     * @param position the position of the move target square; must not be null
+     * @param direction the direction of reading the created word; must not be null
+     * @return boolean value represents whether the player's input format is legal
+     */
     public static boolean validInputForm(String position, String direction) {
 
         int size = GameBoard.getSize();

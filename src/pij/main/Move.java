@@ -33,7 +33,6 @@ public class Move {
         // 3. if the player try to set tile into a grid already been covered by tile
         if (setIntoPosition != null) {
             tilesSetInto = setIntoPosition.getKey();
-            //for (int i : tilesSetInto) System.out.println(i);  //debug
             AbstractMap.SimpleEntry<String, List<Integer>> newWord_and_idxes = setIntoPosition.getValue();
             if (newWord_and_idxes.getKey() != null) { //there is valid string returned
                 isValid = true;
@@ -98,10 +97,6 @@ public class Move {
     public boolean execute() {
 
         recoverBoardGridContent();
-        // Take each tile out of rack
-//        for (Tile useTile : useTiles) {
-//            player.getTileRack().takeOutTileFromRack(useTile);
-//        }
 
         for (int i = 0; i < inputLetters.length(); i++) {
             char letter = inputLetters.charAt(i);
@@ -113,7 +108,6 @@ public class Move {
                 start_and_endPosOfNewWord.get(2), start_and_endPosOfNewWord.get(3), madeNewWord);
 
         // refill the rack
-        //int counter = useTiles.size();
         int counter = inputLetters.length();
         while (counter-- > 0) {
             boolean filled = player.getTileRack().fillUp();
@@ -165,21 +159,21 @@ public class Move {
 
         // rowIdx stays the same as arg row because the game board content at [0][0] is the size number,
         // not the first line of the board
-        //int colIdx = col - 97;
 
         // CHECK 1. is the starting position already having a letter
-        //boolean occupied = Character.isAlphabetic(GameBoard.getBoardGridContent(row, colIdx).charAt(0));
-        boolean occupied = Character.isAlphabetic(GameBoard.getBoardGridContent(row, col).charAt(0));
-        if (occupied) return null;
-        //System.out.println("CHECK 0 done"); // debug
+        String gridContent = GameBoard.getBoardGridContent(row, col);
+        Character gridTileLetter = isGridCoveredByTile(gridContent);
+        boolean occupied = gridTileLetter != null;
+        if (occupied) {
+            if (player.isHuman())
+                System.out.print("The starting square has already been covered by a tile. ");
+            return null;
+        }
 
-
+        // CHECK 2. is the move out of board boundary
         // First fill up the row/column (depends on the direction) skipping the grid already had a letter
         // var newCreatedWordUndone - The word composed of letters from the first tile to the end, maybe it is the new
         // word on its own, maybe it is the substring of the new word constructed with other next letters in the same row/col
-        //Pair<String, List<Integer>> word_and_idx = buildWordUsingTileLetters(inputLetters, row, colIdx, direction);
-        //AbstractMap.SimpleEntry<String, List<Integer>> preword_and_idx = buildWordUsingTileLetters(inputLetters, row, colIdx, direction);
-
         AbstractMap.SimpleEntry<String, List<Integer>> preword_and_idx;
         if (this.isFirstStep)
             preword_and_idx = buildWordForFirstMove(inputLetters, row, col, direction);
@@ -194,21 +188,16 @@ public class Move {
                 forReturn = new AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>>
                 (tilesSetInto, word_and_idx);
 
-        //System.out.println(preWord);  //debug
         if (preWord == null) { // means user's input out of the board bound
-            //System.out.println("out of bound");
+            if (player.isHuman())
+                System.out.print("You are setting tiles out of the board boundary. ");
             return forReturn;
         }
-        //System.out.println("CHECK 1 done"); //debug
 
-
-        // CHECK 2. is there one and only one legal word constructed on the current row (if right)/ col (if down)?
+        // CHECK 3. is there one and only one legal word constructed on the current row (if right)/ col (if down)?
         // if there are more than one or zero, return false;
         int endIdxRow = row + preWord.length() - 1;
-        //int endIdxCol = colIdx + preWord.length() - 1;
         int endIdxCol = col + preWord.length() - 1;
-
-        //System.out.println(preWord);  //debug
         ArrayList<Object> res = new ArrayList<>();
 
         if (direction.equals("right")) {
@@ -227,23 +216,20 @@ public class Move {
             return forReturn;
         }
 
-        //System.out.println("CHECK 2 done"); //debug
 
         // Check 3. is there any new legal word constructed on each tile's right angle direction because of this tile?
         // if yes, return null;
-
         String newWord = (String)res.get(0);
         int startFrom = (int)res.get(1);
         int endAT = (int)res.get(2);
         List<Integer> idxOfNewWord = calNewWordIdx(row, col, startFrom, endAT, direction);
 
-
-        //boolean rightAngleCheck = isAnyRightAngleNewWord(direction, tilesSetInto, row, colIdx);
         boolean rightAngleCheck = isAnyRightAngleNewWord(direction, tilesSetInto, row, col);
         if (rightAngleCheck) {
+            if (player.isHuman())
+                System.out.print("There are more than one new word created in this move. ");
             return forReturn;
         }
-        //System.out.println("CHECK 3 done"); //debug
         // Till here, can ensure that there is not more than one word constructed
         // due to the new adding tiles both horizontally and vertically.
 
@@ -252,17 +238,19 @@ public class Move {
 
         boolean rightAngleExistWordNoOverlap = isRightAngleExistWordNoOverlap(direction, idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3));
         if (rightAngleExistWordNoOverlap) {
+            if (player.isHuman())
+                System.out.println("This move creates a word locating at right angle with existing word " +
+                        "on the board without overlap.");
             return forReturn;
         }
 
-        //System.out.println("CHECK 4 done"); //debug
 
         // CHECK 5. not allowed to place a complete word parallel immediately next to a word already played
-        //System.out.println(" new word : " + newWord);  //debug
-        //for (int i : idxOfNewWord) System.out.println(i); //debug
-
         boolean parallelNextToAWord = isNextToParallelPlayedWord(direction, idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3));
         if (parallelNextToAWord) {
+            if (player.isHuman())
+                System.out.println("This move creates a word locating immediately next to " +
+                        "an existing parallel word on the board. ");
             return forReturn;
         }
 
@@ -276,13 +264,9 @@ public class Move {
         List<Integer> idxOfNewWord = new ArrayList<>();
         if (direction.equals("right")) {
             idxOfNewWord.add(rowIdx);
-            //System.out.println("startRow: " + rowIdx);
             idxOfNewWord.add(startFrom);
-            //System.out.println("startCol: " + startFrom);
             idxOfNewWord.add(rowIdx);
-            //System.out.println("endRow: " + rowIdx);
             idxOfNewWord.add(endAT);
-            //System.out.println("endCol: " + endAT);
         } else {
             idxOfNewWord.add(startFrom);
             idxOfNewWord.add(colIdx);
@@ -354,10 +338,6 @@ public class Move {
         if (bitCounter < inputLetters.length()) {
             return new AbstractMap.SimpleEntry<String, List<Integer>>(null, tilesSetInto);
         }
-
-//        System.out.println("Create undone word case: tilesSetInto: ");    //debug
-//        for (Integer i : tilesSetInto) System.out.print(i + " ");           //debug
-//        System.out.println();                                                //debug
         return new AbstractMap.SimpleEntry<String, List<Integer>>(firstStepWord, tilesSetInto);
     }
 
@@ -381,7 +361,6 @@ public class Move {
                     String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx);
                     newCreatedWordUndone += curLetter;
                     GameBoard.reviseBoard(rowIdx + gridCounter, colIdx, testContent);
-                    //System.out.println(GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx));//debug
                     tilesSetInto.add(rowIdx + gridCounter);
                     //not score, only letter for testing
                     //if move is valid, board content needs to add the corresponding scores
@@ -417,13 +396,9 @@ public class Move {
 
         // Out of legal bounds before using all the tiles,
         // or Tiles did not go through any letter on board to contribute new word.
-        if (bitCounter < inputLetters.length()) {
+        if (bitCounter < inputLetters.length())
             return new AbstractMap.SimpleEntry<String, List<Integer>>(null, tilesSetInto);
-        }
 
-//        System.out.println("Create undone word case: tilesSetInto: ");    //debug
-//        for (Integer i : tilesSetInto) System.out.print(i + " ");           //debug
-//        System.out.println();                                                //debug
         return new AbstractMap.SimpleEntry<String, List<Integer>>(newCreatedWordUndone, tilesSetInto);
     }
 
@@ -442,9 +417,7 @@ public class Move {
         //first find out the consist word with the tile
         int allFilledFrom = colIdx;
         int allFilledTo = endIdxCol;
-        boolean crossed = false;
-
-        //System.out.println("allFilledFrom: " + allFilledFrom + "; allFilledTo: " + allFilledTo);// debug
+        boolean preCapLegalWord = false;
 
         for (int left = colIdx - 1; left >= 0; left--) {
             Character letter = getLetter(GameBoard.getBoardGridContent(rowIdx, left));
@@ -468,14 +441,11 @@ public class Move {
 
         int legalWordsCounter = 0;
         int startFrom = 0, endAT = 0;
-        String newWord1 = "";
         // Get the pre-cap string and post-cap string
         String preCap = "";
         for (int i = allFilledFrom; i < colIdx; i++) preCap += isGridCoveredByTile(GameBoard.getBoardGridContent(rowIdx, i));
-        //System.out.println("preCap: " + preCap); //debug
         String postCap = "";
         for (int i = endIdxCol + 1; i <= allFilledTo; i++) postCap += isGridCoveredByTile(GameBoard.getBoardGridContent(rowIdx, i));
-        //System.out.println("postCap: " + postCap); //debug
 
         // Try pre-cap plus each letter after using tiles
         for (int i = 0; i < preCap.length(); i++) {
@@ -483,23 +453,20 @@ public class Move {
             String useTilesGrids = "";
             for (int j = 0; j <= allFilledTo - colIdx; j++) {
                 useTilesGrids += getLetter(GameBoard.getBoardGridContent(rowIdx, colIdx + j));
-                // useTilesGrids += GameBoard.getBoardGridContent(rowIdx, colIdx + j).charAt(0);
                 String outcome = currentPreCap + useTilesGrids;
-                //System.out.println("Outcome: " + outcome); //debug
                 if (WordList.validateWord(outcome.toLowerCase())) {
                     legalWordsCounter++;
-                    newWord1 = outcome;
                     startFrom = allFilledFrom + i;
                     endAT = colIdx + j;
                 }
-                if (legalWordsCounter > 1) {
-                    //System.out.println("Flag 1");
-                    return null;
+                if (legalWordsCounter > 0) {
+                    preCapLegalWord = true;
+                    break;
                 }
             }
         }
 
-        String newWord2 = "";
+        String newWord = "";
         // Try post-cap plus each letter before using the last tiles
         for (int i = 0; i < postCap.length(); i++) {
             String currentPostCap = postCap.substring(0,postCap.length()-i);
@@ -507,53 +474,61 @@ public class Move {
             for (int j = 0; j <= endIdxCol - allFilledFrom; j++) {
                 useTilesGrids = getLetter(GameBoard.getBoardGridContent(rowIdx, endIdxCol - j)) + useTilesGrids;
                 String outcome = useTilesGrids + currentPostCap;
-                //System.out.println("Outcome: " + outcome); //debug
                 if (WordList.validateWord(outcome.toLowerCase())) {
                     legalWordsCounter++;
-                    newWord2 = outcome;
+                    newWord = outcome;
                     startFrom = endIdxCol - j;
                     endAT = allFilledTo - i;
                 }
                 if (legalWordsCounter > 1) {
-                    //System.out.println("Flag 2");
+                    if (player.isHuman())
+                        System.out.print("There are more than one new word created in this move. ");
                     return null;
                 }
             }
         }
         // Till now, legalWordsCounter == 0 or 1
-        // preword maybe including old tiles, maybe not. for example, A add to T can be a new word
+        // preword itself maybe legal word or not
         boolean preWordIsValid = false;
         if (WordList.validateWord(preWord.toLowerCase())) {
             legalWordsCounter++;
             preWordIsValid = true;
         }
-        //System.out.println("line 312. preWord: " + preWord);  //debug
-        if (legalWordsCounter == 0 || legalWordsCounter > 1) {
-            //System.out.println("Flag 3");
+
+        if (legalWordsCounter == 0 ) {
+            if (player.isHuman())
+                System.out.print("This move does not create any legal word. ");
             return null;
         }
+        if (legalWordsCounter > 1) {
+            if (player.isHuman())
+                System.out.print("There are more than a new word created in this move.");
+            return null;
+        }
+        if (preCapLegalWord) {
+            if (player.isHuman())
+                System.out.println("This move created a new word but it is not created from " +
+                    "the first tile to your supposed direction.");
+            return null;
+        }
+
         if (!preWordIsValid) {
             if (endAT < endIdxCol || startFrom > colIdx) {
-                //System.out.println("Flag 4");
+                if (player.isHuman())
+                    System.out.println("This move created a new word but it is not using " +
+                            "all the tiles you were choosing.");
                 return null;
             }
         }
 
         ArrayList<Object> res = new ArrayList<>();
-        //System.out.println("newWord1: " + newWord1 + "; newWord2: " + newWord2 + "; preWord: " + preWord); //debug
-
-        if (!newWord1.isEmpty()) {
+        if (!newWord.isEmpty()) {
             if (startFrom == colIdx) {
-                res.add(newWord1); res.add(startFrom); res.add(endAT);
+                res.add(newWord); res.add(startFrom); res.add(endAT);
             } else {
-                //System.out.println("Flag 5");
-                return null;
-            }
-        } else if (!newWord2.isEmpty()) {
-            if (startFrom == colIdx) {
-                res.add(newWord2); res.add(startFrom); res.add(endAT);
-            } else {
-                //System.out.println("Flag 6");
+                if (player.isHuman())
+                    System.out.println("This move created a new word but it is not created from " +
+                        "the first tile to your supposed direction.");
                 return null;
             }
         } else {
@@ -563,24 +538,21 @@ public class Move {
                 res.add(colIdx);
                 res.add(endIdxCol);
             } else {
-                //System.out.println("Flag 7");
+                if (player.isHuman())
+                    System.out.println("This move created a new word but it did not cross " +
+                            "any existing tile on the board.");
                 return null;
             }
         }
-//        System.out.println("Legal word startFrom=" + startFrom + "; endAT=" + endAT);  //debug
-//        System.out.println("Pre-word filledFrom: " + allFilledFrom + "; filledTo: " + allFilledTo);  //debug
-//        System.out.println("newWord validated from row mul or none: " + newWord);  //debug
         return res;
     }
 
 
     public ArrayList<Object> multiWordsOrNoneCol(String preWord, int rowIdx, int colIdx, int endIdxRow, List<Integer> tilesSetInto) {
 
-        //System.out.println("Coming into multiCol check"); //debug
         int allFilledFrom = rowIdx;
         int allFilledTo = endIdxRow;
-
-        //System.out.println("allFilledFrom: " + allFilledFrom + "; allFilledTo: " + allFilledTo);// debug
+        boolean preCapLegalWord = false;
 
         for (int up = rowIdx - 1; up >= 1; up--) {
             Character letter = getLetter(GameBoard.getBoardGridContent(up, colIdx));
@@ -603,15 +575,12 @@ public class Move {
         }
 
         int legalWordsCounter = 0;
-        String newWord1 = "";
         int startFrom = 0, endAT = 0;
 
         String preCap = "";
         for (int i = allFilledFrom; i < rowIdx; i++) preCap += getLetter(GameBoard.getBoardGridContent(i, colIdx));
-        // System.out.println("preCap: " + preCap);  //debug
         String postCap = "";
         for (int i = endIdxRow + 1; i <= allFilledTo; i++) postCap += getLetter(GameBoard.getBoardGridContent(i, colIdx));
-        //System.out.println("postCap: " + postCap);
 
         // Try pre-cap plus each letter after using tiles
         for (int i = 0; i < preCap.length(); i++) {
@@ -620,23 +589,20 @@ public class Move {
             for (int j = 0; j <= allFilledTo - rowIdx; j++) {
                 currentTilesWithPostCap += getLetter(GameBoard.getBoardGridContent(rowIdx + j, colIdx));
                 String outcome = currentPreCap + currentTilesWithPostCap;
-                // System.out.println("Outcome: " + outcome); //debug
                 if (WordList.validateWord(outcome.toLowerCase())) {
-                    // System.out.println("Validated word " + outcome); // debug
                     legalWordsCounter++;
-                    newWord1 = outcome;
                     startFrom = allFilledFrom + i;
                     endAT = rowIdx + j;
                 }
-                if (legalWordsCounter > 1) {
-                    //System.out.println("Flag 1");
-                    return null;
+                if (legalWordsCounter > 0) {
+                    preCapLegalWord = true;
+                    break;
                 }
             }
         }
 
         // Try post-cap plus each letter before using the last tiles
-        String newWord2 = "";
+        String newWord = "";
         for (int i = 0; i < postCap.length(); i++) {
             String currentPostCap = postCap.substring(0, postCap.length() - i);
             String useTilesGrids = "";
@@ -644,16 +610,15 @@ public class Move {
             for (int j = 0; j <= endIdxRow - allFilledFrom; j++) {
                 useTilesGrids = getLetter(GameBoard.getBoardGridContent(endIdxRow - j, colIdx)) + useTilesGrids;
                 String outcome = useTilesGrids + currentPostCap;
-                // System.out.println("Outcome: " + outcome); //debug
                 if (WordList.validateWord(outcome.toLowerCase())) {
-                    // System.out.println("Validated word " + outcome);
                     legalWordsCounter++;
-                    newWord2 = outcome;
+                    newWord = outcome;
                     startFrom = endIdxRow - j;
                     endAT = allFilledTo - i;
                 }
                 if (legalWordsCounter > 1) {
-                    //System.out.println("Flag 2");
+                    if (player.isHuman())
+                        System.out.print("There are more than one new word created in this move. ");
                     return null;
                 }
             }
@@ -664,32 +629,42 @@ public class Move {
             legalWordsCounter++;
             preWordIsValid = true;
         }
-        //System.out.println(legalWordsCounter);
-        if (legalWordsCounter == 0 || legalWordsCounter > 1) {
-            //System.out.println("Flag 3");
+
+        if (legalWordsCounter == 0 ) {
+            if (player.isHuman())
+                System.out.print("This move does not create any legal word. ");
+            return null;
+        }
+        if (legalWordsCounter > 1) {
+            if (player.isHuman())
+                System.out.print("There are more than a new word created in this move.");
+            return null;
+        }
+        if (preCapLegalWord) {
+            if (player.isHuman())
+                System.out.println("This move created a new word but it is not created from " +
+                        "the first tile to your supposed direction.");
             return null;
         }
         if (!preWordIsValid) {
             if (endAT < endIdxRow || startFrom > rowIdx) {
-                //System.out.println("Flag 4");
+                if (player.isHuman())
+                    System.out.println("This move created a new word but it is not using " +
+                            "all the tiles you were choosing.");
                 return null;
             }
         }
 
         ArrayList<Object> res = new ArrayList<>();
-        //System.out.println("newWord1: " + newWord1 + "; newWord2: " + newWord2 + "; preWord: " + preWord); //debug
-        if (!newWord1.isEmpty()) {
+        if (!newWord.isEmpty()) {
             if (startFrom == rowIdx) {
-                res.add(newWord1); res.add(startFrom); res.add(endAT);
+                res.add(newWord);
+                res.add(startFrom);
+                res.add(endAT);
             } else {
-                //System.out.println("Flag 5");
-                return null;
-            }
-        } else if (!newWord2.isEmpty()) {
-            if (startFrom == rowIdx) {
-                res.add(newWord2); res.add(startFrom); res.add(endAT);
-            } else {
-                //System.out.println("Flag 6");
+                if (player.isHuman())
+                    System.out.println("This move created a new word but it is not created from " +
+                            "the first tile to your supposed direction.");
                 return null;
             }
         } else {
@@ -699,13 +674,13 @@ public class Move {
                 res.add(rowIdx);
                 res.add(endIdxRow);
             } else {
-                //System.out.println("Flag 7");
+                if (player.isHuman())
+                    System.out.println("This move created a new word but it did not cross " +
+                            "any existing tile on the board.");
                 return null;
             }
         }
-//        System.out.println("Legal word startFrom=" + startFrom + "; endAT=" + endAT);  //debug
-//        System.out.println("Pre-word filledFrom: " + allFilledFrom + "; filledTo: " + allFilledTo);  //debug
-//        System.out.println("newWord validated from col mul or none: " + newWord);  //debug
+
         return res;
     }
 
@@ -713,7 +688,6 @@ public class Move {
     public boolean isAnyRightAngleNewWord(String direction, List<Integer> tilesSetInto, int rowIdx, int colIdx) {
 
         for (int i : tilesSetInto) {
-            //System.out.println(i); //debug
             int allFilledFrom = 1, allFilledTo = GameBoard.getSize() - 1;
             if (direction.equals("right")) {
                 //check each col the tile is set in
@@ -797,31 +771,14 @@ public class Move {
     }
 
 
-    // if next to with no overlap, is like:
-    //      if the new word going right: other words are :
-    //1. on left or right vertical: (start col == nw start col-1 || start col == nw start col+1)
-    //                       && (nw start row >= start row && nw start row <= end row)
-    //2. on top or down vertical: (start row == nw start row+1 || end row == nw start row-1)
-    //                       && (start col >= nw start col && start col <= nw end col)
-
-    //      if the new word going down: other words are :
-    //1. on left or right vertical: (end col == nw start col-1 || start col == nw start col+1)
-    //                        && (nw start row <= start row && nw end row >= start row)
-    //2. on top or down vertical: (start row == nw start row-1 || start row == nw end row+1)
-    //                        && (start col >= nw start col && end col <= nw start col)
     public boolean isRightAngleExistWordNoOverlap(String direction, int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol) {
 
         boolean rightAngleNoOverlap = false;
-//        System.out.println("nwStartRow: " + nwStartRow + "; nwStartCol: " + nwStartCol + "; nwEndRow: " + nwEndRow +
-//                "; nwEndCol: " + nwEndCol);
-
-        for (ArrayList<Integer> idxes : words_on_board.keySet()) {
+       for (ArrayList<Integer> idxes : words_on_board.keySet()) {
             int startRow = idxes.get(0);
             int startCol = idxes.get(1);
             int endRow = idxes.get(2);
             int endCol = idxes.get(3);
-//            System.out.println("Word " + words_on_board.get(idxes) + ": indexes: [" + startRow + "," + startCol +
-//                    "], [" + endRow + "," + endCol + "].");
 
             if (direction.equals("right")) {
                 // if the existing word is in same direction, continue
@@ -841,34 +798,16 @@ public class Move {
     }
 
 
-    // to have a new word parallel next to an existing word(same content word)
-    //      if the new word going right: old words are :
-    //1. on left or right parallel: (end col == nw start col-1 || start col == nw end col+1)
-    //                       && (start row == nw start row && start row == end row)
-    //2. on top or down parallel: (start row == nw start row+1 || start row == nw start row-1 && start row == end row)
-    //                       && ((start col >= nw start col && start col <= nw end col) || (end col >= nw start col && end col <= nw end col))
-
-    //      if the new word going down: old words are :
-    //1. on top or down parallel: (end row == nw start row-1 || start row == nw end row+1)
-    //                       && (start col == nw start col && start col == end col)
-    //2. on left or right parallel: (start col == nw start col+1 || start col == nw start col-1 && start col == end col)
-    //                       && ((start row >= nw start row && start row <= nw end row) || (end row >= nw start row && end row <= nw end row))
-
     public boolean isNextToParallelPlayedWord(String direction,
                                                      int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol) {
 
-
         boolean nextTo = false;
-//        System.out.println("nwStartRow: " + nwStartRow + "; nwStartCol: " + nwStartCol + "; nwEndRow: " + nwEndRow +
-//                "; nwEndCol: " + nwEndCol);
 
         for (ArrayList<Integer> idxes : words_on_board.keySet()) {
             int startRow = idxes.get(0);
             int startCol = idxes.get(1);
             int endRow = idxes.get(2);
             int endCol = idxes.get(3);
-//            System.out.println("Word " + words_on_board.get(idxes) + ": indexes: [" + startRow + "," + startCol +
-//                    "], [" + endRow + "," + endCol + "].");
 
             if (direction.equals("right")) {
                 // if the existing word is not in same direction, continue

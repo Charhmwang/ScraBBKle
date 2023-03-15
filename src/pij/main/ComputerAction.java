@@ -2,6 +2,12 @@ package pij.main;
 
 import java.util.*;
 
+/**
+ * Subclass of Action. Represents computer player's action of making one move.
+ *
+ * @author Haomeng
+ * @version 1.0
+ */
 public class ComputerAction extends Action {
 
     public ComputerAction(Player computer, boolean firstMove) {

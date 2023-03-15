@@ -36,7 +36,6 @@ public class TileRack {
                 .collect(Collectors.joining(", ")));
     }
 
-    //public void takeOutTileFromRack(Tile tile) { tiles.remove(tile); }
 
     public void takeOutTileFromRack(char letter) {
         Tile tile = isTileExisting(letter);
