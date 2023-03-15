@@ -11,7 +11,7 @@ public class HumanAction extends Action{
     /**
      * Constructs a new HumanAction with player's role, and whether first move.
      * Assign values to the attributes move and skipped in base class.
-     *
+     *；
      * @param human the role of the Player; must not be null
      * @param firstMove whether the first move of game; must not be null
      */
@@ -19,10 +19,6 @@ public class HumanAction extends Action{
         super(human, firstMove);
         setMove();
         setSkipped();
-    }
-
-    public void setSkipped() {
-        super();
     }
 
 

@@ -54,6 +54,9 @@ public class ScraBBKle {
             } else {
                 hmAction = new HumanAction(human, false);
             }
+            //BUG IS IGNORED THE SCENARIO THAT HUMAN PLAYER TRIED INVALID MOVE AND THEN SKIP
+
+
 
             if (!hmAction.getSkipped()) {
                 firstMoveDone = true;
@@ -61,7 +64,7 @@ public class ScraBBKle {
                 if (!BagRackNotEmpty) break;
             } else {
                 //human skip to Computer's turn
-                System.out.println("You skipped!");
+                System.out.println("You skipped!\n\nComputer's turn... ");
                 hmSkip = true;
                 // If before human's skip, computer already skipped once, now here is 2 skips in a row, game over.
                 if (pcSkip) {

@@ -43,7 +43,9 @@ public abstract class Action {
     /**
      * Set the attribute skipped based on the move assignment value after setMove method in the corresponding subclass.
      */
-    public void setSkipped() { skipped = move == null; }
+    public void setSkipped() {
+        skipped = move == null || !move.getIsValid(); //player skipped or tried some invalid moves then skipped
+    }
 
     /**
      * Returns the move of this Action.
