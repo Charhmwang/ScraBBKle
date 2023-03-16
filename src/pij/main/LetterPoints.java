@@ -3,9 +3,35 @@ package pij.main;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * LetterPoints class is a letter points reference for the game,
+ * has a map attribute for recording. Singleton class.
+ * Object of this class is Immutable: After LetterPoints has been created,
+ * one cannot change the value of its attribute.
+ *
+ * @author Haomeng Wang
+ * @version 1.0
+ */
 public class LetterPoints {
+
+    /** The map recording letters and the corresponding points.
+     * Always non-null after object creation */
     private static final Map<Character, Integer> letterMap = new HashMap<>();
+
+    /** LetterPoints instance, set as null initially.
+     * Private to be hidden from outside the LetterPoints class.
+     */
     private static LetterPoints letterPointsInstance;
+
+
+    /**
+     * For other classes getting the LetterPoints instance.
+     * If the instance has never been created, initiate one then return.
+     * If the instance has already been initiated, then return the created one.
+     * Ensures the LetterPoints instance can be created once only in the program.
+     *
+     * @return the sole LetterPoints instance
+     */
     public synchronized static LetterPoints getInstance() {
         if (letterPointsInstance == null) {
             letterPointsInstance = new LetterPoints();
@@ -13,6 +39,11 @@ public class LetterPoints {
         return letterPointsInstance;
     }
 
+
+    /**
+     * Constructs a LetterPoints instance.
+     * Private constructor ensures instance can only be initiated inside the class.
+     */
     private LetterPoints() {
         letterMap.put('A', 1);
         letterMap.put('B', 3);
@@ -43,5 +74,11 @@ public class LetterPoints {
         letterMap.put('?', 3);
     }
 
+
+    /**
+     * Returns the map recording letters and the corresponding points.
+     *
+     * @return the map recording letters and the corresponding points
+     */
     public static Map<Character, Integer> getMap() { return letterMap; }
 }

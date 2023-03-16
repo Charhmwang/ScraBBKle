@@ -2,6 +2,9 @@ package pij.main;
 
 /**
  * Abstract base class of HumanAction class and ComputerAction class.
+ * An Action subclass object has a player, a boolean attribute to mark whether it is making the first move in game,
+ * a move and a boolean attribute to mark whether this action is skipping the turn.
+ *
  * Two attributes of this class are immutable:
  * after an object of subclass of Action has been created, the values of player and firstMove cannot be changed.
  *
@@ -25,6 +28,7 @@ public abstract class Action {
 
     /**
      * Constructs a new Action with player's role, and whether first move.
+     * Assign values to the attributes move and skipped.
      *
      * @param player the role of the Player; must not be null
      * @param firstMove whether the first move of game; must not be null
@@ -43,7 +47,7 @@ public abstract class Action {
     public void setMove() {}
 
     /**
-     * Set the attribute skipped based on the move assignment value after setMove method in the corresponding subclass.
+     * Sets the attribute skipped based on the move assignment value after setMove method in the corresponding subclass.
      * If player skipped or tried some invalid moves then skipped, attribute skipped will be assigned as true.
      */
     public void setSkipped() {
@@ -58,9 +62,9 @@ public abstract class Action {
     public Move getMove() { return this.move; }
 
     /**
-     * Returns the boolean status of this Action whether skipped the move.
+     * Returns a boolean result of this Action whether skipped the move.
      *
-     * @return the move skip status
+     * @return a boolean result whether the move skipped
      */
     public Boolean getSkipped() { return this.skipped; }
 }

@@ -5,32 +5,86 @@ import java.util.*;
 
 import static pij.main.WordsOnBoard.words_on_board;
 
+/**
+ * A move has a string representing input tile letters, position of the starting square to set tiles,
+ * direction of setting tiles, new created word on the board, integer values of row and col,
+ * a player who made this move, boolean values to mark the move's validity and whether the first step in game,
+ * one list of integers recording the squares where tiles are planned to set in,
+ * another list of integers recording the square indexes of the new created word's first and last letter.
+ *
+ * @author Haomeng
+ * @version 1.0
+ */
 public class Move {
+
+    /** The input tile letters. Always non-null after object creation. */
     private final String inputLetters;
-    private int row;
-    private int col;
+
+    /** Row of the square setting the first tile. Value assigned in constructor. */
+    private final int row;
+
+    /** Column of the square setting the first tile. Value assigned in constructor. */
+    private final int col;
+
+    /** The starting square location. Always non-null after object creation. */
     private final String position;
-    private String direction;
+
+    /** The direction of setting tiles. Always non-null after object creation. */
+    private final String direction;
+
+    /** The player made this move. Always non-null after object creation. */
     private final Player player;
+
+    /** To mark whether the move is valid.
+     * Value assigned as true in constructor if the move successfully passed the validation. */
     private boolean isValid;
+
+    /** To mark whether the move is first move in game. Always non-null after object creation. */
     private final boolean isFirstStep;
+
+    /** To record the squares where tiles are planned to set in. Values assigned in constructor if the move
+     *  validation has changed the board squares contents. Can be null.
+     *  Instead of storing both row and column index for each square,
+     *  there are only index numbers of columns for the move whose direction is right,
+     *  and rows for the move whose direction is down.
+     *  */
     private List<Integer> tilesSetInto;
-    private String madeNewWord = "";
+
+    /** To record new created word on the board. Value assigned in constructor if the move
+     *  successfully passed validation. If invalid move, stays in null. */
+    private String madeNewWord;
+
+    /** To record the square indexes of the new created word's first and last letter.
+     * Value assigned in constructor if the move successfully passed validation.
+     * If invalid move, stays in null. */
     private List<Integer> start_and_endPosOfNewWord;
 
+
+    /**
+     * Constructs a new Move with player's role, whether first move,
+     * string of input letters, position and direction.
+     * Assign values to part of the class attributes, and call method to validate the move.
+     *
+     * @param player the role of the Player; must not be null
+     * @param isFirstStep whether the first move of game; must not be null
+     * @param inputLetters string composed of letters from the using tiles
+     * @param position position of the starting square to set tiles
+     * @param direction direction of setting tiles
+     */
     public Move(Player player, boolean isFirstStep, String inputLetters, String position, String direction) {
         this.inputLetters = inputLetters;
         this.player = player;
         this.isFirstStep = isFirstStep;
         this.position = position;
-        this.direction = direction;
-        //( tilesSetInto, (newWord, idxOfNewWord) )
+        this.row = Integer.parseInt(position.substring(1));
+        this.col = position.charAt(0) - 'a';
+        this.direction = direction.charAt(0) == 'r' ? "right" : "down";
+        //< tilesSetInto, <newWord, idxOfNewWord> >
         AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>>
-                setIntoPosition = validateMove();
-        // valid_setIntoPosition will be null
-        // 1. if the player's move input form is wrong,
-        // 2. if the player try to use the word not coming from its own rack,
-        // 3. if the player try to set tile into a grid already been covered by tile
+                setIntoPosition = validateMove(inputLetters, row, col, this.direction);
+        // setIntoPosition will be null if the player's move input form is wrong,
+        // or if the player try to use the word not coming from its own rack,
+        // or if the player try to set tile into a grid already been covered by tile
         if (setIntoPosition != null) {
             tilesSetInto = setIntoPosition.getKey();
             AbstractMap.SimpleEntry<String, List<Integer>> newWord_and_idxes = setIntoPosition.getValue();
@@ -47,121 +101,86 @@ public class Move {
     }
 
 
+    /**
+     * Returns the string composed of letters from the using tiles from this move.
+     *
+     * @return string composed of letters from the using tiles
+     */
     public String getInputLetters() { return this.inputLetters; }
+
+
+    /**
+     * Returns column of the square in which this move setting the first tile.
+     *
+     * @return column of the square setting the first tile.
+     */
     public int getCol() { return this.col; }
+
+
+    /**
+     * Returns row of the square in which this move setting the first tile.
+     *
+     * @return row of the square setting the first tile.
+     */
     public int getRow() { return this.row; }
+
+
+    /**
+     * Returns direction of setting tiles from this move.
+     *
+     * @return direction of setting tiles
+     */
     public String getDirection() { return this.direction; }
+
+
+    /**
+     * Returns the status of this move whether valid.
+     *
+     * @return whether the move is valid
+     */
     public boolean getIsValid() { return this.isValid; }
+
+
+    /**
+     * Returns the squares location where tiles are planned to set in.
+     *
+     * @return list of row or column indexes of the squares where tiles are planned to set in.
+     */
     public List<Integer> getTilesSetInto() { return this.tilesSetInto; }
+
+
+    /**
+     * Returns new created word on the board from this move.
+     *
+     * @return new created word on the board.
+     */
     public String getMadeNewWord() { return this.madeNewWord; }
+
+
+    /**
+     * Returns new created word on the board from this move.
+     *
+     * @return new created word on the board.
+     */
     public List<Integer> get_start_and_endPosOfNewWord() { return this.start_and_endPosOfNewWord; }
 
 
-    public AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>> validateMove() {
+    /**
+     * Checks whether the move violates any of the game rules after setting specific tiles in.
+     *
+     * @param inputLetters string composed of letters from the using tiles
+     * @param row row of the square setting the first tile
+     * @param col column of the square setting the first tile
+     * @param direction direction of setting tiles
+     * @return a list of integer storing the row/col indexes of the squares where the using tiles
+     * have been set in during validation, a string of new created word, a list of integers storing
+     * the square indexes of the new created word's first and last letter. Can be null value.
+     */
+    public AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>> validateMove
+    (String inputLetters, int row, int col, String direction) {
 
-        this.row = Integer.parseInt(position.substring(1));
-        this.col = position.charAt(0) - 'a';
-        this.direction = direction.charAt(0) == 'r' ? "right" : "down";
-
-        //Check whether anywhere violates the game word rule after these tiles adding
-        //return WordsOnBoard.validateWord(inputLetters, row, column, direction);
-        return validateWord(inputLetters, row, col, direction);
-    }
-
-
-    public static boolean coveredCenterSquares(String letters, String position, String direction) {
-        List<List<Integer>> coveringSquares = new ArrayList<>();
-        int row = Integer.parseInt(position.substring(1));
-        int col = position.charAt(0) - 'a';
-        if (direction.equals("r")) {
-            for (int i = 0; i < letters.length(); i++) {
-                List<Integer> currentSquareIdx = List.of(row, col + i);
-                coveringSquares.add(currentSquareIdx);
-            }
-        } else {
-            for (int i = 0; i < letters.length(); i++) {
-                List<Integer> currentSquareIdx = List.of(row + i, col);
-                coveringSquares.add(currentSquareIdx);
-            }
-        }
-
-        return coveringSquares.contains(GameBoard.getCenterSquare());
-    }
-
-
-    // Change the grids on board contents as the user input tiles letters
-
-    // If the move is valid,
-    // need to update the grid content from the form such as "G{3}" to "G2" or "T." to "T1", or "t{3}" to "t3"(wildcard)
-    // See method buildWordUsingTileLetters in WordsOnBoard class
-    public boolean execute() {
-
-        recoverBoardGridContent();
-
-        for (int i = 0; i < inputLetters.length(); i++) {
-            char letter = inputLetters.charAt(i);
-            player.getTileRack().takeOutTileFromRack(letter);
-        }
-
-        // Add word to wordsOnBoard map
-        WordsOnBoard.addWord(start_and_endPosOfNewWord.get(0), start_and_endPosOfNewWord.get(1),
-                start_and_endPosOfNewWord.get(2), start_and_endPosOfNewWord.get(3), madeNewWord);
-
-        // refill the rack
-        int counter = inputLetters.length();
-        while (counter-- > 0) {
-            boolean filled = player.getTileRack().fillUp();
-            if (!filled) {
-                if (player.getTileRack().getTilesAmount() == 0)
-                    return false; // cannot refill because tiles bag empty, and also the player rack empty, so game over
-            }
-        }
-        return true;
-    }
-
-    void recoverBoardGridContent() {
-
-        for (int i = 0; i < tilesSetInto.size(); i++) {
-            char letter = inputLetters.charAt(i);
-            int letterPoints = 0;
-            if (Character.isLowerCase(letter)) letterPoints = 3;
-            else letterPoints = LetterPoints.getMap().get(letter);
-            String letter_with_points = " " + letter + letterPoints + " "; //" g3 "
-
-            if (direction.equals("right")) {
-                GameBoard.reviseBoard(row, tilesSetInto.get(i), letter_with_points);
-            }
-            if (direction.equals("down")) {
-                GameBoard.reviseBoard(tilesSetInto.get(i), col, letter_with_points);
-            }
-        }
-    }
-
-    void recoverBoardGridContentForInvalidMove() {
-
-        // Check if the grid content was revised
-        for (Integer integer : tilesSetInto) {
-            String gridContent = "";
-            if (direction.equals("right")) {
-                gridContent = GameBoard.getBoardGridContent(row, integer);
-                gridContent = gridContent.substring(1);
-                GameBoard.reviseBoard(row, integer, gridContent);
-            } else {
-                gridContent = GameBoard.getBoardGridContent(integer, col);
-                gridContent = gridContent.substring(1);
-                GameBoard.reviseBoard(integer, col, gridContent);
-            }
-        }
-    }
-
-
-    public AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>> validateWord(String inputLetters, int row, int col, String direction) {
-
-        // rowIdx stays the same as arg row because the game board content at [0][0] is the size number,
-        // not the first line of the board
-
-        // CHECK 1. is the starting position already having a letter
-        String gridContent = GameBoard.getBoardGridContent(row, col);
+        // CHECK 1. has the starting position square already been covered
+        String gridContent = GameBoard.getBoardSquareContent(row, col);
         Character gridTileLetter = isGridCoveredByTile(gridContent);
         boolean occupied = gridTileLetter != null;
         if (occupied) {
@@ -171,11 +190,8 @@ public class Move {
         }
 
         // CHECK 2. is the move out of board boundary
-        // First fill up the row/column (depends on the direction) skipping the grid already had a letter
-        // var newCreatedWordUndone - The word composed of letters from the first tile to the end, maybe it is the new
-        // word on its own, maybe it is the substring of the new word constructed with other next letters in the same row/col
         AbstractMap.SimpleEntry<String, List<Integer>> preword_and_idx;
-        if (this.isFirstStep)
+        if (isFirstStep)
             preword_and_idx = buildWordForFirstMove(inputLetters, row, col, direction);
         else
             preword_and_idx = buildWordUsingTileLetters(inputLetters, row, col, direction);
@@ -188,14 +204,13 @@ public class Move {
                 forReturn = new AbstractMap.SimpleEntry<List<Integer>, AbstractMap.SimpleEntry<String, List<Integer>>>
                 (tilesSetInto, word_and_idx);
 
-        if (preWord == null) { // means user's input out of the board bound
+        if (preWord == null) { // means user's input out of the board boundary
             if (player.isHuman())
                 System.out.print("You are setting tiles out of the board boundary. ");
             return forReturn;
         }
 
-        // CHECK 3. is there one and only one legal word constructed on the current row (if right)/ col (if down)?
-        // if there are more than one or zero, return false;
+        // CHECK 3. is there one and only one legal word created on the current row (if right)/ col (if down)?
         int endIdxRow = row + preWord.length() - 1;
         int endIdxCol = col + preWord.length() - 1;
         ArrayList<Object> res = new ArrayList<>();
@@ -216,9 +231,8 @@ public class Move {
             return forReturn;
         }
 
-
-        // Check 3. is there any new legal word constructed on each tile's right angle direction because of this tile?
-        // if yes, return null;
+        // Check 4. is there any legal word constructed on each tile's right angle direction
+        // because of this tile's adding?
         String newWord = (String)res.get(0);
         int startFrom = (int)res.get(1);
         int endAT = (int)res.get(2);
@@ -230,12 +244,9 @@ public class Move {
                 System.out.print("There are more than one new word created in this move. ");
             return forReturn;
         }
-        // Till here, can ensure that there is not more than one word constructed
-        // due to the new adding tiles both horizontally and vertically.
+        // Till here, can ensure that there is only one word created by this move.
 
-
-        // CHECK 4. not allowed to place a word at right angles to a word already on the board without an overlap
-
+        // CHECK 5. not allowed to place a word at right angles to a word already on the board without an overlap
         boolean rightAngleExistWordNoOverlap = isRightAngleExistWordNoOverlap(direction, idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3));
         if (rightAngleExistWordNoOverlap) {
             if (player.isHuman())
@@ -244,8 +255,7 @@ public class Move {
             return forReturn;
         }
 
-
-        // CHECK 5. not allowed to place a complete word parallel immediately next to a word already played
+        // CHECK 6. not allowed to place a complete word parallel immediately next to a word already played
         boolean parallelNextToAWord = isNextToParallelPlayedWord(direction, idxOfNewWord.get(0), idxOfNewWord.get(1), idxOfNewWord.get(2), idxOfNewWord.get(3));
         if (parallelNextToAWord) {
             if (player.isHuman())
@@ -253,12 +263,138 @@ public class Move {
                         "an existing parallel word on the board. ");
             return forReturn;
         }
-
+        // Till here, each rule's checking has been passed,
+        // the new word and its start and end indexes can be added into the returned value.
         forReturn.setValue(new AbstractMap.SimpleEntry<>(newWord, idxOfNewWord));
         return forReturn;
     }
 
 
+    /**
+     * Validates whether the first move in game has covered the centre square of the board.
+     *
+     * @param letters string composed of letters from the using tiles
+     * @param position position of the starting square to set tiles
+     * @param direction direction of setting tiles
+     * @return boolean value represents whether the first move in game has covered the centre square of the board
+     */
+    public static boolean coveredCenterSquares(String letters, String position, String direction) {
+        List<List<Integer>> coveringSquares = new ArrayList<>();
+        int row = Integer.parseInt(position.substring(1));
+        int col = position.charAt(0) - 'a';
+        if (direction.equals("r")) {
+            for (int i = 0; i < letters.length(); i++) {
+                List<Integer> currentSquareIdx = List.of(row, col + i);
+                coveringSquares.add(currentSquareIdx);
+            }
+        } else {
+            for (int i = 0; i < letters.length(); i++) {
+                List<Integer> currentSquareIdx = List.of(row + i, col);
+                coveringSquares.add(currentSquareIdx);
+            }
+        }
+
+        return coveringSquares.contains(GameBoard.getCenterSquare());
+    }
+
+
+    /**
+     * Executing the valid move after validation, including revise the board squares contents,
+     * take the move using tiles off the rack and refill the rack, and add the new created word
+     * to the recording map of words on board.
+     *
+     * @return false if both the tiles bag and player's rack empty, true if executed successfully
+     */
+    public boolean execute() {
+
+        // Revise the board targeting squares contents
+        reviseBoardContentForValidMove();
+
+        // Take tiles off the rack
+        for (int i = 0; i < inputLetters.length(); i++) {
+            char letter = inputLetters.charAt(i);
+            player.getTileRack().takeOutTileFromRack(letter);
+        }
+
+        // Add word to wordsOnBoard map
+        WordsOnBoard.addWord(start_and_endPosOfNewWord.get(0), start_and_endPosOfNewWord.get(1),
+                start_and_endPosOfNewWord.get(2), start_and_endPosOfNewWord.get(3), madeNewWord);
+
+        // Refill the rack from tiles bag
+        int counter = inputLetters.length();
+        while (counter-- > 0) {
+            boolean filled = player.getTileRack().fillUp();
+            if (!filled) {
+                // Once failed to refill means tiles bag empty and also the player rack empty
+                // so if a move execute method return false value representing game over
+                if (player.getTileRack().getTilesAmount() == 0)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * To be used after the move has successfully passed the validation.
+     * Revises the board targeting squares contents into the form of letter with the corresponding points.
+     * For example, change "G{3}" to "G2", or "T." to "T1", or "t{3}" to "t3" if there is wildcard.
+     * Read method buildWordUsingTileLetters for more how it became.
+     */
+    void reviseBoardContentForValidMove() {
+
+        for (int i = 0; i < tilesSetInto.size(); i++) {
+            char letter = inputLetters.charAt(i);
+            int letterPoints;
+            if (Character.isLowerCase(letter)) letterPoints = 3;
+            else letterPoints = LetterPoints.getMap().get(letter);
+            String letter_with_points = " " + letter + letterPoints + " ";
+
+            if (direction.equals("right")) {
+                GameBoard.reviseBoard(row, tilesSetInto.get(i), letter_with_points);
+            }
+            if (direction.equals("down")) {
+                GameBoard.reviseBoard(tilesSetInto.get(i), col, letter_with_points);
+            }
+        }
+    }
+
+
+    /**
+     * Revises the board targeting squares contents to the original state.
+     * For example, change "G{3}" to "{3}", or "T." to ".", etc.
+     * Read method buildWordUsingTileLetters for more how it became.
+     */
+    void recoverBoardSquareContentToInitial() {
+
+        // Check if the grid content was revised
+        for (Integer integer : tilesSetInto) {
+            String gridContent = "";
+            if (direction.equals("right")) {
+                gridContent = GameBoard.getBoardSquareContent(row, integer);
+                gridContent = gridContent.substring(1);
+                GameBoard.reviseBoard(row, integer, gridContent);
+            } else {
+                gridContent = GameBoard.getBoardSquareContent(integer, col);
+                gridContent = gridContent.substring(1);
+                GameBoard.reviseBoard(integer, col, gridContent);
+            }
+        }
+    }
+
+
+    /**
+     * Revises the board targeting squares contents to the original state.
+     * For example, change "G{3}" to "{3}", or "T." to ".", etc.
+     * Read method buildWordUsingTileLetters for more how it became.
+     *
+     * @param rowIdx row of the square setting the first tile
+     * @param colIdx column of the square setting the first tile
+     * @param startFrom index of the new created word's first letter's row/column (depends on the direction)
+     * @param endAT index of the new created word's last letter's row/column (depends on the direction)
+     * @param direction direction of setting tiles
+     * @return a list of integers storing the indexes of the new created word's first and last letter.
+     */
     public static List<Integer> calNewWordIdx(int rowIdx, int colIdx, int startFrom, int endAT,
                                               String direction) {
         List<Integer> idxOfNewWord = new ArrayList<>();
@@ -277,33 +413,54 @@ public class Move {
     }
 
 
-    public static Character isGridCoveredByTile(String curGrid) {
-        if (curGrid.contains(".") || curGrid.contains("(") || curGrid.contains("{")) {
+    /**
+     * Checks whether the square has already been covered by tile from the square's contents.
+     *
+     * @param curSquare contents of the validating square
+     * @return a character of alphabet letter if the square is covered by tile, null if it is vacant.
+     */
+    public static Character isGridCoveredByTile(String curSquare) {
+        if (curSquare.contains(".") || curSquare.contains("(") || curSquare.contains("{")) {
             return null;
         } else {
-            for (int i = 0; i < curGrid.length(); i++) {
-                if (Character.isAlphabetic(curGrid.charAt(i))) {
-                    return curGrid.charAt(i);
-                }
+            for (int i = 0; i < curSquare.length(); i++)
+                if (Character.isAlphabetic(curSquare.charAt(i))) return curSquare.charAt(i);
+        }
+        return null;
+    }
+
+
+    /**
+     * Checks whether the square's contents contain an alphabet letter, if yes, take the character value.
+     *
+     * @param curSquare contents of the targeting square
+     * @return a character of alphabet letter if the square's contents contained one, null if there is not.
+     */
+    public static Character getLetter(String curSquare) {
+        for (int i = 0; i < curSquare.length(); i++) {
+            if (Character.isAlphabetic(curSquare.charAt(i))) {
+                return curSquare.charAt(i);
             }
         }
         return null;
     }
 
 
-    public static Character getLetter(String curGrid) {
-        for (int i = 0; i < curGrid.length(); i++) {
-            if (Character.isAlphabetic(curGrid.charAt(i))) {
-                return curGrid.charAt(i);
-            }
-        }
-        return null;
-    }
-
-
+    /**
+     * Builds a string using input letters for the case of the first move in game.
+     * Revises the targeting squares contents for validating with game rules later on in validateMove method.
+     * The return string can be null value if the move made letters went out of the board bound.
+     * The return list of integer is always non-null value.
+     *
+     * @param inputLetters string composed of letters from the using tiles
+     * @param rowIdx row of the square setting the first tile
+     * @param colIdx column of the square setting the first tile
+     * @param direction direction of setting tiles
+     * @return a string of new created but yet validated word, and a list of integer storing
+     * the row/col indexes of the squares where the using tiles have been set in.
+     */
     public AbstractMap.SimpleEntry<String, List<Integer>> buildWordForFirstMove(String inputLetters, int rowIdx, int colIdx, String direction) {
 
-        //System.out.println("Build word for first step"); //debug
         String firstStepWord = "";
         List<Integer> tilesSetInto = new ArrayList<>();
         int bitCounter = 0;
@@ -313,19 +470,17 @@ public class Move {
         while (bitCounter < inputLetters.length() && bound1 < GameBoard.getSize() && bound2 < GameBoard.getSize()) {
             if (direction.equals("down")) {
                 char curLetter = inputLetters.charAt(bitCounter);
-                String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx);
+                String testContent = curLetter + GameBoard.getBoardSquareContent(rowIdx + gridCounter, colIdx);
                 firstStepWord += curLetter;
                 GameBoard.reviseBoard(rowIdx + gridCounter, colIdx, testContent);
-                //System.out.println(GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx));//debug
                 tilesSetInto.add(rowIdx + gridCounter);
                 bitCounter++;
             }
             if (direction.equals("right")) {
                 char curLetter = inputLetters.charAt(bitCounter);
-                String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter);
+                String testContent = curLetter + GameBoard.getBoardSquareContent(rowIdx, colIdx + gridCounter);
                 firstStepWord += curLetter;
                 GameBoard.reviseBoard(rowIdx, colIdx + gridCounter, testContent);  //not score, only letter for testing
-                //System.out.println(GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter));//debug
                 tilesSetInto.add(colIdx + gridCounter);
                 bitCounter++;
             }
@@ -342,31 +497,47 @@ public class Move {
     }
 
 
+    /**
+     * Builds a string using input letters and adds to the letters if there is already on the board throughout
+     * the direction of the tiles moving forward.
+     * Revises the targeting squares contents for validating with game rules later on in validateMove method.
+     * This is for the case of NOT the first move in game.
+     * The return string can be null value if the move made letters went out of the board bound.
+     * The return list of integer is always non-null value.
+     *
+     * @param inputLetters string composed of letters from the using tiles
+     * @param rowIdx row of the square setting the first tile
+     * @param colIdx column of the square setting the first tile
+     * @param direction direction of setting tiles
+     * @return a new created string using all the letter tiles from player's input, and a list of integer storing
+     * the row/col indexes of the squares where the using tiles have been set in.
+     */
     public AbstractMap.SimpleEntry<String, List<Integer>> buildWordUsingTileLetters(String inputLetters, int rowIdx, int colIdx, String direction) {
 
-        //System.out.println("Try to build word with tiles"); //debug
         String newCreatedWordUndone = "";
         List<Integer> tilesSetInto = new ArrayList<>();
         int bitCounter = 0;
         int gridCounter = 0;
         int bound1 = 0, bound2 = 0;
 
+        // Only add letter into square for the word validation
+        // If move is valid, square contents needs to be changed into letter
+        // followed by the corresponding points.
+        // For example, (3) is changed into G(3) at this stage,
+        // and will be changed into G2 if it's a valid move in execute method.
+        // If move is invalid, square contents need to be recovered to initial.
+        // For example, (3) is changed into G(3) at this stage, and will be reset to (3).
         while (bitCounter < inputLetters.length() && bound1 < GameBoard.getSize() && bound2 < GameBoard.getSize()) {
 
             if (direction.equals("down")) {
-                String gridContent = GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx);
+                String gridContent = GameBoard.getBoardSquareContent(rowIdx + gridCounter, colIdx);
                 Character gridTileLetter = isGridCoveredByTile(gridContent);
                 if (gridTileLetter == null) {
                     char curLetter = inputLetters.charAt(bitCounter);
-                    String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx + gridCounter, colIdx);
+                    String testContent = curLetter + GameBoard.getBoardSquareContent(rowIdx + gridCounter, colIdx);
                     newCreatedWordUndone += curLetter;
                     GameBoard.reviseBoard(rowIdx + gridCounter, colIdx, testContent);
                     tilesSetInto.add(rowIdx + gridCounter);
-                    //not score, only letter for testing
-                    //if move is valid, board content needs to add the corresponding scores
-                    //e.g. (3) is changed into G(3) at this stage, will be change into G2 if it's valid move when it's executed
-                    //if move is invalid, board grid contents need to recover (cut the letter of the head)
-                    //e.g. (3) is changed into G(3) at this stage, will be reset into (3)
                     bitCounter++;
                 } else {
                     newCreatedWordUndone += gridTileLetter;
@@ -374,15 +545,14 @@ public class Move {
             }
 
             if (direction.equals("right")) {
-                String gridContent = GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter);
+                String gridContent = GameBoard.getBoardSquareContent(rowIdx, colIdx + gridCounter);
                 Character gridTileLetter = isGridCoveredByTile(gridContent);
                 if (gridTileLetter == null) {
                     char curLetter = inputLetters.charAt(bitCounter);
-                    String testContent = curLetter + GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter);
+                    String testContent = curLetter + GameBoard.getBoardSquareContent(rowIdx, colIdx + gridCounter);
                     newCreatedWordUndone += curLetter;
                     //same as above in "down" case
                     GameBoard.reviseBoard(rowIdx, colIdx + gridCounter, testContent);  //not score, only letter for testing
-                    //System.out.println(GameBoard.getBoardGridContent(rowIdx, colIdx + gridCounter));//debug
                     tilesSetInto.add(colIdx + gridCounter);
                     bitCounter++;
                 } else {
@@ -394,8 +564,7 @@ public class Move {
             if (direction.equals("right")) bound2 = colIdx + gridCounter;
         }
 
-        // Out of legal bounds before using all the tiles,
-        // or Tiles did not go through any letter on board to contribute new word.
+        // Out of legal bounds before using all the tiles
         if (bitCounter < inputLetters.length())
             return new AbstractMap.SimpleEntry<String, List<Integer>>(null, tilesSetInto);
 
@@ -404,23 +573,26 @@ public class Move {
 
 
     /**
+     * To check for the move that having "right" direction, whether leading to zero legal word or
+     * more than one legal word being created on the row.
+     *
+     * @param preWord the new created string using all the letter tiles from player's input
      * @param rowIdx first tile row index
      * @param colIdx first tile column index
      * @param endIdxCol last tile column index
+     * @param tilesSetInto a list of integer storing where the using tiles have been set in
+     * @return a list of objects comprised of a legal word, two column indexes are respectively
+     * the first and the last letter of the created word. Will be null value if there is zero or
+     * more than one legal new word created on the row.
      */
     public ArrayList<Object> multiWordsOrNoneRow(String preWord, int rowIdx, int colIdx, int endIdxCol, List<Integer> tilesSetInto) {
 
-        // 1. find out this row from where to where (index) having consistent letters connected with the current word
-        // 2. then use this below way to check how many legal word it can construct including the tiles word as a part
-
-        //check each col the tile is set in
-        //first find out the consist word with the tile
         int allFilledFrom = colIdx;
         int allFilledTo = endIdxCol;
         boolean preCapLegalWord = false;
 
         for (int left = colIdx - 1; left >= 0; left--) {
-            Character letter = getLetter(GameBoard.getBoardGridContent(rowIdx, left));
+            Character letter = getLetter(GameBoard.getBoardSquareContent(rowIdx, left));
             if (letter == null) {
                 allFilledFrom = left + 1;
                 break;
@@ -430,7 +602,7 @@ public class Move {
         }
 
         for (int right = endIdxCol; right < GameBoard.getSize(); right++) {
-            Character letter = getLetter(GameBoard.getBoardGridContent(rowIdx, right));
+            Character letter = getLetter(GameBoard.getBoardSquareContent(rowIdx, right));
             if (letter == null) {
                 allFilledTo = right - 1;
                 break;
@@ -443,16 +615,16 @@ public class Move {
         int startFrom = 0, endAT = 0;
         // Get the pre-cap string and post-cap string
         String preCap = "";
-        for (int i = allFilledFrom; i < colIdx; i++) preCap += isGridCoveredByTile(GameBoard.getBoardGridContent(rowIdx, i));
+        for (int i = allFilledFrom; i < colIdx; i++) preCap += isGridCoveredByTile(GameBoard.getBoardSquareContent(rowIdx, i));
         String postCap = "";
-        for (int i = endIdxCol + 1; i <= allFilledTo; i++) postCap += isGridCoveredByTile(GameBoard.getBoardGridContent(rowIdx, i));
+        for (int i = endIdxCol + 1; i <= allFilledTo; i++) postCap += isGridCoveredByTile(GameBoard.getBoardSquareContent(rowIdx, i));
 
         // Try pre-cap plus each letter after using tiles
         for (int i = 0; i < preCap.length(); i++) {
             String currentPreCap = preCap.substring(i);
             String useTilesGrids = "";
             for (int j = 0; j <= allFilledTo - colIdx; j++) {
-                useTilesGrids += getLetter(GameBoard.getBoardGridContent(rowIdx, colIdx + j));
+                useTilesGrids += getLetter(GameBoard.getBoardSquareContent(rowIdx, colIdx + j));
                 String outcome = currentPreCap + useTilesGrids;
                 if (WordList.validateWord(outcome.toLowerCase())) {
                     legalWordsCounter++;
@@ -472,7 +644,7 @@ public class Move {
             String currentPostCap = postCap.substring(0,postCap.length()-i);
             String useTilesGrids = "";
             for (int j = 0; j <= endIdxCol - allFilledFrom; j++) {
-                useTilesGrids = getLetter(GameBoard.getBoardGridContent(rowIdx, endIdxCol - j)) + useTilesGrids;
+                useTilesGrids = getLetter(GameBoard.getBoardSquareContent(rowIdx, endIdxCol - j)) + useTilesGrids;
                 String outcome = useTilesGrids + currentPostCap;
                 if (WordList.validateWord(outcome.toLowerCase())) {
                     legalWordsCounter++;
@@ -534,9 +706,7 @@ public class Move {
         } else {
             //if preWord is including an old tile, then add; else return false
             if (preWord.length() > tilesSetInto.size()) {
-                res.add(preWord);
-                res.add(colIdx);
-                res.add(endIdxCol);
+                res.add(preWord); res.add(colIdx); res.add(endIdxCol);
             } else {
                 if (player.isHuman())
                     System.out.println("This move created a new word but it did not cross " +
@@ -547,7 +717,19 @@ public class Move {
         return res;
     }
 
-
+    /**
+     * To check for the move that having "down" direction, whether leading to zero legal word or
+     * more than one legal word being created on the column.
+     *
+     * @param preWord the new created string using all the letter tiles from player's input
+     * @param rowIdx first tile row index
+     * @param colIdx first tile column index
+     * @param endIdxRow last tile row index
+     * @param tilesSetInto a list of integer storing where the using tiles have been set in
+     * @return a list of objects comprised of a legal word, two column indexes are respectively
+     * the first and the last letter of the created word. Will be null value if there is zero or
+     * more than one legal new word created on the column.
+     */
     public ArrayList<Object> multiWordsOrNoneCol(String preWord, int rowIdx, int colIdx, int endIdxRow, List<Integer> tilesSetInto) {
 
         int allFilledFrom = rowIdx;
@@ -555,7 +737,7 @@ public class Move {
         boolean preCapLegalWord = false;
 
         for (int up = rowIdx - 1; up >= 1; up--) {
-            Character letter = getLetter(GameBoard.getBoardGridContent(up, colIdx));
+            Character letter = getLetter(GameBoard.getBoardSquareContent(up, colIdx));
             if (letter == null) {
                 allFilledFrom = up + 1;
                 break;
@@ -565,7 +747,7 @@ public class Move {
         }
 
         for (int down = endIdxRow; down <= GameBoard.getSize(); down++) {
-            Character letter = getLetter(GameBoard.getBoardGridContent(down, colIdx));
+            Character letter = getLetter(GameBoard.getBoardSquareContent(down, colIdx));
             if (letter == null) {
                 allFilledTo = down - 1;
                 break;
@@ -578,16 +760,16 @@ public class Move {
         int startFrom = 0, endAT = 0;
 
         String preCap = "";
-        for (int i = allFilledFrom; i < rowIdx; i++) preCap += getLetter(GameBoard.getBoardGridContent(i, colIdx));
+        for (int i = allFilledFrom; i < rowIdx; i++) preCap += getLetter(GameBoard.getBoardSquareContent(i, colIdx));
         String postCap = "";
-        for (int i = endIdxRow + 1; i <= allFilledTo; i++) postCap += getLetter(GameBoard.getBoardGridContent(i, colIdx));
+        for (int i = endIdxRow + 1; i <= allFilledTo; i++) postCap += getLetter(GameBoard.getBoardSquareContent(i, colIdx));
 
         // Try pre-cap plus each letter after using tiles
         for (int i = 0; i < preCap.length(); i++) {
             String currentPreCap = preCap.substring(i);
             String currentTilesWithPostCap = "";
             for (int j = 0; j <= allFilledTo - rowIdx; j++) {
-                currentTilesWithPostCap += getLetter(GameBoard.getBoardGridContent(rowIdx + j, colIdx));
+                currentTilesWithPostCap += getLetter(GameBoard.getBoardSquareContent(rowIdx + j, colIdx));
                 String outcome = currentPreCap + currentTilesWithPostCap;
                 if (WordList.validateWord(outcome.toLowerCase())) {
                     legalWordsCounter++;
@@ -608,7 +790,7 @@ public class Move {
             String useTilesGrids = "";
             int temp = endIdxRow - allFilledFrom;
             for (int j = 0; j <= endIdxRow - allFilledFrom; j++) {
-                useTilesGrids = getLetter(GameBoard.getBoardGridContent(endIdxRow - j, colIdx)) + useTilesGrids;
+                useTilesGrids = getLetter(GameBoard.getBoardSquareContent(endIdxRow - j, colIdx)) + useTilesGrids;
                 String outcome = useTilesGrids + currentPostCap;
                 if (WordList.validateWord(outcome.toLowerCase())) {
                     legalWordsCounter++;
@@ -685,15 +867,28 @@ public class Move {
     }
 
 
+    /**
+     * To check for the move that whether there is any new word occurrence on the right angel line
+     * of each using tile in the move.
+     *
+     * @param direction direction of setting tiles
+     * @param tilesSetInto a list of integer storing where the using tiles have been set in
+     * @param rowIdx first tile row index
+     * @param colIdx first tile column index
+     *
+     * @return a boolean result whether there is any new word occurrence on the right angle line
+     * of each using tile in the move.
+     */
     public boolean isAnyRightAngleNewWord(String direction, List<Integer> tilesSetInto, int rowIdx, int colIdx) {
 
         for (int i : tilesSetInto) {
-            int allFilledFrom = 1, allFilledTo = GameBoard.getSize() - 1;
+
             if (direction.equals("right")) {
-                //check each col the tile is set in
-                //first find out the consist word with the tile
+                // Check each column of the tiles trying to set in
+                // First find out the range of continuously covered squares in the current column
+                int allFilledFrom = 1, allFilledTo = GameBoard.getSize();
                 for (int up = rowIdx - 1; up >= 1; up--) {
-                    Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(up, i));
+                    Character letter = isGridCoveredByTile(GameBoard.getBoardSquareContent(up, i));
                     if (letter == null) {
                         allFilledFrom = up + 1;
                         break;
@@ -702,7 +897,7 @@ public class Move {
                     }
                 }
                 for (int down = rowIdx + 1; down <= GameBoard.getSize(); down++) {
-                    Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(down, i));
+                    Character letter = isGridCoveredByTile(GameBoard.getBoardSquareContent(down, i));
                     if (letter == null) {
                         allFilledTo = down - 1;
                         break;
@@ -714,24 +909,25 @@ public class Move {
                     String curTry = "";
                     // build each pre-cap including the tile letter
                     for (int b = a; b <= rowIdx; b++) {
-                        curTry += getLetter(GameBoard.getBoardGridContent(b, i));
+                        curTry += getLetter(GameBoard.getBoardSquareContent(b, i));
                     }
                     if (rowIdx == allFilledTo) {
-                        // there is not post-cap on this line after tile
+                        // there is no post-cap on this line after tile
                         if (WordList.validateWord(curTry.toLowerCase())) return true;
                     } else {
                         // combine each pre-cap with different length of post-cap
                         for (int c = rowIdx + 1; c <= allFilledTo; c++) {
-                            curTry += getLetter(GameBoard.getBoardGridContent(c, i));
+                            curTry += getLetter(GameBoard.getBoardSquareContent(c, i));
                             if (WordList.validateWord(curTry.toLowerCase())) return true;
                         }
                     }
                 }
             } else {
-                //check each row the tile is set in
-                //first find out the consist word with the tile
+                // Check each row of the tiles trying to set in
+                // First find out the range of continuously covered squares in the current row
+                int allFilledFrom = 0, allFilledTo = GameBoard.getSize() - 1;
                 for (int left = colIdx - 1; left >= 0; left--) {
-                    Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(i, left));
+                    Character letter = isGridCoveredByTile(GameBoard.getBoardSquareContent(i, left));
                     if (letter == null) {
                         allFilledFrom = left + 1;
                         break;
@@ -740,7 +936,7 @@ public class Move {
                     }
                 }
                 for (int right = colIdx + 1; right < GameBoard.getSize(); right++) {
-                    Character letter = isGridCoveredByTile(GameBoard.getBoardGridContent(i, right));
+                    Character letter = isGridCoveredByTile(GameBoard.getBoardSquareContent(i, right));
                     if (letter == null) {
                         allFilledTo = right - 1;
                         break;
@@ -752,7 +948,7 @@ public class Move {
                     String curTry = "";
                     // build each pre-cap including the tile letter
                     for (int b = a; b <= colIdx; b++) {
-                        curTry += getLetter(GameBoard.getBoardGridContent(i, b));
+                        curTry += getLetter(GameBoard.getBoardSquareContent(i, b));
                     }
                     if (colIdx == allFilledTo) {
                         // there is not post-cap on this line after tile
@@ -760,7 +956,7 @@ public class Move {
                     } else {
                         // combine each pre-cap with different length of post-cap
                         for (int c = colIdx + 1; c <= allFilledTo; c++) {
-                            curTry += getLetter(GameBoard.getBoardGridContent(i, c));
+                            curTry += getLetter(GameBoard.getBoardSquareContent(i, c));
                             if (WordList.validateWord(curTry.toLowerCase())) return true;
                         }
                     }
@@ -771,6 +967,18 @@ public class Move {
     }
 
 
+    /**
+     * To check for the move that whether the move leads the new created word placing at right angle to a word
+     * already on the board without an overlap.
+     *
+     * @param direction direction of setting tiles
+     * @param nwStartRow row index of the new created word's first square
+     * @param nwStartCol column index of the new created word's first square
+     * @param nwEndRow row index of the new created word's last square
+     * @param nwEndCol column index of the new created word's last square
+     * @return a boolean result whether the move leads the new created word placing at right angle to a word
+     * already on the board without an overlap.
+     */
     public boolean isRightAngleExistWordNoOverlap(String direction, int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol) {
 
         boolean rightAngleNoOverlap = false;
@@ -781,7 +989,7 @@ public class Move {
             int endCol = idxes.get(3);
 
             if (direction.equals("right")) {
-                // if the existing word is in same direction, continue
+                // If the existing word is in same direction, continue
                 if (startRow == endRow) continue;
                 if ( ((startCol == nwStartCol - 1 || startCol == nwEndCol + 1) && (nwStartRow >= startRow && nwStartRow <= endRow))
                         || ((startRow == nwStartRow + 1 || endRow == nwStartRow - 1) && (startCol >= nwStartCol && startCol <= nwEndCol)) )
@@ -798,6 +1006,18 @@ public class Move {
     }
 
 
+    /**
+     * To check for the move that whether the move is placing a complete word parallel immediately next to a word
+     * already played.
+     *
+     * @param direction direction of setting tiles
+     * @param nwStartRow row index of the new created word's first square
+     * @param nwStartCol column index of the new created word's first square
+     * @param nwEndRow row index of the new created word's last square
+     * @param nwEndCol column index of the new created word's last square
+     * @return a boolean result whether the move is placing a complete word parallel immediately next to a word
+     * already played.
+     */
     public boolean isNextToParallelPlayedWord(String direction,
                                                      int nwStartRow, int nwStartCol, int nwEndRow, int nwEndCol) {
 
@@ -810,7 +1030,7 @@ public class Move {
             int endCol = idxes.get(3);
 
             if (direction.equals("right")) {
-                // if the existing word is not in same direction, continue
+                // If the existing word is not in same direction, continue
                 if (startRow != endRow) continue;
                 if (((endCol == nwStartCol - 1 || startCol == nwEndCol + 1) && (startRow == nwStartRow))
                         || ((startRow == nwStartRow + 1 || startRow == nwStartRow - 1) &&
@@ -830,6 +1050,11 @@ public class Move {
     }
 
 
+    /**
+     * Enable to print out this Move's contents.
+     *
+     * @return a String represents the Move's contents composed of input tile letters, position and direction.
+     */
     @Override
     public String toString() { return "The move is:     Word: "
             + inputLetters + " at position " + position + ", direction: " + direction; }

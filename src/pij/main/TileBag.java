@@ -3,13 +3,36 @@ package pij.main;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class TileBag { //Needs to be singleton
-    private static ArrayList<Tile> tilesInBag;
+/**
+ * Initialize the game's tile bag. A TileBag has a list of Tile objects.
+ * Object of this class is Immutable: After TileBag has been created,
+ * one cannot change the value of its attribute.
+ *
+ * @author Haomeng Wang
+ * @version 1.0
+ */
+public class TileBag {
+
+    /** The tiles in this TileBag. A list of Tile objects. Always non-null after object creation. */
+    private static final ArrayList<Tile> tilesInBag = new ArrayList<>();
+
+    /** TileBag instance, private to be hidden from outside the TileBag class. */
     private final static TileBag instance = new TileBag();
+
+
+    /**
+     * For other classes getting the TileBag instance.
+     *
+     * @return the TileBag instance
+     */
     public static TileBag getInstance() { return instance; }
 
-    private TileBag() {
-        tilesInBag = new ArrayList<>();
+
+    /**
+     * Constructs a TileBag instance.
+     * Private constructor ensures instance can only be initiated inside the class.
+     */
+    public TileBag() {
         addTiles('A',1,9);
         addTiles('B',3,2);
         addTiles('C',3,2);
@@ -40,12 +63,24 @@ public class TileBag { //Needs to be singleton
     }
 
 
+    /**
+     * Adds tiles into this TileBag.
+     *
+     * @param letter Tile letter
+     * @param points points of the letter
+     * @param amount amount of the adding tile
+     */
     public void addTiles(char letter, int points ,int amount) {
         for (int i = 0 ; i < amount ; i++)
             tilesInBag.add(new Tile(letter, points));
     }
 
 
+    /**
+     * Returns a targeting tile to be taken out from this TileBag, can be null if not found.
+     *
+     * @return a targeting tile to be taken out from this TileBag or null
+     */
     public static Tile takeOutTile(){
         if (isEmpty()) return null;
         Random random = new Random();
@@ -56,5 +91,10 @@ public class TileBag { //Needs to be singleton
     }
 
 
+    /**
+     * Returns a boolean result whether this TileBag is currently empty.
+     *
+     * @return a boolean result whether this TileBag is currently empty
+     */
     public static boolean isEmpty() { return tilesInBag.size() == 0; }
 }

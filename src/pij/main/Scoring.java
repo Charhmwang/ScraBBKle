@@ -30,10 +30,10 @@ public class Scoring {
             //System.out.println("i: " + i);//debug
             String grid = "";
             if (move.getDirection().equals("right")) {
-                grid = GameBoard.getBoardGridContent(startRow, startCol + i);
+                grid = GameBoard.getBoardSquareContent(startRow, startCol + i);
             }
             else {
-                grid = GameBoard.getBoardGridContent(startRow + i, startCol);
+                grid = GameBoard.getBoardSquareContent(startRow + i, startCol);
             }
 
 

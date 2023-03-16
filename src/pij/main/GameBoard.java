@@ -9,20 +9,50 @@ import java.util.Scanner;
 import static java.lang.System.exit;
 
 /**
- * Initialize the game board.
+ * Initialize the game board. Singleton class.
  * A GameBoard has a board in form of 2D string array, and a size(S x S).
- * Objects of this class are mutable: GameBoard has been created,
- * during the game process, players can change the board strings content
- * by placing the tiles they choose, size can be set by SettingBoard class.
+ * Object of this class is mutable: After GameBoard has been created, during the game process
+ * players can change the board strings content by placing the tiles they choose.
+ * Size, board contents and the centre square are initialized in method settingBoard.
  *
  * @author Haomeng Wang
- * @version 1.1
+ * @version 1.2
  */
 public class GameBoard {
 
-    private GameBoard() {}
+    /** The original resource file of the game board. Value assigned in method chooseBoard. */
     private File file;
+
+    /** GameBoard instance, set as null initially.
+     * Private to be hidden from outside the GameBoard class.
+     */
     private static GameBoard gameBoardInstance;
+
+    /** The contents of the GameBoard. Always non-null after object creation. */
+    private static String[][] board;
+
+    /** The size of a GameBoard. Must between (including) 12 and 26. */
+    private static int size;
+
+    /** The centre square of board. */
+    private static List<Integer> CentreSquare;
+
+
+    /**
+     * Constructs a GameBoard instance.
+     * Private constructor ensures instance can only be initiated inside the class.
+     */
+    private GameBoard() {}
+
+
+    /**
+     * For other classes getting the GameBoard instance.
+     * If the instance has never been created, initiate one then return.
+     * If the instance has already been initiated, then return the created one.
+     * Ensures the GameBoard instance can be created once only in the program.
+     *
+     * @return the sole GameBoard instance
+     */
     public synchronized static GameBoard getInstance() {
         if (gameBoardInstance == null) {
             gameBoardInstance = new GameBoard();
@@ -30,25 +60,19 @@ public class GameBoard {
         return gameBoardInstance;
     }
 
-    /** The name of the GameBoard. Always non-null after object creation. */
-    private static String[][] board;
-
-    /** The size of a GameBoard. Must between (including) 12 and 26. */
-    private static int size;
-
-    private static List<Integer> CenterSquare;
 
     /**
-     * Create and initialize a two-dimensional array of string to represent the board for the game.
+     * Creates and initializes a two-dimensional array of string to represent the board for the game.
      * Prompt user input to choose using default board or a local file.
      *
      * For user input letter d, the default board will be read from the file ../resources/defaultBoard.txt.
      * For user input letter l, the program will ask user for the file name in form of the correct filepath.
      * If it is the user's own file, it will be validated whether it is syntactically correct as a specified form board.
      *
-     * If the file is not valid, the program will ask the user to provide another file until successfully validated.
-     * If it is the default file or a validated file, 2D string array board will be created and fulfilled the content
-     * as the provided file.
+     * If the file is not valid or not found from the input filepath, the program will ask the user to provide
+     * another file until successfully validated.
+     * If it is the default file or a validated file, 2D string array board will be created and contents fulfilled
+     * from the provided file.
      */
     public void chooseBoard() {
 
@@ -60,12 +84,12 @@ public class GameBoard {
             System.out.print("Please enter your choice (l/d): ");
             String choice = System.console().readLine();
 
-            // Use a default file.
+            // Use a default file
             if (choice.equals("d")) {
                 correctInput = true;
                 userFilePath = "../resources/defaultBoard.txt";
             }
-            // Load a file.
+            // Load a file
             else if (choice.equals("l")) {
                 System.out.print("Please enter the file name of the board: ");
                 userFilePath = System.console().readLine();
@@ -82,27 +106,25 @@ public class GameBoard {
 
         this.file = new File(userFilePath);
 
-        // Now the valid board for the game is confirmed.
-        // Pass the GameBoard object into SettingBoard to do all the initialisation.
-        settingBoard();
-    }
-
-    // For JUnit tests
-    public void chooseBoard(String userFilePath) {
-        this.file = new File(userFilePath);
+        // Now the valid board for the game is confirmed
+        // Set the board contents, size and centre square
         settingBoard();
     }
 
 
+    /**
+     * Sets the size, squares contents and centre square of the game board.
+     */
     public void settingBoard() {
         setSize();
         setArr();
         setCenter();
     }
 
+
     /**
-     * Read the size number from the first line of the designated file,
-     * and set as the GameBoard object's size feature.
+     * Reads the size number from the first line of the designated file,
+     * and set as the attribute size of this class.
      *
      * @throws RuntimeException if accessing the file unsuccessfully
      * @throws NumberFormatException if reading the size number in the file unsuccessfully
@@ -119,12 +141,9 @@ public class GameBoard {
     }
 
 
-    public void setSize(int s) { size = s; }
-
-
     /**
-     * Read the board each grid content from the designated file,
-     * and set into the GameBoard object's board feature.
+     * Reads the board each square's contents from the designated file,
+     * and set into the attribute board of this class.
      *
      * @catch IOException if reading the file unsuccessfully
      * @catch FileNotFoundException if the file is not found
@@ -164,13 +183,13 @@ public class GameBoard {
                             board[row][col] += ")";
                         }
                         col++;
-                        // When it meets a \n
+                        // When it meets a new line
                         if ((char)c == '\n') {
                             row++;
                             col = 0;
                         }
                     }
-                    // else it is the first row which shows the size number of the board
+                    // Else it is the first row which shows the size of the board
                     else {
                         while ( (char)(c = br.read()) != '\n') ;
                         row++;
@@ -185,22 +204,24 @@ public class GameBoard {
     }
 
 
+    /**
+     * Sets the centre square for game board.
+     */
     public void setCenter() {
 
-        CenterSquare = new ArrayList<>();
-        // If game board size is odd, there is only one center square, else they are four.
+        CentreSquare = new ArrayList<>();
         List<Integer> centerIdx;
-        if (size % 2 == 1) {
+        if (size % 2 == 1)
             centerIdx = List.of((size + 1) / 2, (size - 1) / 2);
-        } else {
+        else
             centerIdx = List.of(size / 2, (size - 2) / 2);
-        }
-        CenterSquare = centerIdx;
+
+        CentreSquare = centerIdx;
     }
 
 
     /**
-     * Print board with line tags and spaces.
+     * Prints board with line tags and spaces.
      */
     public static void printBoard() {
         // Print the col numbers as the first line
@@ -233,13 +254,25 @@ public class GameBoard {
     }
 
 
+    /**
+     * Returns the size of the game board.
+     *
+     * @return size of the game board
+     */
     public static int getSize() { return size; }
-
-    public static List<Integer> getCenterSquare() { return CenterSquare; }
 
 
     /**
-     * Edit board square contents.
+     * Returns a list of integers representing where the centre square locates.
+     *
+     * @return a list of integers containing two elements,
+     * representing the row and column index of the centre square.
+     */
+    public static List<Integer> getCenterSquare() { return CentreSquare; }
+
+
+    /**
+     * Edits board square contents.
      *
      * @param row the targeting row
      * @param col the targeting column
@@ -247,12 +280,47 @@ public class GameBoard {
      */
     public static void reviseBoard(int row, int col, String letter) { board[row][col] = letter; }
 
-    public static boolean isGridRevised(int row, int col) {
+
+    /**
+     * To check whether the specific square's initial contents has been revised.
+     *
+     * @param row row index of the square
+     * @param col column index of the square
+     * @return a boolean result whether the square's initial contents has been revised
+     */
+    public static boolean isSquareRevised(int row, int col) {
         String gridContent = board[row][col];
         return (gridContent.charAt(0) != '.' && gridContent.charAt(0) != '{' && gridContent.charAt(0) != '(')
                 && (gridContent.charAt(1) == '.' || gridContent.charAt(1) == '{' || gridContent.charAt(1) == '(');
     }
 
-    public static String getBoardGridContent(int row, int col) { return board[row][col]; }
+
+    /**
+     * To get the specific square's contents on the board.
+     *
+     * @param row row index of the square
+     * @param col column index of the square
+     * @return the square's contents as a string
+     */
+    public static String getBoardSquareContent(int row, int col) { return board[row][col]; }
+
+
+    /**
+     * Overloads chooseBoard method for the JUnit tests.
+     *
+     * @param userFilePath filepath of the board resource file
+     */
+    public void chooseBoard(String userFilePath) {
+        this.file = new File(userFilePath);
+        settingBoard();
+    }
+
+
+    /**
+     * Overloads setSize method for the JUnit tests.
+     *
+     * @param s size of the game board
+     */
+    public void setSize(int s) { size = s; }
 
 }

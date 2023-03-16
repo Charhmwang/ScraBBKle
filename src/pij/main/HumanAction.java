@@ -10,7 +10,7 @@ public class HumanAction extends Action{
 
     /**
      * Constructs a new HumanAction with player's role, and whether first move.
-     * Assign values to the attributes move and skipped in base class.
+     * Assign values to the attributes move and skipped in base class Action.
      *
      * @param human the role of the Player; must not be null
      * @param firstMove whether the first move of game; must not be null
@@ -42,7 +42,7 @@ public class HumanAction extends Action{
                 String letters = strArr[0], position = strArr[1], direction = strArr[2];
 
                 // Check is it in the legal format
-                if (!validInputForm(position, direction)) {
+                if (!validateInputFormat(position, direction)) {
                     System.out.println("Wrong input format! This is not a valid move");
                     continue;
                 }
@@ -73,8 +73,8 @@ public class HumanAction extends Action{
                     // while validating - See explanation in method buildWordUsingTileLetters in Move class
                     // For example recover the square content from "G{3}" into "{3}", or "T." into ".", etc.
                     System.out.println("This is not a valid move");
-                    if (GameBoard.isGridRevised(move.getRow(), move.getCol()))
-                        move.recoverBoardGridContentForInvalidMove();
+                    if (GameBoard.isSquareRevised(move.getRow(), move.getCol()))
+                        move.recoverBoardSquareContentToInitial();
                 }
             } else {
                 System.out.println("Wrong input format! This is not a valid move");
@@ -85,14 +85,14 @@ public class HumanAction extends Action{
 
 
     /**
-     * Validate the human player's input whether in the format of three elements after being split by a comma,
+     * Validates the human player's input whether in the format of three elements after being split by a comma,
      * and each one is in the supposed format.
      *
      * @param position the position of the move target square; must not be null
      * @param direction the direction of reading the created word; must not be null
-     * @return boolean value represents whether the player's input format is legal
+     * @return a boolean result whether the player's input format is legal
      */
-    public boolean validInputForm(String position, String direction) {
+    public boolean validateInputFormat(String position, String direction) {
 
         int size = GameBoard.getSize();
         if (position.length() >= 2 && position.length() <= 3 &&

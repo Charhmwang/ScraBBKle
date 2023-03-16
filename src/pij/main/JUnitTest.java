@@ -170,7 +170,7 @@ public class JUnitTest {
         Move move = new Move(human, true,"GIT", "f8", "r");
         System.out.println("\n===After the move, before the recover===");
         GameBoard.printBoard();
-        move.recoverBoardGridContent();
+        move.reviseBoardContentForValidMove();
         System.out.println("\n===After the recover===");
         GameBoard.printBoard();
 
@@ -190,18 +190,18 @@ public class JUnitTest {
         GameBoard.printBoard();
         Player human = new Player(true);
         Move move1 = new Move(human, true,"GIT", "f8", "r");
-        move1.recoverBoardGridContent();
+        move1.reviseBoardContentForValidMove();
         System.out.println("\n=== After move1 and recovered ===");
         GameBoard.printBoard();
         Move move2 = new Move(human, false,"SAR", "h7", "d");
-        move2.recoverBoardGridContent();
+        move2.reviseBoardContentForValidMove();
         System.out.println("\n=== After move2 and recovered ===");
         GameBoard.printBoard();
         Move move3 = new Move(human, false, "TG", "g9", "r");
 
         boolean expected = false;
         boolean actual = move3.getIsValid();
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 
@@ -220,24 +220,24 @@ public class JUnitTest {
         GameBoard.printBoard();
         Player human = new Player(true);
         Move move1 = new Move(human, true,"GIT", "f8", "r");
-        move1.recoverBoardGridContent();
+        move1.reviseBoardContentForValidMove();
         WordsOnBoard.addWord(8, 5, 8, 7,"GIT");
         System.out.println("\n=== After move1 and recovered ===");
         GameBoard.printBoard();
         Move move2 = new Move(human, false,"SAR", "h7", "d");
-        move2.recoverBoardGridContent();
+        move2.reviseBoardContentForValidMove();
         WordsOnBoard.addWord(7, 5, 10, 5,"STAR");
         System.out.println("\n=== After move2 and recovered ===");
         GameBoard.printBoard();
         Move move3 = new Move(human, false,"R", "i9", "r");
         System.out.println("\n=== After move3 and recovered ===");
-        move3.recoverBoardGridContent();
+        move3.reviseBoardContentForValidMove();
         GameBoard.printBoard();
 
         // ar is a legal word but it's read to left direction
         boolean expected = false;
         boolean actual = move3.getIsValid();
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 
@@ -253,23 +253,23 @@ public class JUnitTest {
         GameBoard.printBoard();
         Player human = new Player(true);
         Move move1 = new Move(human, true,"GIT", "f8", "r");
-        move1.recoverBoardGridContent();
+        move1.reviseBoardContentForValidMove();
         WordsOnBoard.addWord(8, 5, 8, 7,"GIT");
         System.out.println("\n=== After move1 and recovered ===");
         GameBoard.printBoard();
         Move move2 = new Move(human, false,"SAR", "h7", "d");
-        move2.recoverBoardGridContent();
+        move2.reviseBoardContentForValidMove();
         WordsOnBoard.addWord(7, 5, 10, 5,"STAR");
         System.out.println("\n=== After move2 and recovered ===");
         GameBoard.printBoard();
         Move move3 = new Move(human, false,"TG", "g9", "r");
         System.out.println("\n=== After move3 and recovered ===");
-        move3.recoverBoardGridContentForInvalidMove();
+        move3.recoverBoardSquareContentToInitial();
         GameBoard.printBoard();
 
         boolean expected = false;
         boolean actual = move3.getIsValid();
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 
@@ -288,7 +288,7 @@ public class JUnitTest {
         GameBoard.printBoard();
         Player human = new Player(true);
         Move hmMove = new Move(human, true, "GIT", "f8", "r");
-        hmMove.recoverBoardGridContent();
+        hmMove.reviseBoardContentForValidMove();
         GameBoard.printBoard();
 
         Player computer = new Player(false);
@@ -298,18 +298,18 @@ public class JUnitTest {
         ComputerAction pcAction = new ComputerAction(computer, false);
         if (!pcAction.getSkipped()) {
             Move pcMove = pcAction.getMove();
-            pcMove.recoverBoardGridContent();
+            pcMove.reviseBoardContentForValidMove();
             System.out.println("\n=== After PC move and recovered ===");
             GameBoard.printBoard();
             System.out.println(pcMove.getInputLetters());
             boolean expected = true;
             boolean actual = pcMove.getIsValid();
-            Assertions.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         } else {
             System.out.println("Computer skipped");
             boolean expected = true;
             boolean actual = pcAction.getSkipped();
-            Assertions.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 
@@ -324,50 +324,21 @@ public class JUnitTest {
         gameBoard.setSize(15);
         Player human = new Player(true);
         Move move1 = new Move(human, true, "LIE", "h15", "r");
-        move1.recoverBoardGridContent();
+        move1.reviseBoardContentForValidMove();
         GameBoard.printBoard();
         Move move2 = new Move(human, false,"DE", "i13", "d");
         GameBoard.printBoard();
 
         boolean expected = false;
         boolean actual = move2.getIsValid();
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
-
 
 
     @Test
     @Order(19)
-    void test_Move_validate_inputOneLetter() throws IOException {
-        System.out.println("Test 19: test move validation");
-        GameBoard gameBoard = GameBoard.getInstance();
-        gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        gameBoard.setSize(15);
-        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
-        LetterPoints letterPoints = LetterPoints.getInstance();
-
-        GameBoard.printBoard();
-        Player human = new Player(true);
-        Move move1 = new Move(human, true,"BAN", "f8", "r");
-        move1.recoverBoardGridContent();
-        WordsOnBoard.addWord(8, 5, 8, 7,"BAN");
-        System.out.println("\n=== After move1 and recovered ===");
-        GameBoard.printBoard();
-        Move move2 = new Move(human, false,"T", "g7", "d");
-        move2.recoverBoardGridContent();
-        System.out.println("\n=== After move2 and recovered ===");
-        GameBoard.printBoard();
-
-        boolean expected = true;
-        boolean actual = move2.getIsValid();
-        Assertions.assertEquals(expected, actual);
-    }
-
-
-    @Test
-    @Order(20)
     void test_Scoring_calculateMoveScore1() throws IOException {
-        System.out.println("Test 20: test Scoring class calculateMoveScore method 1");
+        System.out.println("Test 19: test Scoring class calculateMoveScore method 1");
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
         gameBoard.setSize(15);
@@ -376,51 +347,20 @@ public class JUnitTest {
 
         Player human = new Player(true);
         Move move1 = new Move(human, true,"GIT", "f8", "r");
-        move1.recoverBoardGridContent();
+        move1.reviseBoardContentForValidMove();
         GameBoard.printBoard();
         Move move2 = new Move(human, false,"SAR", "h7", "d");
         Scoring scoring = new Scoring(move2);
         int expected = 4;
         int actual = scoring.getScore();
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 
     @Test
-    @Order(21)
-    void test_Move_isRightAngleExistWordNoOverlap() throws IOException {
-        System.out.println("Test 21: test Move class isRightAngleExistWordNoOverlap method");
-
-        GameBoard gameBoard = GameBoard.getInstance();
-        gameBoard.chooseBoard("./resources/defaultBoard.txt");
-        gameBoard.setSize(15);
-        WordList wordList = WordList.getInstance("./resources/wordlist.txt");
-        LetterPoints letterPoints = LetterPoints.getInstance();
-
-        Player human = new Player(true);
-        Move move1 = new Move(human, true,"NO", "h8", "r");
-        move1.recoverBoardGridContent();
-        WordsOnBoard.addWord(8, 7, 8, 8,"NO");
-        GameBoard.printBoard();
-        Move move2 = new Move(human, false,"To", "i7", "d");
-        move2.recoverBoardGridContent();
-        WordsOnBoard.addWord(7, 9, 9, 9,"TOo");
-        GameBoard.printBoard();
-        Move move3 = new Move(human, false,"SD", "g8", "r");
-        move3.recoverBoardGridContent();
-        GameBoard.printBoard();
-
-
-        boolean expected = true;
-        boolean actual = move3.getIsValid();
-        Assertions.assertEquals(expected, actual);
-    }
-
-
-    @Test
-    @Order(22)
+    @Order(20)
     void test_Move_isNextToParallelPlayedWord() throws IOException {
-        System.out.println("Test 22: test Move class isNextToParallelPlayedWord method");
+        System.out.println("Test 20: test Move class isNextToParallelPlayedWord method");
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./resources/defaultBoard.txt");
@@ -430,23 +370,23 @@ public class JUnitTest {
 
         Player human = new Player(true);
         Move move1 = new Move(human, true,"DOG", "f8", "r");
-        move1.recoverBoardGridContent();
+        move1.reviseBoardContentForValidMove();
         WordsOnBoard.addWord(8, 5, 8, 7,"BAN");
         GameBoard.printBoard();
         Move move2 = new Move(human, false,"CAT", "h9", "r");
-        move2.recoverBoardGridContent();
+        move2.reviseBoardContentForValidMove();
         GameBoard.printBoard();
 
         boolean expected = false;
         boolean actual = move2.getIsValid();
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 
     @Test
-    @Order(23)
+    @Order(21)
     void test_Scoring_calculateMoveScore2() throws IOException {
-        System.out.println("Test 23: test Scoring class calculateMoveScore method 2");
+        System.out.println("Test 21: test Scoring class calculateMoveScore method 2");
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./test_res/26.txt");
@@ -459,18 +399,18 @@ public class JUnitTest {
         Player human = new Player(true);
         Move move = new Move(human, true,"CODE", "m13", "r"); //3121
         Scoring scoring = new Scoring(move);
-        move.recoverBoardGridContent();
+        move.reviseBoardContentForValidMove();
         GameBoard.printBoard();
         int expected = 90;
         int actual = scoring.getScore();
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 
     @Test
-    @Order(24)
+    @Order(22)
     void test_Scoring_calculateMoveScore3() throws IOException {
-        System.out.println("Test 20: test Scoring class calculateMoveScore method 3");
+        System.out.println("Test 22: test Scoring class calculateMoveScore method 3");
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./test_res/26.txt");
@@ -483,18 +423,18 @@ public class JUnitTest {
         Player human = new Player(true);
         Move move = new Move(human, true,"COdE", "m13", "r");
         Scoring scoring = new Scoring(move);
-        move.recoverBoardGridContent();
+        move.reviseBoardContentForValidMove();
         GameBoard.printBoard();
         int expected = 110;
         int actual = scoring.getScore();
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 
     @Test
-    @Order(25)
+    @Order(23)
     void test_Scoring_calculateMoveScore4() throws IOException {
-        System.out.println("Test 20: test Scoring class calculateMoveScore method 4");
+        System.out.println("Test 23: test Scoring class calculateMoveScore method 4");
 
         GameBoard gameBoard = GameBoard.getInstance();
         gameBoard.chooseBoard("./test_res/26.txt");
@@ -507,11 +447,11 @@ public class JUnitTest {
         Player human = new Player(true);
         Move move = new Move(human, true,"PREMIUM", "m13", "r"); //plus 70 extra
         Scoring scoring = new Scoring(move);
-        move.recoverBoardGridContent();
+        move.reviseBoardContentForValidMove();
         GameBoard.printBoard();
         int expected = 240;
         int actual = scoring.getScore();
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 }

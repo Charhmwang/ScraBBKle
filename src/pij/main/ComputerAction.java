@@ -12,7 +12,7 @@ public class ComputerAction extends Action {
 
     /**
      * Constructs a new ComputerAction with player's role, and whether first move.
-     * Assign values to the attributes move and skipped in base class.
+     * Assign values to the attributes move and skipped in base class Action.
      *
      * @param computer the role of the Player; must not be null
      * @param firstMove whether the first move of game; must not be null
@@ -22,92 +22,65 @@ public class ComputerAction extends Action {
         if (!skipped) reviseBoardContentForTheChosenMove();
     }
 
-    // To recover the chosen move showing letters on the board leading the factor or a dot - for scoring
+
+    /**
+     * To show letters on the board leading the factor or a dot,
+     * based on the chosen move and the targeting squares' contents.
+     * This change is made for scoring of the valid move.
+     */
     private void reviseBoardContentForTheChosenMove() {
         int bitCounter = 0;
         for (int i : move.getTilesSetInto()) {
             if (move.getDirection().equals("right")) {
                 char curLetter = move.getInputLetters().charAt(bitCounter);
-                String testContent = curLetter + GameBoard.getBoardGridContent(move.getRow(), i);
+                String testContent = curLetter + GameBoard.getBoardSquareContent(move.getRow(), i);
                 GameBoard.reviseBoard(move.getRow(), i, testContent);
             }
             if (move.getDirection().equals("down")) {
                 char curLetter = move.getInputLetters().charAt(bitCounter);
-                String testContent = curLetter + GameBoard.getBoardGridContent(i, move.getCol());
+                String testContent = curLetter + GameBoard.getBoardSquareContent(i, move.getCol());
                 GameBoard.reviseBoard(i, move.getCol(), testContent);
             }
             bitCounter++;
         }
     }
 
-
+    /**
+     * Scanning each vacant square of the board as the position, try to add different amount of tiles,
+     * and each with all possible sequences as moves to be validated. Add all the valid moves to a storing list,
+     * randomly choose one as the return at the end;
+     * if no valid move found, set move as null value.
+     */
     @Override
     public void setMove() {
-
-        // Create a list to store the possible moves, choose one of them randomly as the return:
-
-        // From the most up left corner grid on the board, choose each grid which has not been covered by tile as the start
-        // position to try tiles, use all the tiles on the rack to build input as 1 bit or 2 bits or 3 bits etc until the
-        // maximum size of the tiles amount on the rack (less than 7 if the rack cannot be fully filled up)
-        // use different letter sequences as input letters, choose the current grid as position, and "r" or "d" as direction,
-        // player as computer as 4 arguments to build a new move. Validate the move, if valid, add into the valid move list.
-
-        // skip if there is not an invalid case found
-
-        // Find one of these moves randomly (if hard mode can choose the highest score possible move)
-        // Recover the content of the grid and execute to take tiles out and refill
-
         List<Move> validMoves = new ArrayList<>();
 
         for (int i = 1; i <= GameBoard.getSize(); i++) { //row
             for (int j = 0; j < GameBoard.getSize(); j++) { //col
 
                 int rackTilesNum = player.getTileRack().getTiles().size();
-                String curGrid = GameBoard.getBoardGridContent(i,j);
+                String curGrid = GameBoard.getBoardSquareContent(i,j);
 
-                //If the current try grid already covered a tile, then no need to check
+                //If the current square has already been covered a tile, go to the next one
                 if (Move.isGridCoveredByTile(curGrid) != null) continue;
                 List<Tile> tiles = player.getTileRack().getTiles();
                 List<String> allTheLetterSequences = new ArrayList<>();
 
                 while (rackTilesNum-- > 0) {
                     switch (rackTilesNum) {
-                        case 1 -> {
-                            getSeqFor1Bit(tiles, allTheLetterSequences);
-                            break;
-                        }
-                        case 2 -> {
-                            getSeqFor2Bits(tiles, allTheLetterSequences);
-                            break;
-                        }
-                        case 3 -> {
-                            getSeqFor3Bits(tiles, allTheLetterSequences);
-                            break;
-                        }
-                        case 4 -> {
-                            getSeqFor4Bits(tiles, allTheLetterSequences);
-                            break;
-                        }
-                        case 5 -> {
-                            getSeqFor5Bits(tiles, allTheLetterSequences);
-                            break;
-                        }
-                        case 6 -> {
-                            getSeqFor6Bits(tiles, allTheLetterSequences);
-                            break;
-                        }
-                        case 7 -> {
-                            getSeqFor7Bits(tiles, allTheLetterSequences);
-                            break;
-                        }
-                        default -> {
-                        }
+                        case 1 -> getSeqFor1Bit(tiles, allTheLetterSequences);
+                        case 2 -> getSeqFor2Bits(tiles, allTheLetterSequences);
+                        case 3 -> getSeqFor3Bits(tiles, allTheLetterSequences);
+                        case 4 -> getSeqFor4Bits(tiles, allTheLetterSequences);
+                        case 5 -> getSeqFor5Bits(tiles, allTheLetterSequences);
+                        case 6 -> getSeqFor6Bits(tiles, allTheLetterSequences);
+                        case 7 -> getSeqFor7Bits(tiles, allTheLetterSequences);
+                        default -> {}
                     }
                 }
 
                 for (String s : allTheLetterSequences) {
-                    String pos = "" + (char)('a' + j) + i;  // try each grid on the board to be the starting point
-                    //System.out.println(s + " " + pos);  //debug
+                    String pos = "" + (char)('a' + j) + i;  // try each vacant square as the starting position
                     if (this.firstMove) {
                         if (Move.coveredCenterSquares(s, pos, "r")) {
                             Move tryMoveRight = new Move(player, true, s, pos, "r");
@@ -127,7 +100,6 @@ public class ComputerAction extends Action {
             }
         }
         int validMovesAmount = validMoves.size();
-        // if there was no valid move found, return null meaning skip
         if (validMovesAmount > 0) {
             Random rdm = new Random();
             int choose = rdm.nextInt(0, validMovesAmount);
@@ -135,23 +107,38 @@ public class ComputerAction extends Action {
         } else move = null;
     }
 
+
+    /**
+     * After each move built, remove the board change for the next move try.
+     * If it is a valid move, add to the list of storing valid moves.
+     *
+     * @param tryMove the currently trying move
+     * @param validMoves list of valid moves
+     */
     public void ifValidMove(Move tryMove, List<Move> validMoves) {
-        if (tryMove.getIsValid()) {
-            tryMove.recoverBoardGridContentForInvalidMove();
-            //because it's need to be recovered as original for other potential possible moves validation
-            validMoves.add(tryMove);
-        } else {
-            if (tryMove.getTilesSetInto() != null)
-                tryMove.recoverBoardGridContentForInvalidMove();
-        }
+        tryMove.recoverBoardSquareContentToInitial();
+        if (tryMove.getIsValid()) validMoves.add(tryMove);
     }
 
+
+    /**
+     * Chooses a random lowercase alphabet letter while using a wildcard.
+     *
+     * @return character of a random lowercase alphabet letter
+     */
     public char randomChar() {
         Random random = new Random();
         int rd = random.nextInt(0,26);
         return (char)('a' + rd);
     }
 
+
+    /**
+     * Adds each possible string made of 1 tile from tile rack to the list of storing strings of different sequences.
+     *
+     * @param tiles the tiles on rack currently
+     * @param allTheLetterSequences list of saving all the possible built input strings
+     */
     public void getSeqFor1Bit(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
@@ -159,6 +146,13 @@ public class ComputerAction extends Action {
         }
     }
 
+
+    /**
+     * Adds each possible string made of 2 tiles from tile rack to the list of storing strings of different sequences.
+     *
+     * @param tiles the tiles on rack currently
+     * @param allTheLetterSequences list of saving all the possible built input strings
+     */
     public void getSeqFor2Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
@@ -170,8 +164,15 @@ public class ComputerAction extends Action {
                 }
             }
         }
-    };
+    }
 
+
+    /**
+     * Adds each possible string made of 3 tiles from tile rack to the list of storing strings of different sequences.
+     *
+     * @param tiles the tiles on rack currently
+     * @param allTheLetterSequences list of saving all the possible built input strings
+     */
     public void getSeqFor3Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
@@ -189,8 +190,15 @@ public class ComputerAction extends Action {
                 }
             }
         }
-    };
+    }
 
+
+    /**
+     * Adds each possible string made of 4 tiles from tile rack to the list of storing strings of different sequences.
+     *
+     * @param tiles the tiles on rack currently
+     * @param allTheLetterSequences list of saving all the possible built input strings
+     */
     public void getSeqFor4Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
@@ -216,6 +224,13 @@ public class ComputerAction extends Action {
         }
     }
 
+
+    /**
+     * Adds each possible string made of 5 tiles from tile rack to the list of storing strings of different sequences.
+     *
+     * @param tiles the tiles on rack currently
+     * @param allTheLetterSequences list of saving all the possible built input strings
+     */
     public void getSeqFor5Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
@@ -247,6 +262,13 @@ public class ComputerAction extends Action {
         }
     }
 
+
+    /**
+     * Adds each possible string made of 6 tiles from tile rack to the list of storing strings of different sequences.
+     *
+     * @param tiles the tiles on rack currently
+     * @param allTheLetterSequences list of saving all the possible built input strings
+     */
     public void getSeqFor6Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
@@ -284,6 +306,13 @@ public class ComputerAction extends Action {
         }
     }
 
+
+    /**
+     * Adds each possible string made of 7 tiles from tile rack to the list of storing strings of different sequences.
+     *
+     * @param tiles the tiles on rack currently
+     * @param allTheLetterSequences list of saving all the possible built input strings
+     */
     public void getSeqFor7Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
             String each = tiles.get(a).isWildCard() ? "" + randomChar() : "" + tiles.get(a).getLetter();
