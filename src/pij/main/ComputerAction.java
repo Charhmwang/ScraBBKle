@@ -59,10 +59,10 @@ public class ComputerAction extends Action {
             for (int j = 0; j < GameBoard.getSize(); j++) { //col
 
                 int rackTilesNum = player.getTileRack().getTiles().size();
-                String curGrid = GameBoard.getBoardSquareContent(i,j);
+                String curSquare = GameBoard.getBoardSquareContent(i,j);
 
                 //If the current square has already been covered a tile, go to the next one
-                if (Move.isGridCoveredByTile(curGrid) != null) continue;
+                if (Move.isSquareCoveredByTile(curSquare) != null) continue;
                 List<Tile> tiles = player.getTileRack().getTiles();
                 List<String> allTheLetterSequences = new ArrayList<>();
 

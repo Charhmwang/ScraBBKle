@@ -33,7 +33,7 @@ public class WordList {
      * If the instance has already been initiated, then return the created one.
      * Ensures the WordList instance can be created once only in the program.
      *
-     * @return the sole WordList instance
+     * @return the sole WordList instance; always non-null
      */
     public synchronized static WordList getInstance(String fileName) throws IOException {
         if (WordListInstance == null) {
@@ -47,7 +47,7 @@ public class WordList {
      * Constructs a WordList instance.
      * Private constructor ensures instance can only be initiated inside the class.
      *
-     * @param fileName the word list resource file path name
+     * @param fileName the word list resource file path name; must be not null or empty string
      * @throws IOException if the file is not found
      */
     private WordList(String fileName) throws IOException {
@@ -63,7 +63,7 @@ public class WordList {
     /**
      * Returns a boolean result whether the word is a legal word found in WordList.
      *
-     * @param word the validating word
+     * @param word the validating word; must not be null
      * @return a boolean result whether the word is legal
      */
     public static boolean validateWord(String word) {

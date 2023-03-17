@@ -182,8 +182,8 @@ public class Move {
     (String inputLetters, int row, int col, String direction) {
 
         // CHECK 1. has the starting position square already been covered
-        String gridContent = GameBoard.getBoardSquareContent(row, col);
-        Character gridTileLetter = isGridCoveredByTile(gridContent);
+        String squareContent = GameBoard.getBoardSquareContent(row, col);
+        Character gridTileLetter = isSquareCoveredByTile(squareContent);
         boolean occupied = gridTileLetter != null;
         if (occupied) {
             if (player.isHuman())
@@ -278,7 +278,8 @@ public class Move {
      * @param letters string composed of letters from the using tiles
      * @param position position of the starting square to set tiles
      * @param direction direction of setting tiles
-     * @return boolean value represents whether the first move in game has covered the centre square of the board
+     * @return boolean value represents whether the first move in game has covered the centre square
+     * of the board
      */
     public static boolean coveredCenterSquares(String letters, String position, String direction) {
         List<List<Integer>> coveringSquares = new ArrayList<>();
@@ -397,7 +398,8 @@ public class Move {
      * @param startFrom index of the new created word's first letter's row/column (depends on the direction)
      * @param endAT index of the new created word's last letter's row/column (depends on the direction)
      * @param direction direction of setting tiles
-     * @return a list of integers storing the indexes of the new created word's first and last letter.
+     * @return a list of integers storing the indexes of the new created word's first and last letter; always
+     * non-null
      */
     public static List<Integer> calNewWordIdx(int rowIdx, int colIdx, int startFrom, int endAT,
                                               String direction) {
@@ -420,10 +422,10 @@ public class Move {
     /**
      * Checks whether the square has already been covered by tile from the square's contents.
      *
-     * @param curSquare contents of the validating square
-     * @return a character of alphabet letter if the square is covered by tile, null if it is vacant.
+     * @param curSquare contents of the validating square; must not be null or empty string
+     * @return a character of alphabet letter if the square is covered by tile; null if it is vacant
      */
-    public static Character isGridCoveredByTile(String curSquare) {
+    public static Character isSquareCoveredByTile(String curSquare) {
         if (curSquare.contains(".") || curSquare.contains("(") || curSquare.contains("{")) {
             return null;
         } else {
@@ -461,7 +463,8 @@ public class Move {
      * @param colIdx column of the square setting the first tile
      * @param direction direction of setting tiles
      * @return a string of new created but yet validated word, and a list of integer storing
-     * the row/col indexes of the squares where the using tiles have been set in.
+     * the row/col indexes of the squares where the using tiles have been set in;
+     * always non-null, key of the return can be null if went out of the board's bound
      */
     public AbstractMap.SimpleEntry<String, List<Integer>> buildWordForFirstMove(String inputLetters, int rowIdx, int colIdx, String direction) {
 
@@ -514,7 +517,8 @@ public class Move {
      * @param colIdx column of the square setting the first tile
      * @param direction direction of setting tiles
      * @return a new created string using all the letter tiles from player's input, and a list of integer storing
-     * the row/col indexes of the squares where the using tiles have been set in.
+     * the row/col indexes of the squares where the using tiles have been set in;
+     * always non-null, key of the return can be null if went out of the board's bound
      */
     public AbstractMap.SimpleEntry<String, List<Integer>> buildWordUsingTileLetters(String inputLetters, int rowIdx, int colIdx, String direction) {
 
@@ -535,7 +539,7 @@ public class Move {
 
             if (direction.equals("down")) {
                 String gridContent = GameBoard.getBoardSquareContent(rowIdx + gridCounter, colIdx);
-                Character gridTileLetter = isGridCoveredByTile(gridContent);
+                Character gridTileLetter = isSquareCoveredByTile(gridContent);
                 if (gridTileLetter == null) {
                     char curLetter = inputLetters.charAt(bitCounter);
                     String testContent = curLetter + GameBoard.getBoardSquareContent(rowIdx + gridCounter, colIdx);
@@ -550,7 +554,7 @@ public class Move {
 
             if (direction.equals("right")) {
                 String gridContent = GameBoard.getBoardSquareContent(rowIdx, colIdx + gridCounter);
-                Character gridTileLetter = isGridCoveredByTile(gridContent);
+                Character gridTileLetter = isSquareCoveredByTile(gridContent);
                 if (gridTileLetter == null) {
                     char curLetter = inputLetters.charAt(bitCounter);
                     String testContent = curLetter + GameBoard.getBoardSquareContent(rowIdx, colIdx + gridCounter);
@@ -586,7 +590,7 @@ public class Move {
      * @param endIdxCol last tile column index
      * @param tilesSetInto a list of integer storing where the using tiles have been set in
      * @return a list of objects comprised of a legal word, two column indexes are respectively
-     * the first and the last letter of the created word. Will be null value if there is zero or
+     * the first and the last letter of the created word; will be null if there is zero or
      * more than one legal new word created on the row.
      */
     public ArrayList<Object> multiWordsOrNoneRow(String preWord, int rowIdx, int colIdx, int endIdxCol, List<Integer> tilesSetInto) {
@@ -619,9 +623,11 @@ public class Move {
         int startFrom = 0, endAT = 0;
         // Get the pre-cap string and post-cap string
         String preCap = "";
-        for (int i = allFilledFrom; i < colIdx; i++) preCap += isGridCoveredByTile(GameBoard.getBoardSquareContent(rowIdx, i));
+        for (int i = allFilledFrom; i < colIdx; i++) preCap +=
+                isSquareCoveredByTile(GameBoard.getBoardSquareContent(rowIdx, i));
         String postCap = "";
-        for (int i = endIdxCol + 1; i <= allFilledTo; i++) postCap += isGridCoveredByTile(GameBoard.getBoardSquareContent(rowIdx, i));
+        for (int i = endIdxCol + 1; i <= allFilledTo; i++) postCap +=
+                isSquareCoveredByTile(GameBoard.getBoardSquareContent(rowIdx, i));
 
         // Try pre-cap plus each letter after using tiles
         for (int i = 0; i < preCap.length(); i++) {
@@ -731,7 +737,7 @@ public class Move {
      * @param endIdxRow last tile row index
      * @param tilesSetInto a list of integer storing where the using tiles have been set in
      * @return a list of objects comprised of a legal word, two column indexes are respectively
-     * the first and the last letter of the created word. Will be null value if there is zero or
+     * the first and the last letter of the created word; will be null if there is zero or
      * more than one legal new word created on the column.
      */
     public ArrayList<Object> multiWordsOrNoneCol(String preWord, int rowIdx, int colIdx, int endIdxRow, List<Integer> tilesSetInto) {
@@ -892,7 +898,7 @@ public class Move {
                 // First find out the range of continuously covered squares in the current column
                 int allFilledFrom = 1, allFilledTo = GameBoard.getSize();
                 for (int up = rowIdx - 1; up >= 1; up--) {
-                    Character letter = isGridCoveredByTile(GameBoard.getBoardSquareContent(up, i));
+                    Character letter = isSquareCoveredByTile(GameBoard.getBoardSquareContent(up, i));
                     if (letter == null) {
                         allFilledFrom = up + 1;
                         break;
@@ -901,7 +907,7 @@ public class Move {
                     }
                 }
                 for (int down = rowIdx + 1; down <= GameBoard.getSize(); down++) {
-                    Character letter = isGridCoveredByTile(GameBoard.getBoardSquareContent(down, i));
+                    Character letter = isSquareCoveredByTile(GameBoard.getBoardSquareContent(down, i));
                     if (letter == null) {
                         allFilledTo = down - 1;
                         break;
@@ -931,7 +937,7 @@ public class Move {
                 // First find out the range of continuously covered squares in the current row
                 int allFilledFrom = 0, allFilledTo = GameBoard.getSize() - 1;
                 for (int left = colIdx - 1; left >= 0; left--) {
-                    Character letter = isGridCoveredByTile(GameBoard.getBoardSquareContent(i, left));
+                    Character letter = isSquareCoveredByTile(GameBoard.getBoardSquareContent(i, left));
                     if (letter == null) {
                         allFilledFrom = left + 1;
                         break;
@@ -940,7 +946,7 @@ public class Move {
                     }
                 }
                 for (int right = colIdx + 1; right < GameBoard.getSize(); right++) {
-                    Character letter = isGridCoveredByTile(GameBoard.getBoardSquareContent(i, right));
+                    Character letter = isSquareCoveredByTile(GameBoard.getBoardSquareContent(i, right));
                     if (letter == null) {
                         allFilledTo = right - 1;
                         break;

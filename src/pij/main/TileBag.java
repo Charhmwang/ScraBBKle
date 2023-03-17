@@ -66,9 +66,11 @@ public class TileBag {
     /**
      * Adds tiles into this TileBag.
      *
-     * @param letter Tile letter
-     * @param points points of the letter
-     * @param amount amount of the adding tile
+     * @param letter Tile letter; must be an uppercase alphabet letter or question mark
+     * @param points points of the letter;
+     *               must be equal to the letter's corresponding points in the constructor
+     * @param amount amount of the adding tile;
+     *               must be equal to the letter's corresponding amount in the constructor
      */
     public void addTiles(char letter, int points ,int amount) {
         for (int i = 0 ; i < amount ; i++)
@@ -77,9 +79,9 @@ public class TileBag {
 
 
     /**
-     * Returns a targeting tile to be taken out from this TileBag, can be null if not found.
+     * Returns a targeting tile to be taken out from this TileBag, can be null if Tile not found.
      *
-     * @return a targeting tile to be taken out from this TileBag or null
+     * @return a targeting tile to be taken out from this TileBag; can be null if Tile not found
      */
     public static Tile takeOutTile(){
         if (isEmpty()) return null;

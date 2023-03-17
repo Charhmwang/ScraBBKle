@@ -25,7 +25,7 @@ public class Scoring {
     /**
      * Constructs a Scoring instance to calculate score for a valid move.
      *
-     * @param move the specific move supposed to be scored
+     * @param move the specific move supposed to be scored; must not be null
      */
     public Scoring(Move move) {
         this.move = move;
@@ -67,7 +67,7 @@ public class Scoring {
             // Checks the square contents,
             // if it's new added letter, contents in form of "G{3}", "G(2)", "T." or "t." or "t{3}" (if using wildcard)
             // if it's existed letter, contents in form of "G2" "I1" "g3" (if using wildcard)
-            if (Move.isGridCoveredByTile(square) != null) { // already covered by a tile
+            if (Move.isSquareCoveredByTile(square) != null) { // already covered by a tile
                 scoreWithoutPremiumWord += getNumber(square);
             } else { // new tile maybe with premium factors
                 char letter = square.charAt(0);
@@ -109,7 +109,7 @@ public class Scoring {
     /**
      * Calculates the total factor from the premium word square(s).
      *
-     * @param factorInPremiumWordSqr list of premium word square factors
+     * @param factorInPremiumWordSqr list of premium word square factors; must not be null
      * @return the total factor from the premium word square(s)
      */
     public int getWordFactorProduct(List<Integer> factorInPremiumWordSqr) {
@@ -124,7 +124,7 @@ public class Scoring {
     /**
      * Returns the factor number in a premium letter or word square.
      *
-     * @param square the contents of a premium letter or word square
+     * @param square the contents of a premium letter or word square; must not be null or empty string
      * @return the factor number in a premium letter or word square
      */
     public int getNumber(String square) {
@@ -143,7 +143,7 @@ public class Scoring {
     /**
      * Reduce the sum of the values of the player's own un-played tiles from its score.
      *
-     * @param player the specific player to get score reduced
+     * @param player the specific player to get score reduced; must not be null
      */
     public static void removeScoresFromRemainedTiles(Player player) {
         int remove = getSumValuesOfRack(player.getTileRack());
@@ -154,7 +154,7 @@ public class Scoring {
     /**
      * Returns the sum of the values of all the tiles on the rack.
      *
-     * @param tileRack the TileRack to be checked
+     * @param tileRack the TileRack to be checked; must not be null
      * @return sum of the values of all the tiles on the rack
      */
     public static int getSumValuesOfRack(TileRack tileRack) {

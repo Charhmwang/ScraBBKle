@@ -33,7 +33,7 @@ public class TileRack {
     /**
      * Returns all the current tiles on this rack.
      *
-     * @return all the current tiles on this rack.
+     * @return all the current tiles on this rack; can be null if rack is empty
      */
     public List<Tile> getTiles() { return tiles; }
 
@@ -57,7 +57,7 @@ public class TileRack {
     /**
      * Returns amount of the current tiles on this rack.
      *
-     * @return amount of the current tiles on this rack
+     * @return amount of the current tiles on this rack; always included between 0 and 7
      */
     public int getTilesAmount() { return tiles.size(); }
 
@@ -76,7 +76,7 @@ public class TileRack {
     /**
      * Take a tile of the specific letter off from this rack.
      *
-     * @param letter a tile of which letter is supposed to be taken off from rack
+     * @param letter a tile of which letter is supposed to be taken off from rack; must non-null
      */
     public void takeOutTileFromRack(char letter) {
         Tile tile = isTileExisting(letter);
@@ -88,8 +88,8 @@ public class TileRack {
      * Returns a boolean result whether the player's input letters are all
      * from the current tile rack.
      *
-     * @param rack the targeted rack to be checked for input letters
-     * @param letters player's input for indicating the word
+     * @param rack the targeted rack to be checked for input letters; must not be null
+     * @param letters player's input for indicating the word; must not be null or empty string
      * @return a boolean result whether the player's input letters are all
      * from the current tile rack
      */
@@ -121,10 +121,10 @@ public class TileRack {
     }
 
     /**
-     * Returns a Tile if a Tile of the specific letter exists, null if not found.
+     * Returns a Tile if a Tile of the specific letter exists; null if Tile not found.
      *
-     * @param letter a tile of which letter is supposed to be found
-     * @return a Tile if a tile of the specific letter exists, null if not found
+     * @param letter a tile of which letter is supposed to be found; must not be null
+     * @return a Tile if a tile of the specific letter exists; null if Tile not found
      */
     public Tile isTileExisting(char letter) {
 
@@ -147,7 +147,8 @@ public class TileRack {
     /**
      * Enable to print out this TileRack's contents.
      *
-     * @return a String represents the move's contents composed of input tile letters, position and direction.
+     * @return a String represents the move's contents composed of input tile letters, position and direction;
+     * always non-null and non-empty string.
      */
     @Override
     public String toString() {

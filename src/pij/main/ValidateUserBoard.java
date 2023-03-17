@@ -23,7 +23,7 @@ public class ValidateUserBoard {
      * Constructs a new board validation with the given user file path.
      * Assign File attribute value using the user file path name.
      *
-     * @param userFilePath the board resource file path name
+     * @param userFilePath the board resource file path name; must not be null or empty string
      */
     public ValidateUserBoard(String userFilePath) {
         this.f = new File(userFilePath);

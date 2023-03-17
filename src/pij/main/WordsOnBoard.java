@@ -38,7 +38,7 @@ public class WordsOnBoard {
      * If the instance has already been initiated, then return the created one.
      * Ensures the WordsOnBoard instance can be created once only in the program.
      *
-     * @return the sole WordsOnBoard instance
+     * @return the sole WordsOnBoard instance; always non-null
      */
     public synchronized static WordsOnBoard getInstance() {
         if (instance == null) {
@@ -55,7 +55,7 @@ public class WordsOnBoard {
      * @param startCol the column of the word's first letter square
      * @param endRow the row of the word's last letter square
      * @param endCol the column of the word's last letter square
-     * @param word the new created adding word
+     * @param word the new created adding word; must not be null or empty string
      */
     public static void addWord(int startRow, int startCol, int endRow, int endCol, String word) {
         ArrayList<Integer> list = new ArrayList<>();
