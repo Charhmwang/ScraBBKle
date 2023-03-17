@@ -34,7 +34,7 @@ public class GameBoard {
     /** The size of a GameBoard. Must between (including) 12 and 26. */
     private static int size;
 
-    /** The centre square of board. */
+    /** The centre square of board. List must include two elements, one is row index, the other is column. */
     private static List<Integer> CentreSquare;
 
 
@@ -51,7 +51,7 @@ public class GameBoard {
      * If the instance has already been initiated, then return the created one.
      * Ensures the GameBoard instance can be created once only in the program.
      *
-     * @return the sole GameBoard instance
+     * @return the sole GameBoard instance; always non-null
      */
     public synchronized static GameBoard getInstance() {
         if (gameBoardInstance == null) {
@@ -257,7 +257,7 @@ public class GameBoard {
     /**
      * Returns the size of the game board.
      *
-     * @return size of the game board
+     * @return size of the game board; always included between 12 and 26
      */
     public static int getSize() { return size; }
 
@@ -274,9 +274,9 @@ public class GameBoard {
     /**
      * Edits board square contents.
      *
-     * @param row the targeting row
-     * @param col the targeting column
-     * @param letter the new content
+     * @param row the targeting row; must include between 1 and board size
+     * @param col the targeting column; must include between 0 and board size minus 1
+     * @param letter the new content; must non-null and non-empty
      */
     public static void reviseBoard(int row, int col, String letter) { board[row][col] = letter; }
 
@@ -284,8 +284,8 @@ public class GameBoard {
     /**
      * To check whether the specific square's initial contents has been revised.
      *
-     * @param row row index of the square
-     * @param col column index of the square
+     * @param row row index of the square; must include between 1 and board size
+     * @param col column index of the square; must include between 0 and board size minus 1
      * @return a boolean result whether the square's initial contents has been revised
      */
     public static boolean isSquareRevised(int row, int col) {
@@ -298,9 +298,9 @@ public class GameBoard {
     /**
      * To get the specific square's contents on the board.
      *
-     * @param row row index of the square
-     * @param col column index of the square
-     * @return the square's contents as a string
+     * @param row row index of the square; must include between 1 and board size
+     * @param col column index of the square; must include between 0 and board size minus 1
+     * @return the square's contents as a string; always non-null and non-empty
      */
     public static String getBoardSquareContent(int row, int col) { return board[row][col]; }
 
@@ -308,7 +308,7 @@ public class GameBoard {
     /**
      * Overloads chooseBoard method for the JUnit tests.
      *
-     * @param userFilePath filepath of the board resource file
+     * @param userFilePath filepath of the board resource file; must non-null
      */
     public void chooseBoard(String userFilePath) {
         this.file = new File(userFilePath);
@@ -319,7 +319,7 @@ public class GameBoard {
     /**
      * Overloads setSize method for the JUnit tests.
      *
-     * @param s size of the game board
+     * @param s size of the game board; must include between 12 and 26
      */
     public void setSize(int s) { size = s; }
 

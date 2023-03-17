@@ -112,8 +112,8 @@ public class ComputerAction extends Action {
      * After each move built, remove the board change for the next move try.
      * If it is a valid move, add to the list of storing valid moves.
      *
-     * @param tryMove the currently trying move
-     * @param validMoves list of valid moves
+     * @param tryMove the currently trying move; must non-null
+     * @param validMoves list of valid moves; must non-null
      */
     public void ifValidMove(Move tryMove, List<Move> validMoves) {
         tryMove.recoverBoardSquareContentToInitial();
@@ -136,8 +136,8 @@ public class ComputerAction extends Action {
     /**
      * Adds each possible string made of 1 tile from tile rack to the list of storing strings of different sequences.
      *
-     * @param tiles the tiles on rack currently
-     * @param allTheLetterSequences list of saving all the possible built input strings
+     * @param tiles the tiles on rack currently; must non-null
+     * @param allTheLetterSequences list of saving all the possible built input strings; must non-null
      */
     public void getSeqFor1Bit(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
@@ -150,8 +150,8 @@ public class ComputerAction extends Action {
     /**
      * Adds each possible string made of 2 tiles from tile rack to the list of storing strings of different sequences.
      *
-     * @param tiles the tiles on rack currently
-     * @param allTheLetterSequences list of saving all the possible built input strings
+     * @param tiles the tiles on rack currently; must non-null
+     * @param allTheLetterSequences list of saving all the possible built input strings; must non-null
      */
     public void getSeqFor2Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
@@ -170,8 +170,8 @@ public class ComputerAction extends Action {
     /**
      * Adds each possible string made of 3 tiles from tile rack to the list of storing strings of different sequences.
      *
-     * @param tiles the tiles on rack currently
-     * @param allTheLetterSequences list of saving all the possible built input strings
+     * @param tiles the tiles on rack currently; must non-null
+     * @param allTheLetterSequences list of saving all the possible built input strings; must non-null
      */
     public void getSeqFor3Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
@@ -196,8 +196,8 @@ public class ComputerAction extends Action {
     /**
      * Adds each possible string made of 4 tiles from tile rack to the list of storing strings of different sequences.
      *
-     * @param tiles the tiles on rack currently
-     * @param allTheLetterSequences list of saving all the possible built input strings
+     * @param tiles the tiles on rack currently; must non-null
+     * @param allTheLetterSequences list of saving all the possible built input strings; must non-null
      */
     public void getSeqFor4Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
@@ -228,8 +228,8 @@ public class ComputerAction extends Action {
     /**
      * Adds each possible string made of 5 tiles from tile rack to the list of storing strings of different sequences.
      *
-     * @param tiles the tiles on rack currently
-     * @param allTheLetterSequences list of saving all the possible built input strings
+     * @param tiles the tiles on rack currently; must non-null
+     * @param allTheLetterSequences list of saving all the possible built input strings; must non-null
      */
     public void getSeqFor5Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
@@ -266,8 +266,8 @@ public class ComputerAction extends Action {
     /**
      * Adds each possible string made of 6 tiles from tile rack to the list of storing strings of different sequences.
      *
-     * @param tiles the tiles on rack currently
-     * @param allTheLetterSequences list of saving all the possible built input strings
+     * @param tiles the tiles on rack currently; must non-null
+     * @param allTheLetterSequences list of saving all the possible built input strings; must non-null
      */
     public void getSeqFor6Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {
@@ -310,8 +310,8 @@ public class ComputerAction extends Action {
     /**
      * Adds each possible string made of 7 tiles from tile rack to the list of storing strings of different sequences.
      *
-     * @param tiles the tiles on rack currently
-     * @param allTheLetterSequences list of saving all the possible built input strings
+     * @param tiles the tiles on rack currently; must non-null
+     * @param allTheLetterSequences list of saving all the possible built input strings; must non-null
      */
     public void getSeqFor7Bits(List<Tile> tiles, List<String> allTheLetterSequences) {
         for (int a = 0; a < 7; a++) {

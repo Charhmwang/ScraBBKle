@@ -32,10 +32,12 @@ public class HumanAction extends Action{
         boolean valid = false;
         Move move = null;
         while (!valid) {
-            System.out.println("Please enter your move with letter sequence, position, and direction (d for down," +
-                    " r for right) separated by commas. Entering just two commas passes. (Type \'S\' to skip): ");
+            System.out.println("Please enter your move with letter sequence, position, " +
+                    "and direction (d for down, r for right) separated by commas." +
+                    "\nEntering just two commas passes. " +
+                    "(Type two commas as \",,\" to skip the move): ");
             String input = System.console().readLine();
-            if (input.equals("S")) break;
+            if (input.equals(",,")) break;
 
             if (input.chars().filter(ch -> ch == ',').count() == 2) {
                 strArr = input.split(",");

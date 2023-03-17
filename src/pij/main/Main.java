@@ -3,24 +3,20 @@ package pij.main;
 import java.io.IOException;
 
 /**
- * A shipment consists of 1 or more parcels.
- * A parcel consists of 1 or more Products.
- * Objects of this class can currently only store the contents of a Shipment,
- * provide a String representation, and allow limited access to information
- * about the contents.
+ * Represent the ScraBBKle game overall.
+ * Initiate the game board.
+ * Create two players with tile racks set in, and pass into the created ScraBBle
+ * class instance to start the game.
  *
- * Further functionality may be provided in a later version of class Shipment.
- *
- * @author Carsten Fuhs
- * @version 0.1
+ * @author Haomeng Wang
+ * @version 1.0
  */
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        // Initiate board and game
+        // Initiate board
         GameBoard board = GameBoard.getInstance();
         board.chooseBoard();
-        ScraBBKle play = ScraBBKle.getInstance();
 
         // Initiate players
         Player human = new Player(true);
@@ -32,8 +28,8 @@ public class Main {
         TileRack pcRack = new TileRack();
         computer.setTileRack(pcRack);
 
-        // Set the player, tile rack into game class Scrabble
-        play.startGame(human, computer);
+        // Set the players into game class Scrabble
+        ScraBBKle scraBBKle = ScraBBKle.getInstance(human, computer);
 
     }
 }

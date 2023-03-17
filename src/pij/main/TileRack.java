@@ -85,7 +85,7 @@ public class TileRack {
 
 
     /**
-     * Returns a a boolean result whether the player's input letters are all
+     * Returns a boolean result whether the player's input letters are all
      * from the current tile rack.
      *
      * @param rack the targeted rack to be checked for input letters
@@ -94,7 +94,8 @@ public class TileRack {
      * from the current tile rack
      */
     public static boolean validateTilesFromRack(TileRack rack, String letters) {
-        // memorize the tiles letters and each letter's amounts
+
+        // Memorize the tiles letters and each letter's amount
         Map<Character, Integer> letterAmountOnRack = new HashMap<>();
         for (Tile tile : rack.getTiles()) {
             if (!letterAmountOnRack.containsKey(tile.getLetter())) {
@@ -104,11 +105,12 @@ public class TileRack {
                 letterAmountOnRack.replace(tile.getLetter(), oldValue + 1);
             }
         }
-        // validate letters using memoization
+
+        // Validate letters using memoization
         for (int i = 0; i < letters.length(); i++) {
             char ch = letters.charAt(i);
             if (Character.isLowerCase(ch)) ch = '?';
-            // letter not existing or exceed the letter's using amount
+            // Letter not existing or exceed the letter tiles amount
             if (!letterAmountOnRack.containsKey(ch) || letterAmountOnRack.get(ch) == 0) return false;
             else {
                 int oldValue = letterAmountOnRack.get(ch);

@@ -3,86 +3,115 @@ package pij.main;
 import java.util.ArrayList;
 import java.util.List;
 
-// Present the scores getting from each move
+/**
+ * Scoring class is to score a specific valid move.
+ * Object of this class are immutable: after an object of this class has been created,
+ * one cannot change the value of its attribute.
+ *
+ * @author Haomeng Wang
+ * @version 1.0
+ */
 public class Scoring {
 
+    /** The score of the given move. Value assigned in constructor.
+     * Always non-null after object creation. Immutable. */
     private final int score;
+
+    /** The specific move to be scored.
+     * Always non-null after object creation. Immutable. */
     private final Move move;
 
+
+    /**
+     * Constructs a Scoring instance to calculate score for a valid move.
+     *
+     * @param move the specific move supposed to be scored
+     */
     public Scoring(Move move) {
         this.move = move;
         this.score = calculateMoveScore();
     }
 
+
+    /**
+     * Returns the score of the move gained from this Scoring.
+     *
+     * @return the score of the move gained
+     */
     public int getScore() { return score; }
 
-    public int calculateMoveScore() {
-        int totalScoreOfThisMove = 0;
-        int scoreWithoutPremiumWord = 0;
 
+    /**
+     * Calculates the move gaining score. Each case is commented in the following code.
+     *
+     * @return the calculated score
+     */
+    public int calculateMoveScore() {
+        int totalScoreOfThisMove;
+        int scoreWithoutPremiumWord = 0;
         int wordSize = move.getMadeNewWord().length();
-        //( (newWord, idxOfNewWord), tilesSetInto )
-        int startRow = move.get_start_and_endPosOfNewWord().get(0), startCol = move.get_start_and_endPosOfNewWord().get(1);
-        //System.out.println("startRow: " + startRow + "; startCol: " + startCol);  //debug found!! startRow is 1 higher num
+        int startRow = move.get_start_and_endPosOfNewWord().get(0);
+        int startCol = move.get_start_and_endPosOfNewWord().get(1);
         boolean hasPremiumWordSqr  = false;
         List<Integer> factorInPremiumWordSqr = new ArrayList<>();
+
         for (int i = 0; i < wordSize; i++) {
-            //System.out.println("i: " + i);//debug
-            String grid = "";
+            String square;
             if (move.getDirection().equals("right")) {
-                grid = GameBoard.getBoardSquareContent(startRow, startCol + i);
+                square = GameBoard.getBoardSquareContent(startRow, startCol + i);
             }
             else {
-                grid = GameBoard.getBoardSquareContent(startRow + i, startCol);
+                square = GameBoard.getBoardSquareContent(startRow + i, startCol);
             }
 
-
-            //System.out.println(grid); //debug
-            // check grid content, if it's new added letter, content is in form of "G{3}", "G(2)", "T." or "t." or "t{3}"(if used wildcard)
-            // if it's existed letter, content is in form of "G2" "I1" "g3"(if used wildcard)
-            if (Move.isGridCoveredByTile(grid) != null) { // already covered by a tile
-                scoreWithoutPremiumWord += getNumber(grid);
+            // Checks the square contents,
+            // if it's new added letter, contents in form of "G{3}", "G(2)", "T." or "t." or "t{3}" (if using wildcard)
+            // if it's existed letter, contents in form of "G2" "I1" "g3" (if using wildcard)
+            if (Move.isGridCoveredByTile(square) != null) { // already covered by a tile
+                scoreWithoutPremiumWord += getNumber(square);
             } else { // new tile maybe with premium factors
-                char letter = grid.charAt(0);
-                if (grid.charAt(1) == '.') {
+                char letter = square.charAt(0);
+                if (square.charAt(1) == '.') {
                     if (Character.isUpperCase(letter))
                         scoreWithoutPremiumWord += LetterPoints.getMap().get(letter);
                     else scoreWithoutPremiumWord += 3;
-                    //System.out.println("Plus this grid gained score: " + scoreWithoutPremiumWord); //debug
                 }
-                if (grid.charAt(1) == '(') {  // premium letter, multiply factor of the current letter
-                    int factor = getNumber(grid);
+                if (square.charAt(1) == '(') {  // premium letter, multiply factor of the current letter
+                    int factor = getNumber(square);
                     if (Character.isUpperCase(letter))
                         scoreWithoutPremiumWord += LetterPoints.getMap().get(letter) * factor;
                     else scoreWithoutPremiumWord += 3 * factor;
-                    //System.out.println("Plus this grid gained score: " + scoreWithoutPremiumWord); //debug
                 }
-                if (grid.charAt(1) == '{') {  // !premium word, multiply the whole word value with factor
+                if (square.charAt(1) == '{') {  // !premium word, multiply the whole word value with factor
                     hasPremiumWordSqr = true;
                     if (Character.isUpperCase(letter))
                         scoreWithoutPremiumWord += LetterPoints.getMap().get(letter);
                     else scoreWithoutPremiumWord += 3;
-                    factorInPremiumWordSqr.add(getNumber(grid));
-                    //System.out.println("Plus this grid gained score: " + scoreWithoutPremiumWord); //debug
+                    factorInPremiumWordSqr.add(getNumber(square));
                 }
             }
         }
 
         if (hasPremiumWordSqr) {
-            // Calculate the product in list
+            // Calculates the product in the list of premium word square factors
             int factorProduct = getWordFactorProduct(factorInPremiumWordSqr);
             totalScoreOfThisMove = scoreWithoutPremiumWord * factorProduct;
         }
         else totalScoreOfThisMove = scoreWithoutPremiumWord;
 
-        // Check whether player used all 7 tiles in this move to get awarded 70 extra points
+        // Checks whether player used all 7 tiles in this move to get awarded 70 extra points
         if (move.getTilesSetInto().size() == 7) totalScoreOfThisMove += 70;
-
-        //System.out.println("Word gained total score: " + totalScoreOfThisMove);// debug
 
         return totalScoreOfThisMove;
     }
 
+
+    /**
+     * Calculates the total factor from the premium word square(s).
+     *
+     * @param factorInPremiumWordSqr list of premium word square factors
+     * @return the total factor from the premium word square(s)
+     */
     public int getWordFactorProduct(List<Integer> factorInPremiumWordSqr) {
         int res = 1;
         for (int i : factorInPremiumWordSqr) {
@@ -91,10 +120,17 @@ public class Scoring {
         return res;
     }
 
-    public int getNumber(String grid) {
+
+    /**
+     * Returns the factor number in a premium letter or word square.
+     *
+     * @param square the contents of a premium letter or word square
+     * @return the factor number in a premium letter or word square
+     */
+    public int getNumber(String square) {
         String factorStr = "";
-        for (int i = 0; i < grid.length(); i++) {
-            char cur = grid.charAt(i);
+        for (int i = 0; i < square.length(); i++) {
+            char cur = square.charAt(i);
             if (Character.isDigit(cur)) {
                 factorStr += cur;
             }
@@ -104,13 +140,23 @@ public class Scoring {
     }
 
 
-    // At the end of the game, each player’s score is reduced by the sum of the values of their own un-played tiles.
+    /**
+     * Reduce the sum of the values of the player's own un-played tiles from its score.
+     *
+     * @param player the specific player to get score reduced
+     */
     public static void removeScoresFromRemainedTiles(Player player) {
         int remove = getSumValuesOfRack(player.getTileRack());
         player.reduceScore(remove);
     }
 
 
+    /**
+     * Returns the sum of the values of all the tiles on the rack.
+     *
+     * @param tileRack the TileRack to be checked
+     * @return sum of the values of all the tiles on the rack
+     */
     public static int getSumValuesOfRack(TileRack tileRack) {
         int sum = 0;
         for (Tile t : tileRack.getTiles()) {

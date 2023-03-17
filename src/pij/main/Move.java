@@ -67,9 +67,9 @@ public class Move {
      *
      * @param player the role of the Player; must not be null
      * @param isFirstStep whether the first move of game; must not be null
-     * @param inputLetters string composed of letters from the using tiles
-     * @param position position of the starting square to set tiles
-     * @param direction direction of setting tiles
+     * @param inputLetters string composed of letters from the using tiles; must not be null or empty
+     * @param position position of the starting square to set tiles; must not be null or empty
+     * @param direction direction of setting tiles; must not be null or empty
      */
     public Move(Player player, boolean isFirstStep, String inputLetters, String position, String direction) {
         this.inputLetters = inputLetters;
@@ -104,7 +104,7 @@ public class Move {
     /**
      * Returns the string composed of letters from the using tiles from this move.
      *
-     * @return string composed of letters from the using tiles
+     * @return string composed of letters from the using tiles; always non-null and non-empty string
      */
     public String getInputLetters() { return this.inputLetters; }
 
@@ -112,7 +112,7 @@ public class Move {
     /**
      * Returns column of the square in which this move setting the first tile.
      *
-     * @return column of the square setting the first tile.
+     * @return column of the square setting the first tile
      */
     public int getCol() { return this.col; }
 
@@ -120,7 +120,7 @@ public class Move {
     /**
      * Returns row of the square in which this move setting the first tile.
      *
-     * @return row of the square setting the first tile.
+     * @return row of the square setting the first tile
      */
     public int getRow() { return this.row; }
 
@@ -128,7 +128,7 @@ public class Move {
     /**
      * Returns direction of setting tiles from this move.
      *
-     * @return direction of setting tiles
+     * @return direction of setting tiles; always non-null and non-empty string
      */
     public String getDirection() { return this.direction; }
 
@@ -144,7 +144,8 @@ public class Move {
     /**
      * Returns the squares location where tiles are planned to set in.
      *
-     * @return list of row or column indexes of the squares where tiles are planned to set in.
+     * @return list of row or column indexes of the squares where tiles are planned to set in;
+     * can be null if the move did not pass CHECK 1 in validateMove method
      */
     public List<Integer> getTilesSetInto() { return this.tilesSetInto; }
 
@@ -152,15 +153,16 @@ public class Move {
     /**
      * Returns new created word on the board from this move.
      *
-     * @return new created word on the board.
+     * @return new created word on the board; can be null if the move is invalid
      */
     public String getMadeNewWord() { return this.madeNewWord; }
 
 
     /**
-     * Returns new created word on the board from this move.
+     * Returns indexes of the first and last square of the new created word on the board from this move.
      *
-     * @return new created word on the board.
+     * @return indexes of the first and last square of the new created word on the board;
+     * can be null if the move did not successfully pass the validation in validateMove method
      */
     public List<Integer> get_start_and_endPosOfNewWord() { return this.start_and_endPosOfNewWord; }
 
@@ -168,10 +170,10 @@ public class Move {
     /**
      * Checks whether the move violates any of the game rules after setting specific tiles in.
      *
-     * @param inputLetters string composed of letters from the using tiles
-     * @param row row of the square setting the first tile
-     * @param col column of the square setting the first tile
-     * @param direction direction of setting tiles
+     * @param inputLetters string composed of letters from the using tiles;
+     * @param row row of the square setting the first tile; must include between 1 and board size
+     * @param col column of the square setting the first tile; must include between 0 and board size minus 1
+     * @param direction direction of setting tiles; must not be null or empty string
      * @return a list of integer storing the row/col indexes of the squares where the using tiles
      * have been set in during validation, a string of new created word, a list of integers storing
      * the square indexes of the new created word's first and last letter. Can be null value.
@@ -349,6 +351,8 @@ public class Move {
             if (Character.isLowerCase(letter)) letterPoints = 3;
             else letterPoints = LetterPoints.getMap().get(letter);
             String letter_with_points = " " + letter + letterPoints + " ";
+            if (letterPoints > 9) letter_with_points =
+                    letter_with_points.stripTrailing();
 
             if (direction.equals("right")) {
                 GameBoard.reviseBoard(row, tilesSetInto.get(i), letter_with_points);
